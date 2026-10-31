@@ -1,0 +1,522 @@
+.section {
+  padding-block: var(--section-space) calc(var(--section-space) - 20px);
+}
+
+.section > .eyebrow,
+.section > :global(.eyebrow) {
+  margin-bottom: 14px;
+}
+
+.narrow {
+  max-width: 760px;
+}
+
+/* ───── Services ───── */
+.cards3 {
+  margin-top: 64px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 40px;
+  border-radius: var(--radius-l);
+  background: var(--bg-alt);
+}
+
+.card h3 {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.card p {
+  color: var(--muted);
+}
+
+.more {
+  margin-top: auto;
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--blue);
+  text-decoration: none;
+}
+
+.arrow {
+  display: inline-block;
+  transition: transform var(--dur-ui) var(--ease-ui);
+}
+
+:global([dir="rtl"]) .arrow {
+  transform: scaleX(-1);
+}
+
+.more:hover .arrow {
+  transform: translateX(3px);
+}
+
+:global([dir="rtl"]) .more:hover .arrow {
+  transform: scaleX(-1) translateX(3px);
+}
+
+/* ───── Destinations ───── */
+.destinations {
+  background: var(--bg-alt);
+}
+
+.destinations[data-motion="on"] {
+  height: 250vh;
+}
+
+.destSticky {
+  padding-block: 120px;
+}
+
+.destinations[data-motion="on"] .destSticky {
+  position: sticky;
+  top: 68px;
+  min-height: calc(100vh - 68px);
+  display: flex;
+  align-items: center;
+  padding-block: 40px;
+}
+
+.destGrid {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 64px;
+  align-items: center;
+}
+
+.destCopy {
+  flex: 1 1 360px;
+  min-width: 0;
+}
+
+.destCopy :global(.eyebrow) {
+  margin-bottom: 14px;
+}
+
+.badge {
+  display: inline-flex;
+  margin-top: 20px;
+  padding: 6px 12px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--line);
+  background: var(--surface);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.destList {
+  list-style: none;
+  margin: 40px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.destButton {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  min-height: 56px;
+  padding: 6px 0;
+  border: 0;
+  background: transparent;
+  text-align: start;
+  font-size: clamp(24px, 2.6vw, 34px);
+  font-weight: 500;
+  letter-spacing: var(--tracking-title);
+  color: var(--muted);
+  cursor: pointer;
+  transition: color var(--dur-ui) var(--ease-ui);
+}
+
+.destButton[aria-pressed="true"] {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.destDot {
+  flex: 0 0 auto;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: transparent;
+  transition: background-color var(--dur-ui) var(--ease-ui);
+}
+
+.destButton[aria-pressed="true"] .destDot {
+  background: var(--accent);
+}
+
+.destMedia {
+  position: relative;
+  flex: 1 1 520px;
+  min-width: 0;
+  margin: 0;
+  height: min(600px, 62vh);
+  min-height: 360px;
+  border-radius: var(--radius-l);
+  overflow: hidden;
+  background: var(--blue-soft);
+}
+
+.arc {
+  position: absolute;
+  z-index: 2;
+  inset-inline: 7%;
+  top: 40px;
+  width: 86%;
+}
+
+.arc path {
+  stroke-dasharray: 2 8;
+}
+
+.arcLabel {
+  font-family: var(--font-latin), sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  fill: var(--ink);
+}
+
+.destPhoto {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  padding: 28px 32px;
+  background: var(--blue-soft);
+  opacity: 0;
+  transform: scale(1.06);
+  transition: opacity 600ms var(--ease-reveal), transform 1200ms var(--ease-reveal);
+}
+
+.destPhoto[data-active="true"] {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.destPhoto figcaption {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+/* ───── Featured ───── */
+.featuredWrap {
+  padding-top: var(--section-space);
+}
+
+.featured {
+  position: relative;
+  min-height: 620px;
+  display: flex;
+  align-items: flex-end;
+  border-radius: var(--radius-l);
+  overflow: hidden;
+  background: var(--night-surface);
+}
+
+.mediaNote {
+  position: absolute;
+  top: 28px;
+  inset-inline-end: 32px;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: var(--night-muted);
+}
+
+.featuredCopy {
+  max-width: 620px;
+  padding: 48px;
+}
+
+.featuredCopy h2 {
+  margin-top: 12px;
+  font-size: clamp(32px, 3.8vw, 48px);
+  line-height: 1.12;
+  font-weight: 700;
+  letter-spacing: var(--tracking-title);
+  color: var(--night-ink);
+}
+
+.nightEyebrow {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--night-accent);
+}
+
+:global([lang="ar"]) .nightEyebrow {
+  text-transform: none;
+}
+
+.lightButton,
+.sunButton,
+.ghostButton {
+  display: inline-flex;
+  align-items: center;
+  min-height: 52px;
+  padding: 0 28px;
+  border-radius: var(--radius-pill);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 16px;
+  transition: filter var(--dur-ui) var(--ease-ui), background-color var(--dur-ui) var(--ease-ui);
+}
+
+.lightButton {
+  margin-top: 28px;
+  background: var(--night-ink);
+  color: var(--night-bg);
+}
+
+.sunButton {
+  background: var(--night-accent);
+  color: var(--night-bg);
+}
+
+.ghostButton {
+  border: 1px solid rgba(238, 243, 251, 0.3);
+  color: var(--night-ink);
+  font-weight: 600;
+}
+
+.lightButton:hover,
+.sunButton:hover {
+  filter: brightness(1.06);
+}
+
+.ghostButton:hover {
+  background: rgba(238, 243, 251, 0.08);
+}
+
+/* ───── Comfort ───── */
+.cards2 {
+  margin-top: 64px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.cabin {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-l);
+  overflow: hidden;
+}
+
+.cabinImage {
+  height: 300px;
+  display: flex;
+  align-items: flex-end;
+  padding: 24px;
+  background: var(--blue-soft);
+}
+
+.cabinImage p {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.cabinBody {
+  padding: 36px 40px 40px;
+}
+
+.cabinBody h3 {
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.cabinBody ul {
+  margin: 18px 0 0;
+  padding-inline-start: 18px;
+  line-height: 1.9;
+  color: var(--muted);
+}
+
+/* ───── Why ───── */
+.why {
+  border-top: 1px solid var(--line);
+}
+
+.whyGrid {
+  padding-block: 120px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 48px;
+}
+
+.whyGrid h3 {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.whyGrid p {
+  margin-top: 12px;
+  color: var(--muted);
+}
+
+/* ───── Final call to action (night in both themes) ───── */
+.final {
+  position: relative;
+  overflow: hidden;
+  min-height: 720px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 96px var(--gutter);
+  text-align: center;
+  background: var(--night-bg);
+  color: var(--night-ink);
+}
+
+.finalGlow {
+  position: absolute;
+  inset: auto 0 0;
+  height: 260px;
+  background: linear-gradient(180deg, rgba(8, 19, 39, 0) 0%, rgba(216, 176, 98, 0.1) 100%);
+}
+
+.cityLights {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 40px;
+  width: 100%;
+  height: 120px;
+}
+
+.finalCopy {
+  position: relative;
+  max-width: 760px;
+}
+
+.finalCopy h2 {
+  margin-top: 16px;
+}
+
+.finalSub {
+  margin-top: 22px;
+  font-size: 20px;
+  line-height: 1.55;
+  color: var(--night-muted);
+}
+
+.finalActions {
+  margin-top: 36px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+}
+
+/* ───── Footer ───── */
+.footer {
+  border-top: 1px solid var(--line);
+}
+
+.footerRow {
+  padding-block: 64px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 48px;
+  font-size: 15px;
+  color: var(--muted);
+}
+
+.footerBrand {
+  flex: 2 1 260px;
+}
+
+.footerBrand p + p {
+  margin-top: 12px;
+}
+
+.footerLogo {
+  display: block;
+  height: 48px;
+  width: auto;
+}
+
+:global([data-theme="dark"]) .footerLogo {
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.35));
+}
+
+.footerNav {
+  flex: 1 1 160px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.footerNav a {
+  text-decoration: none;
+}
+
+.footerNav a:hover {
+  color: var(--ink);
+}
+
+@media (max-width: 900px) {
+  .cards3,
+  .cards2,
+  .whyGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .card {
+    padding: 28px;
+  }
+
+  .destinations[data-motion="on"] {
+    height: auto;
+  }
+
+  .destinations[data-motion="on"] .destSticky {
+    position: static;
+    min-height: 0;
+    padding-block: 72px;
+  }
+
+  .destMedia {
+    flex-basis: 100%;
+    height: 320px;
+    min-height: 0;
+  }
+
+  .featured {
+    min-height: 480px;
+  }
+
+  .featuredCopy {
+    padding: 28px;
+  }
+
+  .cabinImage {
+    height: 220px;
+  }
+
+  .cabinBody {
+    padding: 28px;
+  }
+
+  .whyGrid {
+    padding-block: 72px;
+    gap: 32px;
+  }
+
+  .final {
+    min-height: 560px;
+  }
+}

@@ -1,0 +1,76 @@
+{
+  "generatedBy": "scripts/aircraft/build.ts",
+  "fans": [
+    "Fan_L",
+    "Fan_R"
+  ],
+  "size": {
+    "length": 9,
+    "span": 8.72
+  },
+  "lights": [
+    {
+      "position": [
+        -2.21,
+        0.06,
+        -4.39
+      ],
+      "color": "#ff3b3b",
+      "kind": "steady"
+    },
+    {
+      "position": [
+        -2.21,
+        0.06,
+        4.39
+      ],
+      "color": "#3dff8a",
+      "kind": "steady"
+    },
+    {
+      "position": [
+        -4.52,
+        0.42,
+        0
+      ],
+      "color": "#ffffff",
+      "kind": "steady"
+    },
+    {
+      "position": [
+        -2.43,
+        0.06,
+        -4.39
+      ],
+      "color": "#ffffff",
+      "kind": "strobe"
+    },
+    {
+      "position": [
+        -2.43,
+        0.06,
+        4.39
+      ],
+      "color": "#ffffff",
+      "kind": "strobe"
+    },
+    {
+      "position": [
+        0.2,
+        0.47,
+        0
+      ],
+      "color": "#ff4a3d",
+      "kind": "beacon"
+    },
+    {
+      "position": [
+        0.6,
+        -0.76,
+        0
+      ],
+      "color": "#ff4a3d",
+      "kind": "beacon"
+    }
+  ]
+}

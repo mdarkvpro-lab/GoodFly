@@ -1,0 +1,46 @@
+.main {
+  max-width: 760px;
+  padding-block: 96px;
+}
+
+.intro {
+  margin-top: 16px;
+  color: var(--muted);
+}
+
+.list {
+  margin: 40px 0 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-m);
+  min-height: 200px;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 18px 24px;
+}
+
+.row + .row {
+  border-top: 1px solid var(--line);
+}
+
+.row dt {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.row dd {
+  margin: 0;
+  font-weight: 600;
+  text-align: end;
+}
+
+.back {
+  display: inline-flex;
+  margin-top: 32px;
+  color: var(--blue);
+  font-weight: 600;
+  text-decoration: none;
+}

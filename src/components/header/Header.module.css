@@ -1,0 +1,140 @@
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--header-bg);
+  backdrop-filter: saturate(1.4) blur(18px);
+  -webkit-backdrop-filter: saturate(1.4) blur(18px);
+  border-bottom: 1px solid var(--line);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  min-height: 68px;
+}
+
+.logo {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+}
+
+.logo img {
+  display: block;
+  height: 48px;
+  width: auto;
+}
+
+/* The royal-blue script needs a soft light halo to stay legible on night navy. */
+:global([data-theme="dark"]) .logo img {
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.35));
+}
+
+.nav {
+  display: flex;
+  gap: 28px;
+  flex-grow: 1;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.nav a {
+  text-decoration: none;
+  color: var(--ink);
+  transition: opacity var(--dur-ui) var(--ease-ui);
+}
+
+.nav a:hover {
+  opacity: 0.7;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-inline-start: auto;
+}
+
+.langButton,
+.iconButton {
+  height: 44px;
+  min-width: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--ink);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color var(--dur-ui) var(--ease-ui);
+}
+
+.langButton {
+  padding: 0 14px;
+  font-family: var(--font-latin), sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.langOther {
+  font-family: var(--font-arabic), sans-serif;
+}
+
+.langButton:hover,
+.iconButton:hover {
+  background: var(--bg-alt);
+}
+
+.sun {
+  display: none;
+}
+
+:global([data-theme="dark"]) .moon {
+  display: none;
+}
+
+:global([data-theme="dark"]) .sun {
+  display: block;
+}
+
+.book {
+  height: 44px;
+  padding: 0 22px;
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--radius-pill);
+  background: var(--cta-bg);
+  color: var(--cta-ink);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 15px;
+  transition: filter var(--dur-ui) var(--ease-ui);
+}
+
+.book:hover {
+  filter: brightness(1.08);
+}
+
+@media (max-width: 960px) {
+  .nav {
+    display: none;
+  }
+}
+
+@media (max-width: 420px) {
+  .row {
+    gap: 10px;
+  }
+
+  .actions {
+    gap: 6px;
+  }
+
+  .book {
+    padding: 0 16px;
+  }
+}

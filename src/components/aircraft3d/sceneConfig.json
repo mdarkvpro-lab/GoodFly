@@ -1,0 +1,32 @@
+{
+  "camera": {
+    "fov": 30,
+    "target": [0.3, -0.12, 0],
+    "aspectTuned": 2.4,
+    "orbit": [
+      { "p": 0, "azimuth": 36, "elevation": 9, "radius": 13.2 },
+      { "p": 0.5, "azimuth": 86, "elevation": 4, "radius": 13.8 },
+      { "p": 1, "azimuth": 146, "elevation": 12, "radius": 15.5 }
+    ],
+    "departure": { "from": 0.8, "forward": 5, "climb": 0.9 }
+  },
+  "lighting": {
+    "light": {
+      "sun": { "color": "#fff3e0", "intensity": 3.0, "position": [8, 12, 6] },
+      "fill": { "color": "#cfe0ff", "intensity": 0.55, "position": [-6, 3, -5] },
+      "hemisphere": { "sky": "#dbe8fb", "ground": "#b9c6d8", "intensity": 0.7 },
+      "environment": 1.0,
+      "exposure": 1.0,
+      "cabinGlow": 0
+    },
+    "dark": {
+      "sun": { "color": "#cfdcff", "intensity": 1.25, "position": [-4, 10, 6] },
+      "fill": { "color": "#5b7bd6", "intensity": 0.45, "position": [6, 2, -5] },
+      "hemisphere": { "sky": "#3e5487", "ground": "#0b1830", "intensity": 0.5 },
+      "environment": 0.35,
+      "exposure": 1.0,
+      "cabinGlow": 1.8
+    }
+  },
+  "shadows": { "bounds": 7, "bias": -0.0004, "normalBias": 0.03 }
+}

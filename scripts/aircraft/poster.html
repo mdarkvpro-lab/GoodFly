@@ -1,0 +1,122 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>GoodFly poster renderer</title>
+<style>html,body{margin:0;background:transparent;overflow:hidden}canvas{display:block}</style>
+<script type="importmap">
+{ "imports": {
+  "three": "/node_modules/three/build/three.module.js",
+  "three/addons/": "/node_modules/three/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<script type="module">
+// Renders the same scene as the site's hero (sceneConfig.json) at scroll 0, without clouds.
+import * as THREE from "three";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
+import { createSkyEnvironment } from "/src/components/aircraft3d/skyEnvironment.js";
+
+const q = new URLSearchParams(location.search);
+const theme = q.get("theme") === "dark" ? "dark" : "light";
+const sign = q.get("dir") === "rtl" ? -1 : 1;
+const [config, anchors] = await Promise.all([
+  fetch("/src/components/aircraft3d/sceneConfig.json").then((r) => r.json()),
+  fetch("/src/components/aircraft3d/aircraftAnchors.json").then((r) => r.json()),
+]);
+const L = config.lighting[theme];
+const W = 1920, H = 800;
+
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(1);
+renderer.setSize(W, H);
+renderer.toneMapping = THREE.ACESFilmicToneMapping; // same as React Three Fiber's default
+renderer.toneMappingExposure = L.exposure;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+document.body.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.environment = createSkyEnvironment(renderer, theme, L.sun.position);
+scene.environmentIntensity = L.environment;
+scene.add(new THREE.HemisphereLight(L.hemisphere.sky, L.hemisphere.ground, L.hemisphere.intensity));
+const sun = new THREE.DirectionalLight(L.sun.color, L.sun.intensity);
+sun.position.set(...L.sun.position);
+sun.castShadow = true;
+sun.shadow.mapSize.set(4096, 4096);
+const S = config.shadows;
+Object.assign(sun.shadow.camera, { left: -S.bounds, right: S.bounds, top: S.bounds, bottom: -S.bounds, near: 1, far: 40 });
+sun.shadow.bias = S.bias;
+sun.shadow.normalBias = S.normalBias;
+scene.add(sun);
+const fill = new THREE.DirectionalLight(L.fill.color, L.fill.intensity);
+fill.position.set(...L.fill.position);
+scene.add(fill);
+
+const gltf = await new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).loadAsync("/public/models/goodfly-airliner.glb");
+const holder = new THREE.Group();
+holder.rotation.y = sign < 0 ? Math.PI : 0;
+const maxAniso = renderer.capabilities.getMaxAnisotropy();
+gltf.scene.traverse((o) => {
+  if (!o.isMesh) return;
+  o.castShadow = o.receiveShadow = true;
+  for (const key of ["map", "normalMap", "roughnessMap", "metalnessMap", "emissiveMap"]) {
+    if (o.material[key]) o.material[key].anisotropy = Math.min(8, maxAniso);
+  }
+  if (o.material.emissiveMap) {
+    o.material.emissive.set(L.cabinGlow > 0 ? "#ffcf8a" : "#000000");
+    o.material.emissiveIntensity = L.cabinGlow;
+  }
+});
+holder.add(gltf.scene);
+
+// Steady navigation lights only (no strobes) — subtle by day, glowing at night.
+const halo = (() => {
+  const c = document.createElement("canvas");
+  c.width = c.height = 128;
+  const g = c.getContext("2d");
+  const grad = g.createRadialGradient(64, 64, 0, 64, 64, 64);
+  grad.addColorStop(0, "rgba(255,255,255,1)");
+  grad.addColorStop(0.18, "rgba(255,255,255,0.55)");
+  grad.addColorStop(0.5, "rgba(255,255,255,0.12)");
+  grad.addColorStop(1, "rgba(255,255,255,0)");
+  g.fillStyle = grad;
+  g.fillRect(0, 0, 128, 128);
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  return t;
+})();
+for (const light of anchors.lights) {
+  if (light.kind !== "steady") continue;
+  const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: halo, color: light.color, blending: THREE.AdditiveBlending, transparent: true, depthWrite: false, toneMapped: false, opacity: theme === "dark" ? 1 : 0.5 }));
+  s.position.set(...light.position);
+  s.scale.setScalar(theme === "dark" ? 0.55 : 0.22);
+  holder.add(s);
+}
+scene.add(holder);
+
+// Camera: first orbit key (same maths as src/components/aircraft3d/orbit.ts).
+// Review views (?view=nose|side) are for checking details while modelling; posters use the default.
+const k = config.camera.orbit[0];
+const DEG = Math.PI / 180;
+const view = q.get("view");
+const camera = new THREE.PerspectiveCamera(view ? 22 : config.camera.fov, W / H, 0.1, 160);
+const [tx, ty, tz] = config.camera.target;
+if (view === "nose") {
+  camera.position.set(sign * 8.2, 0.9, 3.6);
+  camera.lookAt(sign * 3.3, -0.05, 0);
+} else if (view === "side") {
+  camera.position.set(sign * 2.6, 0.1, 9.5);
+  camera.lookAt(sign * 2.6, 0, 0);
+} else {
+  camera.position.set(sign * k.radius * Math.cos(k.elevation * DEG) * Math.cos(k.azimuth * DEG), k.radius * Math.sin(k.elevation * DEG), k.radius * Math.cos(k.elevation * DEG) * Math.sin(k.azimuth * DEG));
+  camera.lookAt(tx * sign, ty, tz);
+}
+
+renderer.render(scene, camera);
+window.__ready = true;
+</script>
+</body>
+</html>

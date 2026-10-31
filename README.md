@@ -1,36 +1,82 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# GoodFly 2.0
 
-## Getting Started
+Nouveau site de l'agence GoodFly — concept « Quiet Luxury Aviation ».
+Le site actuel goodfly.ma n'est pas concerné par ce dépôt.
 
-First, run the development server:
+Maquette approuvée : https://claude.ai/artifact/4cWzjtHn2moST5oKbCXA49
+
+## Lancer le projet
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev            # http://localhost:3000 → redirige vers /fr
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Tests
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm run test:db        # règles des comptes (Postgres en mémoire, aucun service en ligne)
+npm run build          # nécessaire avant les tests navigateur
+npm run test:e2e       # Playwright, bureau 1440 px + mobile 390 px
+npm run test:owner     # console propriétaire (sécurité + règles, navigateur réel)
+npm test               # tout
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Organisation
 
-## Learn More
+| Dossier | Contenu |
+|---|---|
+| `src/app/[lang]` | Pages `/fr` et `/ar` (l'arabe s'affiche de droite à gauche) |
+| `src/i18n` | Textes français et arabes |
+| `src/config/site.ts` | Aéroport de départ par défaut (RBA) et destinations d'exemple |
+| `src/components/hero` | Page d'accueil : emblème soleil-mer du logo (SVG animé), titres, boutons, barre de réservation |
+| `src/components/aircraft3d` | Avion 3D mis de côté (non utilisé pour l'instant, voir son README) |
+| `src/components/sections` | Sections de la page d'accueil |
+| `src/app/globals.css` | Couleurs, typographie, espacements, mouvement (thèmes clair et sombre) |
+| `supabase/migrations` | Rôles et règles des comptes |
+| `owner-console/` | Console propriétaire, locale uniquement (`npm run owner:demo`) — voir son README |
 
-To learn more about Next.js, take a look at the following resources:
+## Avion 3D (mis de côté)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Pas utilisé sur le site pour l'instant (décision du 30/10/2026 : finir le site d'abord). Tout est conservé pour le réactiver plus tard.
+Modèle original GoodFly (aucun modèle tiers, aucune licence) : long-courrier biréacteur généré par code.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npm run build:aircraft   # régénère les GLB + les 4 images fixes
+npm run test:model       # vérifie tailles, compression, structure
+```
 
-## Deploy on Vercel
+| Fichier | Usage | Poids |
+|---|---|---|
+| `public/models/goodfly-airliner.glb` | Ordinateur | ~380 Ko, ~44 000 triangles |
+| `public/models/goodfly-airliner-lite.glb` | Téléphone / appareil modeste | ~160 Ko, ~11 000 triangles |
+| `public/aircraft/poster-{light,dark}-{ltr,rtl}.webp` | Première image + version « animations réduites » | ~25 Ko chacune |
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Source : `scripts/aircraft/` (géométrie, textures PBR, export glTF, rendu des images fixes).
+- Compression : géométrie meshopt, textures WebP. Police du logo : Manrope (licence OFL, `scripts/aircraft/fonts/OFL.txt`).
+- Réglages partagés site ↔ images fixes : `src/components/hero/sceneConfig.json` (caméra, lumières) et `skyEnvironment.js` (reflets du ciel).
+- Qualité automatique : haute / moyenne / basse selon l'appareil, et baisse automatique si l'animation ralentit.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Comptes et droits
+
+| Rôle | Rapports | Agents et clients | Son propre compte | L'autre compte Direction |
+|---|---|---|---|---|
+| Direction (X, Y) | Tout voir | Modifier, désactiver, restaurer | Modifier | Interdit |
+| Propriétaire | Tout | Tout | Tout | Modifier et désactiver |
+
+- Les règles sont appliquées dans la base (RLS + fonctions), pas seulement à l'écran.
+- « Supprimer » un compte = le désactiver ; il reste récupérable 30 jours.
+- Le propriétaire utilise la console locale `owner-console/` (sur son PC uniquement) avec la clé service-role.
+  Cette clé ne doit jamais être déployée sur le site.
+
+## Mouvement et accessibilité
+
+- Page d'accueil : vagues et petit avion animés en CSS/SVG (aucun JavaScript, aucun modèle 3D chargé).
+- Avec « réduire les animations » activé : emblème immobile, pas d'épinglage des destinations.
+
+## Encore provisoire
+
+- Photos, films, numéro WhatsApp, adresse et licence de l'agence : à fournir.
+- Destinations : exemples, non confirmés.
+- Réservation en ligne et espace Direction : phase suivante (Supabase).
+- Console propriétaire : prête, en mode démo tant qu'aucun projet Supabase n'est créé.

@@ -1,0 +1,405 @@
+.hero {
+  position: relative;
+  overflow: hidden;
+  min-height: max(720px, calc(100svh - 68px));
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 40px;
+  padding-block: 48px 56px;
+  background: linear-gradient(180deg, var(--hero-top) 0%, var(--bg) 70%, var(--bg-alt) 100%);
+}
+
+.clouds span {
+  position: absolute;
+  border-radius: 50%;
+  background: var(--cloud);
+  filter: blur(52px);
+  pointer-events: none;
+}
+
+.clouds span:nth-child(1) {
+  inset-inline-start: -120px;
+  top: 58%;
+  width: 760px;
+  height: 220px;
+}
+
+.clouds span:nth-child(2) {
+  inset-inline-end: -160px;
+  top: 14%;
+  width: 820px;
+  height: 260px;
+}
+
+.clouds span:nth-child(3) {
+  inset-inline-start: 30%;
+  top: 78%;
+  width: 900px;
+  height: 200px;
+}
+
+.grid {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 48px;
+}
+
+.copy {
+  flex: 1 1 460px;
+  min-width: 0;
+}
+
+.copy :global(.eyebrow) {
+  margin-bottom: 18px;
+}
+
+.subtitle {
+  margin-top: 22px;
+  max-width: 540px;
+  font-size: clamp(17px, 1.5vw, 20px);
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+.actions {
+  margin-top: 34px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 24px;
+}
+
+.primary {
+  display: inline-flex;
+  align-items: center;
+  min-height: 56px;
+  padding: 0 30px;
+  border-radius: var(--radius-pill);
+  background: var(--cta-bg);
+  color: var(--cta-ink);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 17px;
+  box-shadow: 0 14px 34px -18px var(--cta-bg);
+  transition: transform var(--dur-ui) var(--ease-ui), filter var(--dur-ui) var(--ease-ui);
+}
+
+.primary:hover {
+  filter: brightness(1.06);
+  transform: translateY(-1px);
+}
+
+.secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  color: var(--blue);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 17px;
+}
+
+.arrow {
+  display: inline-block;
+  transition: transform var(--dur-ui) var(--ease-ui);
+}
+
+:global([dir="rtl"]) .arrow {
+  transform: scaleX(-1);
+}
+
+.secondary:hover .arrow {
+  transform: translateX(4px);
+}
+
+:global([dir="rtl"]) .secondary:hover .arrow {
+  transform: scaleX(-1) translateX(4px);
+}
+
+.highlights {
+  list-style: none;
+  margin: 30px 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.highlights li {
+  padding: 7px 14px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--line);
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+/* Headline block appears line by line on load */
+.line {
+  animation: lineIn var(--dur-reveal) var(--ease-reveal) both;
+}
+
+.copy > .line:nth-child(2) {
+  animation-delay: 90ms;
+}
+
+.copy > .line:nth-child(3) {
+  animation-delay: 180ms;
+}
+
+.copy > .line:nth-child(4) {
+  animation-delay: 270ms;
+}
+
+.copy > .line:nth-child(5) {
+  animation-delay: 360ms;
+}
+
+@keyframes lineIn {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+}
+
+/* ───── Emblem (sun over sea, from the logo) ───── */
+.emblem {
+  flex: 0 1 520px;
+  min-width: 0;
+  margin-inline: auto;
+  animation: emblemIn 1200ms var(--ease-reveal) 150ms both;
+}
+
+@keyframes emblemIn {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.97);
+  }
+}
+
+.emblemSvg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+:global([dir="rtl"]) .emblemSvg {
+  transform: scaleX(-1);
+}
+
+.glow {
+  transform-origin: 300px 300px;
+  animation: glow 9s ease-in-out infinite alternate;
+}
+
+:global([data-theme="dark"]) .glow {
+  opacity: 0.75;
+}
+
+@keyframes glow {
+  to {
+    transform: scale(1.05);
+  }
+}
+
+.wave {
+  animation: drift linear infinite;
+}
+
+.waveSlow {
+  animation-duration: 28s;
+}
+
+.waveMid {
+  animation-duration: 20s;
+}
+
+.waveFast {
+  animation-duration: 14s;
+}
+
+/* One disc width = two wave periods, so the loop is seamless */
+@keyframes drift {
+  to {
+    transform: translateX(-484px);
+  }
+}
+
+.route {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-dasharray: 1 11;
+  opacity: 0.9;
+}
+
+.planeShape {
+  fill: var(--blue);
+}
+
+:global([data-theme="dark"]) .planeShape {
+  fill: #ffffff;
+}
+
+.planeStill {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wave,
+  .glow,
+  .emblem {
+    animation: none;
+  }
+
+  .planeMoving {
+    display: none;
+  }
+
+  .planeStill {
+    display: inline;
+  }
+}
+
+/* ───── Booking bar ───── */
+.bookingWrap {
+  position: relative;
+  z-index: 3;
+  width: 100%;
+}
+
+.booking {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 14px;
+  border-radius: 24px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-card);
+}
+
+.field {
+  flex: 1 1 190px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 16px;
+  border-radius: 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: text;
+  transition: background-color var(--dur-ui) var(--ease-ui);
+}
+
+.field + .field {
+  border-inline-start: 1px solid var(--line);
+}
+
+.field:focus-within {
+  background: var(--bg-alt);
+}
+
+.field input {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ink);
+  min-width: 0;
+}
+
+.field input:focus {
+  outline: none;
+}
+
+.field input::placeholder {
+  color: var(--muted);
+}
+
+.submit {
+  flex: 0 0 auto;
+  min-height: 56px;
+  padding: 0 32px;
+  border: 0;
+  border-radius: 16px;
+  background: var(--cta-bg);
+  color: var(--cta-ink);
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+  transition: filter var(--dur-ui) var(--ease-ui);
+}
+
+.submit:hover {
+  filter: brightness(1.08);
+}
+
+@media (max-width: 900px) {
+  .grid {
+    flex-direction: column-reverse;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .emblem {
+    flex: 0 0 auto;
+    width: min(78vw, 340px);
+  }
+
+  .copy {
+    flex: 0 0 auto;
+    text-align: center;
+  }
+
+  .subtitle {
+    margin-inline: auto;
+  }
+
+  .actions,
+  .highlights {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 720px) {
+  .hero {
+    min-height: 0;
+    padding-block: 24px 40px;
+    gap: 28px;
+  }
+
+  .primary {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .booking {
+    flex-direction: column;
+    padding: 8px;
+  }
+
+  .field {
+    flex: 1 1 auto;
+  }
+
+  .field + .field {
+    border-inline-start: 0;
+    border-top: 1px solid var(--line);
+    border-radius: 0;
+  }
+
+  .submit {
+    width: 100%;
+  }
+}

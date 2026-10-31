@@ -1,49 +1,209 @@
+/* ───────────── Design tokens — GoodFly logo palette: royal blue, sky blue, sun yellow ───────────── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: light;
+  --bg: #ffffff;
+  --bg-alt: #f2f7ff;
+  --surface: #ffffff;
+  --ink: #0b1b33;
+  --ink-soft: #2b3b55;
+  --muted: #5a6b85;
+  --line: #e3eaf4;
+  --blue: #0858f8; /* logo royal blue: text and links, 5.6:1 on white */
+  --blue-soft: #dcebff;
+  --accent: #08a8f8; /* logo sky blue: decoration only (2.6:1 on white) */
+  --label: #0858f8; /* small uppercase labels */
+  --sun: #f8f808; /* logo sun yellow: fills on blue/dark only, never text on white */
+  --cta-bg: #0858f8;
+  --cta-ink: #ffffff;
+  --hero-top: #e5f1ff;
+  --cloud: rgba(255, 255, 255, 0.95);
+  --plane: #ffffff;
+  --plane-line: #b9c8de;
+  --header-bg: rgba(255, 255, 255, 0.78);
+  --shadow-card: 0 24px 60px -32px rgba(11, 27, 51, 0.35);
+
+  /* Night palette, used by the final call-to-action in both themes */
+  --night-bg: #081327;
+  --night-surface: #0f1f3d;
+  --night-ink: #eef3fb;
+  --night-muted: #9aa9c2;
+  --night-accent: #f8f808; /* sun yellow on night navy, 16:1 */
+
+  --radius-s: 12px;
+  --radius-m: 20px;
+  --radius-l: 28px;
+  --radius-pill: 999px;
+  --container: 1200px;
+  --gutter: 32px;
+  --section-space: 160px;
+
+  --tracking-display: -0.03em;
+  --tracking-title: -0.025em;
+  --tracking-label: 0.12em;
+
+  --ease-ui: cubic-bezier(0.4, 0, 0.6, 1);
+  --ease-reveal: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-ui: 240ms;
+  --dur-reveal: 700ms;
 }
 
-@media (prefers-color-scheme: dark) {
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #081327;
+  --bg-alt: #0b1830;
+  --surface: #0f1f3d;
+  --ink: #eef3fb;
+  --ink-soft: #c9d4e6;
+  --muted: #9aa9c2;
+  --line: rgba(238, 243, 251, 0.14);
+  --blue: #5cb6ff;
+  --blue-soft: #12284f;
+  --accent: #08a8f8;
+  --label: #f8f808;
+  --cta-bg: #f8f808;
+  --cta-ink: #081327;
+  --hero-top: #0b1a36;
+  --cloud: rgba(127, 176, 255, 0.1);
+  --plane: #e8eef8;
+  --plane-line: #7f92b3;
+  --header-bg: rgba(8, 19, 39, 0.72);
+  --shadow-card: 0 24px 60px -32px rgba(0, 0, 0, 0.6);
+}
+
+/* Arabic: no negative tracking, no uppercase labels, taller lines */
+:root[lang="ar"] {
+  --tracking-display: 0;
+  --tracking-title: 0;
+  --tracking-label: 0;
+}
+
+@media (max-width: 720px) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --gutter: 16px;
+    --section-space: 96px;
   }
 }
 
-html {
-  height: 100%;
-}
-
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
-}
-
-body {
-  min-height: 100%;
-  display: flex;
-  flex-direction: column;
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-* {
+/* ───────────── Base ───────────── */
+*,
+*::before,
+*::after {
   box-sizing: border-box;
-  padding: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-latin), var(--font-arabic), system-ui, sans-serif;
+  font-size: 17px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  transition: background-color var(--dur-ui) var(--ease-ui), color var(--dur-ui) var(--ease-ui);
+}
+
+:root[lang="ar"] body {
+  font-family: var(--font-arabic), var(--font-latin), system-ui, sans-serif;
+  line-height: 1.7;
+}
+
+h1,
+h2,
+h3,
+p {
   margin: 0;
 }
 
 a {
   color: inherit;
-  text-decoration: none;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
+button,
+input {
+  font: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 3px;
+}
+
+.container {
+  max-width: var(--container);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.eyebrow {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--label);
+}
+
+:root[lang="ar"] .eyebrow {
+  text-transform: none;
+}
+
+.title-xl {
+  font-size: clamp(44px, 7vw, 88px);
+  line-height: 1.04;
+  font-weight: 700;
+  letter-spacing: var(--tracking-display);
+}
+
+.title-l {
+  font-size: clamp(32px, 4.4vw, 56px);
+  line-height: 1.1;
+  font-weight: 700;
+  letter-spacing: var(--tracking-title);
+}
+
+:root[lang="ar"] .title-xl,
+:root[lang="ar"] .title-l {
+  line-height: 1.3;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.skip-link {
+  position: absolute;
+  inset-inline-start: 16px;
+  top: -60px;
+  z-index: 100;
+  padding: 10px 16px;
+  border-radius: var(--radius-pill);
+  background: var(--ink);
+  color: var(--bg);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.skip-link:focus {
+  top: 12px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

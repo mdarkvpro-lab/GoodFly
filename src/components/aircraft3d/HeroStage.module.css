@@ -1,0 +1,56 @@
+/* Styles for the parked 3D hero stage (not used by the site at the moment). */
+.stage {
+  position: relative;
+  z-index: 1;
+  flex: 1 1 auto;
+  min-height: 300px;
+  width: min(1100px, 100%);
+  margin: 8px auto 0;
+  padding-inline: var(--gutter);
+}
+
+/* Poster and canvas share the same full-bleed box, so the still and the live scene line up. */
+.posterWrap,
+.canvasWrap {
+  position: absolute;
+  top: -40px;
+  bottom: -40px;
+  left: 50%;
+  width: 100vw;
+  transform: translateX(-50%);
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 16%, #000 82%, transparent 100%);
+  mask-image: linear-gradient(180deg, transparent 0%, #000 16%, #000 82%, transparent 100%);
+}
+
+.posterWrap {
+  transition: opacity 900ms var(--ease-reveal);
+}
+
+.poster {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.posterDark,
+:global([data-theme="dark"]) .posterLight {
+  display: none;
+}
+
+:global([data-theme="dark"]) .posterDark {
+  display: block;
+}
+
+.canvasWrap {
+  opacity: 0;
+  transition: opacity 900ms var(--ease-reveal);
+}
+
+.stage[data-3d="on"] .canvasWrap {
+  opacity: 1;
+}
+
+.stage[data-3d="on"] .posterWrap {
+  opacity: 0;
+}

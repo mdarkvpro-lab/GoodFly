@@ -1,0 +1,148 @@
+{
+  "meta": {
+    "title": "GoodFly — Agence de voyage",
+    "description": "Vols, séjours et accompagnement, organisés avec soin — en ligne ou en agence."
+  },
+  "nav": {
+    "label": "Navigation principale",
+    "destinations": "Destinations",
+    "flights": "Vols",
+    "stays": "Séjours",
+    "business": "Entreprises",
+    "agency": "L'agence",
+    "book": "Réserver",
+    "switchLanguage": "Changer de langue : arabe",
+    "otherLanguageShort": "ع",
+    "currentLanguageShort": "FR",
+    "toggleTheme": "Changer de thème",
+    "skipToContent": "Aller au contenu"
+  },
+  "hero": {
+    "eyebrow": "Bienvenue chez GoodFly · Au départ de {airport}",
+    "title": "Au-dessus de tout.",
+    "subtitle": "Vols, séjours et accompagnement, organisés avec soin — en ligne ou en agence.",
+    "ctaPrimary": "Planifier mon voyage",
+    "ctaSecondary": "Découvrir les destinations",
+    "highlightsLabel": "Nos services",
+    "highlights": [
+      "Vols",
+      "Hôtels et séjours",
+      "Visas et assistance"
+    ]
+  },
+  "booking": {
+    "label": "Rechercher un voyage",
+    "from": "Départ",
+    "to": "Destination",
+    "toPlaceholder": "Où allez-vous ?",
+    "dates": "Dates",
+    "datesPlaceholder": "Aller — Retour",
+    "travellers": "Voyageurs",
+    "travellersDefault": "1 adulte · Économie",
+    "submit": "Rechercher"
+  },
+  "services": {
+    "eyebrow": "Nos services",
+    "title": "Le voyage commence bien avant le décollage.",
+    "more": "En savoir plus",
+    "items": [
+      {
+        "title": "Vols",
+        "text": "Nous comparons les compagnies, les horaires et les bagages pour vous proposer le bon vol."
+      },
+      {
+        "title": "Hôtels et séjours",
+        "text": "Des hébergements choisis selon votre budget, votre rythme et la raison de votre voyage."
+      },
+      {
+        "title": "Visas et assistance",
+        "text": "Un accompagnement pour les formalités, avant le départ et pendant votre voyage."
+      }
+    ]
+  },
+  "destinations": {
+    "eyebrow": "Destinations",
+    "title": "Là où vous voulez être.",
+    "unconfirmed": "Exemples — offres à confirmer",
+    "listLabel": "Choisir une destination",
+    "names": {
+      "makkah-madinah": "Makkah et Madinah",
+      "istanbul": "Istanbul",
+      "paris": "Paris",
+      "dubai": "Dubaï"
+    },
+    "photo": {
+      "makkah-madinah": "Photographie à sourcer — Madinah, la mosquée du Prophète au lever du jour",
+      "istanbul": "Photographie à sourcer — Istanbul, le Bosphore au crépuscule",
+      "paris": "Photographie à sourcer — Paris, les quais de Seine au matin",
+      "dubai": "Photographie à sourcer — Dubaï, la ville vue du désert"
+    }
+  },
+  "featured": {
+    "eyebrow": "À la une · Exemple",
+    "title": "Un séjour pensé dans les moindres détails.",
+    "cta": "Découvrir",
+    "mediaNote": "Film — à produire ou licencier"
+  },
+  "comfort": {
+    "eyebrow": "Confort",
+    "title": "Votre confort, à votre rythme.",
+    "cabins": [
+      {
+        "name": "Économie",
+        "image": "Image à sourcer — cabine économie",
+        "points": [
+          "Comparaison des tarifs et des bagages",
+          "Choix du siège lorsque la compagnie le permet",
+          "Conseil personnalisé avant l'achat"
+        ]
+      },
+      {
+        "name": "Affaires",
+        "image": "Image à sourcer — cabine affaires",
+        "points": [
+          "Salons et embarquement prioritaire selon la compagnie",
+          "Correspondances choisies pour leur confort",
+          "Un conseiller joignable pendant le voyage"
+        ]
+      }
+    ]
+  },
+  "why": {
+    "items": [
+      {
+        "title": "En ligne ou en agence",
+        "text": "Commencez votre demande sur le site, finalisez-la avec un conseiller si vous le souhaitez."
+      },
+      {
+        "title": "Un conseiller dédié",
+        "text": "Une seule personne suit votre dossier, du devis au retour."
+      },
+      {
+        "title": "Informations vérifiées",
+        "text": "[Licence d'agence n° — à fournir] · [Partenaires et accréditations — à vérifier]"
+      }
+    ]
+  },
+  "finalCta": {
+    "eyebrow": "Approche finale",
+    "title": "Atterrissez serein.",
+    "subtitle": "Dites-nous où et quand. Nous préparons le reste.",
+    "plan": "Planifier mon voyage",
+    "whatsapp": "WhatsApp [numéro]"
+  },
+  "footer": {
+    "contact": "[Adresse de l'agence] · [Téléphone] · [E-mail]",
+    "explore": "Explorer",
+    "info": "Informations",
+    "contactLink": "Contact",
+    "legal": "Mentions légales",
+    "privacy": "Confidentialité"
+  },
+  "reservation": {
+    "title": "Votre demande",
+    "intro": "La réservation en ligne arrive bientôt. Un conseiller GoodFly vous recontactera avec ces informations.",
+    "back": "Retour à l'accueil",
+    "empty": "Non précisé"
+  }
+}
