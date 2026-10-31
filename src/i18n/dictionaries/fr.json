@@ -144,5 +144,134 @@
     "intro": "La réservation en ligne arrive bientôt. Un conseiller GoodFly vous recontactera avec ces informations.",
     "back": "Retour à l'accueil",
     "empty": "Non précisé"
+  },
+  "staff": {
+    "title": "Espace Direction",
+    "loading": "Chargement…",
+    "nav": {
+      "label": "Espace Direction",
+      "overview": "Vue d'ensemble",
+      "accounts": "Comptes",
+      "journal": "Journal",
+      "me": "Mon compte",
+      "logout": "Se déconnecter",
+      "site": "Voir le site"
+    },
+    "login": {
+      "title": "Connexion Direction",
+      "intro": "Accès réservé à la direction de l'agence.",
+      "email": "E-mail",
+      "password": "Mot de passe",
+      "submit": "Se connecter",
+      "errors": {
+        "credentials": "E-mail ou mot de passe incorrect.",
+        "forbidden": "Ce compte n'a pas accès à l'espace Direction.",
+        "rate": "Trop de tentatives. Réessayez dans quelques minutes.",
+        "config": "La connexion n'est pas encore configurée sur ce serveur."
+      }
+    },
+    "password": {
+      "title": "Choisissez votre mot de passe",
+      "intro": "Vous vous connectez avec un mot de passe temporaire. Choisissez-en un nouveau, connu de vous seul.",
+      "password": "Nouveau mot de passe",
+      "confirm": "Confirmez le mot de passe",
+      "hint": "12 caractères minimum.",
+      "submit": "Enregistrer",
+      "errors": {
+        "short": "Le mot de passe doit faire au moins 12 caractères.",
+        "mismatch": "Les deux mots de passe sont différents.",
+        "same": "Choisissez un mot de passe différent de l'actuel.",
+        "weak": "Ce mot de passe est trop faible.",
+        "generic": "Impossible d'enregistrer le mot de passe. Réessayez."
+      }
+    },
+    "overview": {
+      "title": "Vue d'ensemble",
+      "activeClients": "Clients actifs",
+      "activeAgents": "Agents actifs",
+      "newClients": "Nouveaux clients ce mois",
+      "lostClients": "Clients perdus ce mois",
+      "lastMonth": "{n} le mois dernier",
+      "chartTitle": "Clients gagnés et perdus par mois",
+      "gained": "Gagnés",
+      "lost": "Perdus",
+      "tableView": "Voir en tableau",
+      "month": "Mois",
+      "bookingsSoon": "Les rapports de réservations et de chiffre d'affaires apparaîtront avec la réservation en ligne."
+    },
+    "accounts": {
+      "title": "Comptes",
+      "intro": "Agents et clients de l'agence. Les comptes Direction sont protégés : seul le propriétaire peut les modifier.",
+      "filters": {
+        "label": "Filtrer",
+        "all": "Tous",
+        "client": "Clients",
+        "agent": "Agents",
+        "direction": "Direction"
+      },
+      "name": "Nom",
+      "email": "E-mail",
+      "role": "Rôle",
+      "status": "Statut",
+      "since": "Depuis",
+      "actions": "Actions",
+      "active": "Actif",
+      "suspended": "Suspendu",
+      "protected": "Protégé — propriétaire seulement",
+      "you": "Vous",
+      "deactivate": "Désactiver",
+      "restore": "Réactiver",
+      "makeAgent": "Passer agent",
+      "makeClient": "Repasser client",
+      "empty": "Aucun compte pour l'instant.",
+      "noName": "(sans nom)",
+      "roles": {
+        "owner": "Propriétaire",
+        "direction": "Direction",
+        "agent": "Agent",
+        "client": "Client"
+      }
+    },
+    "journal": {
+      "title": "Journal",
+      "when": "Quand",
+      "action": "Action",
+      "account": "Compte",
+      "by": "Par",
+      "empty": "Aucune action enregistrée pour l'instant.",
+      "system": "Propriétaire",
+      "actions": {
+        "deactivate_account": "Compte désactivé",
+        "restore_account": "Compte réactivé",
+        "owner_invite_direction": "Invitation Direction",
+        "owner_create_direction": "Compte Direction créé",
+        "owner_set_role": "Rôle modifié",
+        "owner_suspend": "Compte suspendu",
+        "owner_restore": "Compte réactivé",
+        "owner_delete": "Compte supprimé",
+        "owner_recovery_link": "Lien de réinitialisation",
+        "owner_purge": "Purge (30 jours)"
+      }
+    },
+    "me": {
+      "title": "Mon compte",
+      "name": "Nom affiché",
+      "save": "Enregistrer",
+      "email": "E-mail",
+      "changePassword": "Changer le mot de passe"
+    },
+    "messages": {
+      "password": "Mot de passe enregistré.",
+      "name": "Nom mis à jour.",
+      "deactivated": "Compte désactivé (récupérable 30 jours).",
+      "restored": "Compte réactivé.",
+      "role": "Rôle mis à jour."
+    },
+    "errors": {
+      "forbidden": "Action refusée : ce compte est protégé.",
+      "window": "Le délai de 30 jours pour réactiver ce compte est dépassé.",
+      "generic": "Une erreur est survenue. Réessayez.",
+      "name": "Le nom est obligatoire."
+    }
   }
 }

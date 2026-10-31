@@ -2,6 +2,7 @@ import { match } from "@formatjs/intl-localematcher";
 import Negotiator from "negotiator";
 import { NextResponse, type NextRequest } from "next/server";
 import { defaultLocale, locales } from "@/i18n/config";
+import { updateSession } from "@/lib/supabase/proxy";
 
 function preferredLocale(request: NextRequest): string {
   const headers = { "accept-language": request.headers.get("accept-language") ?? "" };
@@ -13,8 +14,13 @@ function preferredLocale(request: NextRequest): string {
   }
 }
 
-export function proxy(request: NextRequest) {
+const STAFF = new RegExp(`^/(${locales.join("|")})/espace(/|$)`);
+
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  // Staff area: keep the Supabase session fresh (public pages stay fully static).
+  if (STAFF.test(pathname)) return updateSession(request);
+
   const hasLocale = locales.some(
     (locale) => pathname === `/${locale}` || pathname.startsWith(`/${locale}/`),
   );

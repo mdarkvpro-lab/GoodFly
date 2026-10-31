@@ -124,7 +124,8 @@ export class SupabaseStore implements AdminStore {
       email,
       password,
       email_confirm: true,
-      user_metadata: { full_name: fullName },
+      // The website asks for a new password at first sign-in while this flag is set.
+      user_metadata: { full_name: fullName, must_change_password: true },
     });
     if (error || !data.user) SupabaseStore.fail("account creation", error);
     const { error: e } = await this.db.from("profiles").update({ role: "direction", full_name: fullName }).eq("id", data.user.id);

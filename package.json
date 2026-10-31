@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "npm run test:db && npm run test:owner && npm run test:model && npm run test:e2e",
+    "test": "npm run test:db && npm run test:owner && npm run test:staff && npm run test:model && npm run test:e2e",
     "test:db": "node tests/db/roles.test.mjs",
     "test:e2e": "playwright test",
     "build:aircraft": "node scripts/aircraft/build.ts && node scripts/aircraft/render-posters.ts",
@@ -16,7 +16,8 @@
     "owner:demo": "OWNER_DEMO=1 node owner-console/server.ts",
     "owner:passcode": "node owner-console/passcode.ts",
     "test:owner": "node tests/owner/owner.test.ts",
-    "owner:setup": "node owner-console/setup.ts"
+    "owner:setup": "node owner-console/setup.ts",
+    "test:staff": "node tests/staff/stats.test.ts"
   },
   "dependencies": {
     "@formatjs/intl-localematcher": "^0.10.0",

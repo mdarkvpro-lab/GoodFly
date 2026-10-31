@@ -1,0 +1,40 @@
+import { expect, test } from "@playwright/test";
+
+test.describe("Direction area (signed out)", () => {
+  for (const page of ["", "/comptes", "/journal", "/mon-compte", "/mot-de-passe"]) {
+    test(`/fr/espace${page} sends visitors to the sign-in page`, async ({ page: p }) => {
+      await p.goto(`/fr/espace${page}`);
+      await expect(p).toHaveURL(/\/fr\/espace\/connexion/);
+      await expect(p.getByRole("heading", { level: 1 })).toHaveText("Connexion Direction");
+    });
+  }
+
+  test("Arabic sign-in page is right-to-left", async ({ page }) => {
+    await page.goto("/ar/espace/connexion");
+    await expect(page.locator("html")).toHaveAttribute("dir", "rtl");
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("دخول الإدارة");
+  });
+
+  test("wrong credentials show a clear error", async ({ page }) => {
+    await page.goto("/fr/espace/connexion");
+    await page.getByLabel("E-mail").fill("personne@exemple.invalid");
+    await page.getByLabel("Mot de passe").fill("pas-le-bon-mot-de-passe");
+    await page.getByRole("button", { name: "Se connecter" }).click();
+    // Scoped to <main>: Next.js also renders an empty route announcer with role="alert".
+    await expect(page.getByRole("main").getByRole("alert")).toHaveText(/E-mail ou mot de passe incorrect|Trop de tentatives/);
+    await expect(page).toHaveURL(/\/fr\/espace\/connexion/);
+  });
+
+  test("staff pages are private: not indexed, not cached", async ({ request }) => {
+    const res = await request.get("/fr/espace/connexion");
+    expect(res.headers()["x-robots-tag"]).toContain("noindex");
+    expect(res.headers()["cache-control"]).toContain("no-store");
+    expect(await res.text()).toContain('name="robots" content="noindex, nofollow"');
+  });
+
+  test("an unknown message key in the URL is never displayed", async ({ page }) => {
+    await page.goto("/fr/espace/connexion?e=<script>alert(1)</script>");
+    await expect(page.getByRole("main").getByRole("heading", { level: 1 })).toBeVisible();
+    await expect(page.getByRole("main").getByRole("alert")).toHaveCount(0);
+  });
+});

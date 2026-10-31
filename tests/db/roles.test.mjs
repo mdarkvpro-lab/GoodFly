@@ -15,7 +15,7 @@ const db = new PGlite();
 await db.exec(`
   create role anon nologin; create role authenticated nologin; create role service_role nologin bypassrls;
   create schema auth;
-  create table auth.users (id uuid primary key, raw_user_meta_data jsonb default '{}'::jsonb);
+  create table auth.users (id uuid primary key, email text, raw_user_meta_data jsonb default '{}'::jsonb);
   create function auth.uid() returns uuid language sql stable as
     $$ select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid $$;
   grant usage on schema auth to authenticated, anon;
@@ -37,7 +37,7 @@ const ids = {
   C: "00000000-0000-0000-0000-00000000000e",
 };
 for (const [name, id] of Object.entries(ids)) {
-  await db.query(`insert into auth.users (id, raw_user_meta_data) values ($1, $2)`, [id, { full_name: name, role: "owner" }]);
+  await db.query(`insert into auth.users (id, email, raw_user_meta_data) values ($1, $2, $3)`, [id, `${name.toLowerCase()}@exemple.ma`, { full_name: name, role: "owner" }]);
 }
 // Owner console path (runs as postgres): assign roles.
 await db.exec(`
@@ -133,13 +133,33 @@ await check("owner can permanently delete a boss who had deactivated someone (jo
 await check("owner can deactivate boss Y", () => expectRows(db.query(`update public.profiles set disabled_at = now() where id = $1`, [ids.Y]), 1));
 await check("deactivated boss Y can no longer see reports", () => expectRows(as("Y", `select id from public.profiles where id <> $1`, [ids.Y]), 0));
 
+console.log("E-mail copy on profiles");
+await check("the e-mail is copied to the profile at sign-up", async () => {
+  const r = await db.query(`select email from public.profiles where id = $1`, [ids.C]);
+  if (r.rows[0].email !== "c@exemple.ma") throw new Error(r.rows[0].email);
+});
+await check("an e-mail change in auth updates the profile", async () => {
+  await db.query(`update auth.users set email = 'client.c@exemple.ma' where id = $1`, [ids.C]);
+  const r = await db.query(`select email from public.profiles where id = $1`, [ids.C]);
+  if (r.rows[0].email !== "client.c@exemple.ma") throw new Error(r.rows[0].email);
+});
+// Earlier checks suspended C and Y: use the active agent A, and bring Y back (owner path).
+await db.query(`update public.profiles set disabled_at = null where id = $1`, [ids.Y]);
+await check("a website user cannot change the copied e-mail", () =>
+  expectError(as("A", `update public.profiles set email = 'x@evil.ma' where id = $1`, [ids.A]), "managed by Supabase Auth"));
+await check("Direction can read e-mails of accounts", async () => {
+  const r = await as("Y", `select email from public.profiles where id = $1`, [ids.A]);
+  if (r.rows[0]?.email !== "a@exemple.ma") throw new Error(JSON.stringify(r.rows));
+});
+
 console.log("API exposure");
 await check("the sign-up trigger function is not executable by API roles", async () => {
   const r = await db.query(
     `select has_function_privilege('anon', 'public.handle_new_user()', 'execute') as anon,
-            has_function_privilege('authenticated', 'public.handle_new_user()', 'execute') as auth`,
+            has_function_privilege('authenticated', 'public.handle_new_user()', 'execute') as auth,
+            has_function_privilege('authenticated', 'public.sync_profile_email()', 'execute') as sync`,
   );
-  if (r.rows[0].anon || r.rows[0].auth) throw new Error(JSON.stringify(r.rows[0]));
+  if (r.rows[0].anon || r.rows[0].auth || r.rows[0].sync) throw new Error(JSON.stringify(r.rows[0]));
 });
 await check("foreign keys and the journal are indexed", async () => {
   const r = await db.query(`select indexname from pg_indexes where schemaname = 'public'`);

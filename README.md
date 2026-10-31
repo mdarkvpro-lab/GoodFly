@@ -19,6 +19,7 @@ npm run test:db        # règles des comptes (Postgres en mémoire, aucun servic
 npm run build          # nécessaire avant les tests navigateur
 npm run test:e2e       # Playwright, bureau 1440 px + mobile 390 px
 npm run test:owner     # console propriétaire (sécurité + règles, navigateur réel)
+npm run test:staff     # statistiques de l'espace Direction
 npm test               # tout
 ```
 
@@ -35,6 +36,8 @@ npm test               # tout
 | `src/app/globals.css` | Couleurs, typographie, espacements, mouvement (thèmes clair et sombre) |
 | `supabase/migrations` | Rôles et règles des comptes |
 | `owner-console/` | Console propriétaire, locale uniquement (`npm run owner:demo`) — voir son README |
+| `src/app/[lang]/espace` | Espace Direction : connexion, vue d'ensemble, comptes, journal, mon compte |
+| `src/lib/staff`, `src/lib/supabase` | Accès aux données Direction (vérification à chaque page) et clients Supabase |
 
 ## Avion 3D (mis de côté)
 
@@ -78,5 +81,6 @@ npm run test:model       # vérifie tailles, compression, structure
 
 - Photos, films, numéro WhatsApp, adresse et licence de l'agence : à fournir.
 - Destinations : exemples, non confirmés.
-- Réservation en ligne et espace Direction : phase suivante (Supabase).
-- Console propriétaire : prête, en mode démo tant qu'aucun projet Supabase n'est créé.
+- Espace Direction : prêt (`/fr/espace`). Les rapports de réservation viendront avec la réservation en ligne.
+- Réservation en ligne : phase suivante.
+- Console propriétaire : prête et reliée au projet Supabase GoodFly (`npm run owner`).

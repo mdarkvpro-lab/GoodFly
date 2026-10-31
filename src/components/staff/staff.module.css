@@ -1,0 +1,403 @@
+.shell {
+  min-height: 100vh;
+  background: var(--bg-alt);
+}
+
+.top {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+}
+
+.topRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 28px;
+  min-height: 68px;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.brand img {
+  height: 40px;
+  width: auto;
+  display: block;
+}
+
+:global([data-theme="dark"]) .brand img {
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.35));
+}
+
+.badge {
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  background: var(--blue-soft);
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  flex-grow: 1;
+}
+
+.nav a {
+  padding: 10px 14px;
+  border-radius: 12px;
+  color: var(--ink-soft);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.nav a:hover {
+  background: var(--bg-alt);
+  color: var(--ink);
+}
+
+.topActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-inline-start: auto;
+}
+
+.main {
+  padding-block: 32px 64px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.h1 {
+  font-size: clamp(28px, 3vw, 36px);
+  font-weight: 700;
+  letter-spacing: var(--tracking-title);
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-m);
+  padding: 22px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.narrow {
+  max-width: 440px;
+  width: 100%;
+  margin: 8vh auto 0;
+}
+
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 16px;
+}
+
+.kpi strong {
+  font-size: 38px;
+  line-height: 1.1;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+.input {
+  min-height: 48px;
+  padding: 0 14px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--ink);
+  font-size: 16px;
+}
+
+.button,
+.ghost,
+.danger {
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: var(--radius-pill);
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.button {
+  border: 0;
+  background: var(--cta-bg);
+  color: var(--cta-ink);
+}
+
+.ghost {
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--ink);
+}
+
+.danger {
+  border: 1px solid color-mix(in srgb, #c0392b 50%, transparent);
+  background: transparent;
+  color: #b42318;
+}
+
+:global([data-theme="dark"]) .danger {
+  color: #ff9d94;
+}
+
+.button:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.notice {
+  padding: 14px 18px;
+  border-radius: 14px;
+  font-weight: 600;
+}
+
+.ok {
+  background: color-mix(in srgb, #12a150 14%, transparent);
+  color: #0b6b37;
+}
+
+.error {
+  background: color-mix(in srgb, #c0392b 14%, transparent);
+  color: #a3271b;
+}
+
+:global([data-theme="dark"]) .ok {
+  color: #7fe0a8;
+}
+
+:global([data-theme="dark"]) .error {
+  color: #ff9d94;
+}
+
+.tableWrap {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  min-width: 720px;
+}
+
+.table th {
+  text-align: start;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  padding: 10px 8px;
+}
+
+:global([lang="ar"]) .table th {
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.table td {
+  padding: 12px 8px;
+  border-top: 1px solid var(--line);
+  vertical-align: middle;
+}
+
+.tag {
+  display: inline-flex;
+  width: fit-content;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.tagOn {
+  background: color-mix(in srgb, #12a150 14%, transparent);
+  color: #0b6b37;
+}
+
+.tagOff {
+  background: color-mix(in srgb, #c0392b 14%, transparent);
+  color: #a3271b;
+}
+
+:global([data-theme="dark"]) .tagOn {
+  color: #7fe0a8;
+}
+
+:global([data-theme="dark"]) .tagOff {
+  color: #ff9d94;
+}
+
+.inlineForm {
+  display: inline;
+}
+
+.actionsCell {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.filters a {
+  padding: 8px 14px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--line);
+  text-decoration: none;
+  color: var(--ink-soft);
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.filters a[aria-current="true"] {
+  background: var(--ink);
+  color: var(--bg);
+  border-color: var(--ink);
+}
+
+/* ───── Chart: gained (up) / lost (down) per month ───── */
+.legend {
+  display: flex;
+  gap: 18px;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  display: inline-block;
+}
+
+.gained {
+  background: var(--blue);
+}
+
+.lost {
+  background: #b07a12;
+}
+
+.chart {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  align-items: end;
+  gap: 2px;
+}
+
+.col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 8px;
+  padding-top: 4px;
+}
+
+.col:hover,
+.col:focus-within {
+  background: var(--bg-alt);
+}
+
+.up,
+.down {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.up {
+  height: 140px;
+  align-items: flex-end;
+  border-bottom: 1px solid var(--muted);
+}
+
+.down {
+  height: 56px;
+  align-items: flex-start;
+  padding-top: 2px;
+}
+
+.bar {
+  width: min(18px, 70%);
+  border-radius: 4px 4px 0 0;
+  background: var(--blue);
+}
+
+.barLost {
+  width: min(18px, 70%);
+  border-radius: 0 0 4px 4px;
+  background: #b07a12;
+}
+
+.monthLabel {
+  font-size: 11px;
+  color: var(--muted);
+  padding: 6px 0 4px;
+}
+
+.details summary {
+  cursor: pointer;
+  color: var(--blue);
+  font-weight: 600;
+  font-size: 14px;
+}
