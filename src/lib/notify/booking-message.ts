@@ -32,3 +32,15 @@ export function bookingMessage(b: BookingSummary, staffUrl?: string): string {
   if (staffUrl) lines.push("", `Ouvrir : ${staffUrl}`);
   return lines.join("\n");
 }
+
+/** Short phone notification (Web Push): same rules, no client name, phone or e-mail. */
+export function bookingPush(b: BookingSummary) {
+  const trip = clean(b.program_title, 60) || clean(b.to_place, 60) || "—";
+  const people = `${b.adults} adulte(s)${b.children ? `, ${b.children} enfant(s)` : ""}`;
+  return {
+    title: "🛎 Nouvelle demande de réservation",
+    body: [b.reference, trip, clean(b.travel_dates, 40), people].filter(Boolean).join(" · "),
+    url: "/fr/espace/reservations?statut=new",
+    tag: `booking-${b.reference}`,
+  };
+}

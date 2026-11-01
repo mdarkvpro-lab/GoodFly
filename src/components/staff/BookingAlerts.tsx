@@ -2,13 +2,11 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/browser";
 import styles from "./staff.module.css";
 
-type T = { title: string; open: string; enable: string; enabled: string; dismiss: string };
-
-const noop = () => () => {};
+type T = { title: string; open: string; dismiss: string };
 
 /** Short two-tone chime made in the browser (no audio file). Browsers may mute it until the page was clicked once. */
 function chime() {
@@ -33,20 +31,13 @@ function chime() {
 
 /**
  * Live alert when a client sends a booking request while the staff area is open:
- * banner + chime + tab title, and a system notification if the browser allows it.
- * The list and the menu counter refresh by themselves. Realtime applies the table's
+ * banner + chime + tab title; the list and the menu counter refresh by themselves.
+ * (Phone/computer notifications when the site is closed come from Web Push: PushToggle.) Realtime applies the table's
  * RLS, so only accounts allowed to manage bookings receive anything.
  */
 export function BookingAlerts({ href, t }: { href: string; t: T }) {
   const router = useRouter();
   const [count, setCount] = useState(0);
-  // Re-read after the user answers the browser prompt (bumped by ask()).
-  const [asked, setAsked] = useState(0);
-  const permission = useSyncExternalStore(
-    noop,
-    () => ("Notification" in window ? Notification.permission : "unsupported") + "#" + asked,
-    () => "unsupported#0",
-  ).split("#")[0];
   const baseTitle = useRef("");
 
   useEffect(() => {
@@ -66,9 +57,6 @@ export function BookingAlerts({ href, t }: { href: string; t: T }) {
           setCount((n) => n + 1);
           chime();
           router.refresh();
-          if ("Notification" in window && Notification.permission === "granted" && document.visibilityState !== "visible") {
-            new Notification(t.title, { body: row.reference ?? "", tag: "goodfly-booking", icon: "/icon.png" });
-          }
         })
         .subscribe();
     })();
@@ -76,25 +64,15 @@ export function BookingAlerts({ href, t }: { href: string; t: T }) {
       cancelled = true;
       if (channel) supabase.removeChannel(channel);
     };
-  }, [router, t.title]);
+  }, [router]);
 
   useEffect(() => {
     if (!baseTitle.current) return;
     document.title = count ? `(${count}) ${baseTitle.current}` : baseTitle.current;
   }, [count]);
 
-  const ask = async () => {
-    await Notification.requestPermission();
-    setAsked((n) => n + 1);
-  };
-
   return (
     <>
-      {permission === "default" && (
-        <button type="button" className={`${styles.ghost} ${styles.alertsButton}`} onClick={ask}>
-          {t.enable}
-        </button>
-      )}
       {count > 0 && (
         <div className={styles.liveAlert} role="status">
           <strong>

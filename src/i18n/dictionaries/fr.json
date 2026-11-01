@@ -488,9 +488,20 @@
       "live": {
         "title": "Nouvelle demande de réservation",
         "open": "Voir",
-        "enable": "🔔 Activer les alertes",
-        "enabled": "Alertes activées",
         "dismiss": "Fermer"
+      },
+      "whatsapp": "WhatsApp",
+      "push": {
+        "title": "Alertes sur ce téléphone / cet ordinateur",
+        "intro": "Recevez une notification à chaque nouvelle demande, même quand le site est fermé. À activer sur chaque appareil.",
+        "enable": "🔔 Activer les alertes",
+        "on": "Alertes activées sur cet appareil",
+        "off": "Désactiver",
+        "test": "Envoyer un test",
+        "testSent": "Notification de test envoyée.",
+        "denied": "Les notifications sont bloquées pour ce site dans le navigateur. Autorisez-les dans les réglages du navigateur, puis rechargez la page.",
+        "unsupported": "Ce navigateur ne reçoit pas les alertes. Sur iPhone : ouvrez le site dans Safari, « Partager » → « Sur l'écran d'accueil », puis ouvrez GoodFly depuis l'écran d'accueil.",
+        "error": "Impossible d'activer les alertes. Réessayez."
       }
     }
   },

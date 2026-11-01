@@ -6,7 +6,8 @@ import { after } from "next/server";
 import { defaultLocale, isLocale } from "@/i18n/config";
 import { parseBooking, type BookingErrors } from "@/lib/bookings/validate";
 import { verifyTurnstile } from "@/lib/bookings/turnstile";
-import { bookingMessage } from "@/lib/notify/booking-message";
+import { bookingMessage, bookingPush } from "@/lib/notify/booking-message";
+import { pushToBookingStaff } from "@/lib/notify/push";
 import { sendTelegram } from "@/lib/notify/telegram";
 import { publicClient } from "@/lib/programs/data";
 
@@ -66,15 +67,10 @@ export async function submitBooking(_prev: BookingFormState, form: FormData): Pr
     console.error("[booking] submit failed:", error?.code, m);
     return { error: "generic", values };
   }
-  // Alert the agency's Telegram group after the response (never delays or breaks the request).
+  // Alert the staff after the response (never delays or breaks the request): phone/computer
+  // notifications (Web Push), and the Telegram group when it is configured.
   const reference = data;
-  after(() =>
-    sendTelegram(
-      bookingMessage(
-        { reference, program_title: v.program, from_place: v.from_place, to_place: v.to_place, travel_dates: v.travel_dates, adults: v.adults, children: v.children, lang },
-        staffUrl(),
-      ),
-    ),
-  );
+  const summary = { reference, program_title: v.program, from_place: v.from_place, to_place: v.to_place, travel_dates: v.travel_dates, adults: v.adults, children: v.children, lang };
+  after(() => Promise.allSettled([pushToBookingStaff(bookingPush(summary)), sendTelegram(bookingMessage(summary, staffUrl()))]));
   return { reference };
 }

@@ -35,7 +35,7 @@ for (const sql of migrations) await db.exec(sql);
 // Supabase grants table privileges to API roles by default; RLS does the filtering.
 await db.exec(`
   grant usage on schema public to authenticated, anon;
-  grant select, insert, update, delete on public.profiles, public.audit_log, public.programs, public.employee_removal_requests, public.booking_requests to authenticated;
+  grant select, insert, update, delete on public.profiles, public.audit_log, public.programs, public.employee_removal_requests, public.booking_requests, public.push_subscriptions to authenticated;
   grant select on public.programs to anon;
 `);
 
@@ -374,6 +374,44 @@ await check("deleting a programme keeps its requests", async () => {
   await db.exec(`delete from public.programs where slug in ('omra-test', 'brouillon-test')`);
   const r = await db.query(`select count(*)::int as n from public.booking_requests where program_title = 'Omra test'`);
   if (r.rows[0].n !== 1) throw new Error(JSON.stringify(r.rows));
+});
+
+console.log("Push notifications (staff devices)");
+const dev = (n) => ({ endpoint: `https://fcm.googleapis.com/fcm/send/device-${n}`, p256dh: "B".repeat(87), auth: "a".repeat(22) });
+const addDevice = (who, d) => as(who, `insert into public.push_subscriptions (user_id, endpoint, p256dh, auth) values ($1, $2, $3, $4)`, [ids[who], d.endpoint, d.p256dh, d.auth]);
+await check("Direction registers a device", () => addDevice("Y", dev(1)));
+await check("an employee without bookings.manage cannot register", async () => {
+  await as("Y", `select public.set_employee_permissions($1, array[]::text[])`, [ids.A]);
+  await expectError(addDevice("A", dev(2)), "row-level security");
+});
+await check("nobody registers a device for someone else", () =>
+  expectError(as("Y", `insert into public.push_subscriptions (user_id, endpoint, p256dh, auth) values ($1, $2, $3, $4)`, [ids.A, dev(3).endpoint, dev(3).p256dh, dev(3).auth]), "row-level security"));
+await check("only official push services are accepted (no arbitrary URL)", async () => {
+  for (const endpoint of ["https://evil.example/hook", "http://fcm.googleapis.com/x", "https://fcm.googleapis.com.evil.example/x", "https://169.254.169.254/latest"]) {
+    await expectError(addDevice("Y", { ...dev(4), endpoint }), "check constraint");
+  }
+});
+await check("an employee with bookings.manage registers; others cannot see their devices", async () => {
+  await as("Y", `select public.set_employee_permissions($1, array['bookings.manage'])`, [ids.A]);
+  await addDevice("A", dev(5));
+  await expectRows(as("Y", `select 1 from public.push_subscriptions where user_id = $1`, [ids.A]), 0);
+  await expectRows(as("A", `select 1 from public.push_subscriptions`), 1);
+});
+await check("visitors cannot read devices", () => expectError(asAnon(`select * from public.push_subscriptions`), "permission denied"));
+await check("the device list needs the site's form key", async () => {
+  await expectError(asAnon(`select * from public.booking_push_targets($1)`, ["wrong"]), "form_key");
+  const r = await asAnon(`select endpoint from public.booking_push_targets($1)`, [FORM_KEY]);
+  if (r.rows.length !== 2) throw new Error(JSON.stringify(r.rows));
+});
+await check("an employee who loses bookings.manage stops receiving alerts", async () => {
+  await as("Y", `select public.set_employee_permissions($1, array[]::text[])`, [ids.A]);
+  const r = await asAnon(`select endpoint from public.booking_push_targets($1)`, [FORM_KEY]);
+  if (r.rows.length !== 1 || !r.rows[0].endpoint.endsWith("device-1")) throw new Error(JSON.stringify(r.rows));
+});
+await check("expired devices are forgotten only with the form key", async () => {
+  await expectError(asAnon(`select public.forget_push_endpoint($1, $2)`, ["wrong", dev(1).endpoint]), "form_key");
+  await asAnon(`select public.forget_push_endpoint($1, $2)`, [FORM_KEY, dev(1).endpoint]);
+  await expectRows(db.query(`select 1 from public.push_subscriptions where endpoint = $1`, [dev(1).endpoint]), 0);
 });
 
 console.log(`\n${pass} passed, ${fail} failed`);

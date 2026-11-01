@@ -1,5 +1,6 @@
 // Telegram alert text: no personal data, no injected lines or links.  node tests/staff/notify.test.ts
-import { bookingMessage } from "../../src/lib/notify/booking-message.ts";
+import { bookingMessage, bookingPush } from "../../src/lib/notify/booking-message.ts";
+import { waLink, waNumber } from "../../src/lib/bookings/whatsapp.ts";
 
 let pass = 0;
 let fail = 0;
@@ -21,6 +22,27 @@ check("visitor text is cut to a short length", evil.split("\n").every((l) => l.l
 check("a programme booking says Programme", bookingMessage({ ...base, program_title: "omra-ramadan-2027" }).includes("Programme : omra-ramadan-2027"));
 check("Arabic-speaking clients are flagged", bookingMessage({ ...base, lang: "ar" }).includes("Client arabophone"));
 check("the type has no name, phone or e-mail field", !/full_name|phone|email/.test(Object.keys(base).join(",")));
+
+console.log("Phone notification (Web Push)");
+const push = bookingPush({ ...base, to_place: "Istanbul\nhttps://evil.example" });
+check("short text with reference, trip and travellers", push.body.startsWith("GF-1A2B3C4D · Istanbul") && push.body.includes("2 adulte(s)"), push.body);
+check("the click opens the staff page on this site (relative link only)", push.url === "/fr/espace/reservations?statut=new");
+check("no line breaks from visitor text", !push.body.includes("\n"), push.body);
+
+console.log("WhatsApp button");
+const cases: [string, string | null][] = [
+  ["06 12 34 56 78", "212612345678"],
+  ["0712345678", "212712345678"],
+  ["+212 6 12 34 56 78", "212612345678"],
+  ["00212612345678", "212612345678"],
+  ["+212 0612345678", "212612345678"],
+  ["+33 6 12 34 56 78", "33612345678"],
+  ["12", null],
+];
+for (const [input, want] of cases) check(`${input} → ${want}`, waNumber(input) === want, String(waNumber(input)));
+const link = waLink("0612345678", "GF-1A2B3C4D", "fr", "Salma");
+check("link is an official wa.me link with a prefilled message", !!link && link.startsWith("https://wa.me/212612345678?text=") && decodeURIComponent(link.split("text=")[1]).includes("GF-1A2B3C4D"), String(link));
+check("Arabic clients get an Arabic message", decodeURIComponent(waLink("0612345678", "GF-1", "ar", "")!.split("text=")[1]).startsWith("السلام عليكم"));
 
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

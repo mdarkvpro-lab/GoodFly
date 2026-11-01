@@ -2,11 +2,13 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { Notice } from "@/components/staff/Notice";
+import { PushToggle } from "@/components/staff/PushToggle";
 import { StaffShell } from "@/components/staff/StaffShell";
 import styles from "@/components/staff/staff.module.css";
 import { isLocale, type Locale } from "@/i18n/config";
 import { getDictionary, type Dictionary } from "@/i18n/dictionaries";
 import { BOOKING_STATUSES, type BookingStatus } from "@/lib/bookings/validate";
+import { waLink } from "@/lib/bookings/whatsapp";
 import { listBookings, requireStaff, staffNames, staffPath } from "@/lib/staff/dal";
 import { deleteBooking, updateBooking } from "./actions";
 
@@ -51,6 +53,7 @@ async function Bookings({ lang, dict, searchParams }: { lang: Locale; dict: Dict
         const trip = b.program_title || [b.from_place, b.to_place].filter(Boolean).join(" → ");
         const travellers = [t.adults.replace("{n}", String(b.adults)), b.children ? t.children.replace("{n}", String(b.children)) : ""].filter(Boolean).join(", ");
         const tel = b.phone.replace(/[^\d+]/g, "");
+        const wa = waLink(b.phone, b.reference, b.lang, user.fullName);
         return (
           <article key={b.id} className={`${styles.card} ${styles.employee}`} aria-labelledby={`b-${b.id}`}>
             <div className={styles.employeeHead}>
@@ -87,6 +90,14 @@ async function Bookings({ lang, dict, searchParams }: { lang: Locale; dict: Dict
                   <a href={`tel:${tel}`} dir="ltr">
                     {b.phone}
                   </a>
+                  {wa && (
+                    <>
+                      {" "}
+                      <a className={styles.waLink} href={wa} target="_blank" rel="noopener noreferrer">
+                        {t.whatsapp}
+                      </a>
+                    </>
+                  )}
                 </dd>
               </div>
               {b.email && (
@@ -170,6 +181,7 @@ export default async function BookingsPage({ params, searchParams }: PageProps<"
       <Suspense fallback={null}>
         <Notice searchParams={searchParams} dict={dict} />
       </Suspense>
+      {process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && <PushToggle lang={lang} vapidKey={process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY} t={dict.staff.bookings.push} />}
       <Suspense fallback={<p className={styles.muted}>{dict.staff.loading}</p>}>
         <Bookings lang={lang} dict={dict} searchParams={searchParams} />
       </Suspense>
