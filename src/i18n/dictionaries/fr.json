@@ -217,7 +217,8 @@
         "rate": "Trop de tentatives. Réessayez dans quelques minutes.",
         "config": "La connexion n'est pas encore configurée sur ce serveur.",
         "useDirection": "Ce compte est un compte Direction : choisissez « Direction ».",
-        "useEmployee": "Ce compte est un compte employé : choisissez « Employé »."
+        "useEmployee": "Ce compte est un compte employé : choisissez « Employé ».",
+        "passwordChanged": "Mot de passe enregistré. Reconnectez-vous avec votre nouveau mot de passe."
       },
       "accountType": "Je suis",
       "employee": "Employé",

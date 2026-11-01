@@ -60,6 +60,13 @@ export async function changePassword(_prev: FormState, form: FormData): Promise<
   if (password !== confirm) return { error: "mismatch" };
   const { error } = await supabase.auth.updateUser({ password, data: { must_change_password: false } });
   if (error) return { error: error.code === "same_password" ? "same" : error.code === "weak_password" ? "weak" : "generic" };
+  // The "temporary password" flag is read from the session token: get a fresh token now,
+  // otherwise the old one (still flagged) sends the user back to this page until it expires.
+  const { error: refreshError } = await supabase.auth.refreshSession();
+  if (refreshError) {
+    await supabase.auth.signOut();
+    redirect(`${staffPath(lang, "connexion")}?e=passwordChanged`);
+  }
   redirect(`${staffPath(lang, staffHome(user))}?m=password`);
 }
 
