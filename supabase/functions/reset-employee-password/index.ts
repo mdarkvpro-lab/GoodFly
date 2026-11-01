@@ -66,11 +66,11 @@ Deno.serve(async (req) => {
   if (limitError) return json(429, { error: /reset_limit/.test(limitError.message) ? "limit" : "generic" });
 
   const password = temporaryPassword();
-  const { error: updateError } = await admin.auth.admin.updateUserById(id, {
-    password,
-    user_metadata: { must_change_password: true },
-  });
+  const { error: updateError } = await admin.auth.admin.updateUserById(id, { password });
   if (updateError) return json(500, { error: "generic" });
+  // After the new password (which clears the flag): ask for a new one at the next sign-in.
+  const { error: flagError } = await admin.from("profiles").update({ must_change_password: true }).eq("id", id);
+  if (flagError) return json(500, { error: "generic" });
 
   await admin.from("audit_log").insert({ actor: userData.user.id, action: "reset_employee_password", target: id, details: {} });
   return json(200, { password });

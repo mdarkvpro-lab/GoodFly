@@ -31,7 +31,7 @@ const loadSession = cache(async () => {
   if (!claims?.sub) return { supabase, claims: null, profile: null };
   const { data: profile } = await supabase
     .from("profiles")
-    .select("id, full_name, email, role, disabled_at, permissions")
+    .select("id, full_name, email, role, disabled_at, permissions, must_change_password")
     .eq("id", claims.sub)
     .maybeSingle();
   return { supabase, claims, profile };
@@ -47,14 +47,13 @@ export async function requireStaff(lang: Locale, opts: Options = {}) {
     redirect(`${staffPath(lang, "connexion")}?e=forbidden`);
   }
 
-  const meta = (claims.user_metadata ?? {}) as Record<string, unknown>;
   const user: StaffUser = {
     id: profile.id,
     email: profile.email || String(claims.email ?? ""),
     fullName: profile.full_name,
     role: profile.role,
     permissions: ((profile.permissions ?? []) as string[]).filter((p): p is Permission => (PERMISSIONS as readonly string[]).includes(p)),
-    mustChangePassword: meta.must_change_password === true,
+    mustChangePassword: profile.must_change_password === true,
   };
   // First sign-in with a temporary password: change it before anything else.
   if (user.mustChangePassword && !opts.allowPasswordChange) redirect(staffPath(lang, "mot-de-passe"));

@@ -15,7 +15,7 @@ const db = new PGlite();
 await db.exec(`
   create role anon nologin; create role authenticated nologin; create role service_role nologin bypassrls;
   create schema auth;
-  create table auth.users (id uuid primary key, email text, raw_user_meta_data jsonb default '{}'::jsonb);
+  create table auth.users (id uuid primary key, email text, raw_user_meta_data jsonb default '{}'::jsonb, encrypted_password text);
   create function auth.uid() returns uuid language sql stable as
     $$ select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid $$;
   grant usage on schema auth to authenticated, anon;
@@ -567,6 +567,18 @@ await check("employees and visitors cannot list Direction devices", async () => 
 await check("an employee is never returned as a Direction target", async () => {
   await db.query(`insert into public.push_subscriptions (user_id, endpoint, p256dh, auth) values ($1, $2, $3, $4)`, [ids.A, dev(22).endpoint, dev(22).p256dh, dev(22).auth]);
   await expectRows(as("Z", `select * from public.direction_push_targets($1, $2)`, [FORM_KEY, ids.A]), 0);
+});
+
+console.log("Temporary password");
+await check("an employee cannot clear the forced password change", async () => {
+  await db.query(`update public.profiles set must_change_password = true, disabled_at = null, role = 'agent' where id = $1`, [ids.A]);
+  await expectError(as("A", `update public.profiles set must_change_password = false where id = $1`, [ids.A]), "temporary password flag");
+  await expectError(as("Z", `update public.profiles set must_change_password = false where id = $1`, [ids.A]), "temporary password flag");
+});
+await check("changing the password clears the flag", async () => {
+  await db.query(`update auth.users set encrypted_password = 'new-hash' where id = $1`, [ids.A]);
+  const r = await db.query(`select must_change_password from public.profiles where id = $1`, [ids.A]);
+  if (r.rows[0].must_change_password !== false) throw new Error("flag still set");
 });
 
 console.log(`\n${pass} passed, ${fail} failed`);

@@ -68,7 +68,7 @@ Deno.serve(async (req) => {
     email,
     password,
     email_confirm: true,
-    user_metadata: { full_name: fullName, must_change_password: true },
+    user_metadata: { full_name: fullName },
   });
   if (createError || !created.user) {
     const exists = /already|registered|exists/i.test(createError?.message ?? "");
@@ -76,7 +76,7 @@ Deno.serve(async (req) => {
   }
 
   const id = created.user.id;
-  const { error: promoteError } = await admin.from("profiles").update({ role: "agent", full_name: fullName, permissions }).eq("id", id);
+  const { error: promoteError } = await admin.from("profiles").update({ role: "agent", full_name: fullName, permissions, must_change_password: true }).eq("id", id);
   if (promoteError) {
     await admin.auth.admin.deleteUser(id); // never leave a half-created account behind
     return json(500, { error: "create" });

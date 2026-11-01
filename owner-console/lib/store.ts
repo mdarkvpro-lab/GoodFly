@@ -124,11 +124,11 @@ export class SupabaseStore implements AdminStore {
       email,
       password,
       email_confirm: true,
-      // The website asks for a new password at first sign-in while this flag is set.
-      user_metadata: { full_name: fullName, must_change_password: true },
+      user_metadata: { full_name: fullName },
     });
     if (error || !data.user) SupabaseStore.fail("account creation", error);
-    const { error: e } = await this.db.from("profiles").update({ role: "direction", full_name: fullName }).eq("id", data.user.id);
+    // The website asks for a new password at first sign-in while this flag is set.
+    const { error: e } = await this.db.from("profiles").update({ role: "direction", full_name: fullName, must_change_password: true }).eq("id", data.user.id);
     if (e) SupabaseStore.fail("promotion", e);
     const account = await this.getAccount(data.user.id);
     if (!account) throw new Error("created account not found");
