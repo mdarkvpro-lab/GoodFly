@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { IBM_Plex_Sans_Arabic, Manrope } from "next/font/google";
 import { notFound } from "next/navigation";
 import { isLocale, localeDir, locales } from "@/i18n/config";
+import { InlineScript } from "@/components/InlineScript";
 import { getDictionary } from "@/i18n/dictionaries";
 import "../globals.css";
 
@@ -55,7 +56,7 @@ export default async function RootLayout({ children, params }: LayoutProps<"/[la
       suppressHydrationWarning
     >
       <head>
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        <InlineScript html={themeScript} />
       </head>
       <body>{children}</body>
     </html>
