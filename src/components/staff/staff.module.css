@@ -806,3 +806,22 @@
   outline: 3px solid var(--blue);
   outline-offset: 2px;
 }
+
+.who {
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.who strong {
+  color: var(--ink);
+}
+
+@media (max-width: 720px) {
+  .whoRole {
+    display: none;
+  }
+}

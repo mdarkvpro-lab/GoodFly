@@ -31,6 +31,17 @@ async function StaffNav({ lang, t, bookingsLive }: { lang: Locale; t: Dictionary
   );
 }
 
+/** Who is signed in on this browser (all tabs share one session). */
+async function WhoAmI({ lang, t }: { lang: Locale; t: Dictionary["staff"]["nav"] }) {
+  const { user } = await requireStaff(lang, { allowPasswordChange: true });
+  return (
+    <span className={styles.who} title={user.email}>
+      {t.signedInAs} <strong dir="auto">{user.fullName || user.email}</strong>
+      <span className={styles.whoRole}> · {user.role === "direction" ? t.roleDirection : t.roleEmployee}</span>
+    </span>
+  );
+}
+
 /** Static chrome of the staff area; only the nav links depend on the session. */
 export function StaffShell({ lang, dict, children, withNav = true }: Props) {
   const t = dict.staff.nav;
@@ -51,6 +62,11 @@ export function StaffShell({ lang, dict, children, withNav = true }: Props) {
             </nav>
           )}
           <div className={styles.topActions}>
+            {withNav && (
+              <Suspense fallback={null}>
+                <WhoAmI lang={lang} t={t} />
+              </Suspense>
+            )}
             <ThemeToggle label={dict.nav.toggleTheme} />
             {withNav ? (
               <form action={signOut}>

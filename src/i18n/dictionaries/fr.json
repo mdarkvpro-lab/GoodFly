@@ -202,7 +202,10 @@
       "site": "Voir le site",
       "programs": "Programmes",
       "employees": "Employés",
-      "bookings": "Réservations"
+      "bookings": "Réservations",
+      "signedInAs": "Connecté :",
+      "roleDirection": "Direction",
+      "roleEmployee": "Employé"
     },
     "login": {
       "title": "Connexion équipe",

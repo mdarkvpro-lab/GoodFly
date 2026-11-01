@@ -202,7 +202,10 @@
       "site": "عرض الموقع",
       "programs": "البرامج",
       "employees": "الموظفون",
-      "bookings": "الحجوزات"
+      "bookings": "الحجوزات",
+      "signedInAs": "متصل:",
+      "roleDirection": "الإدارة",
+      "roleEmployee": "موظف"
     },
     "login": {
       "title": "دخول الفريق",
