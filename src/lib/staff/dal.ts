@@ -1,5 +1,6 @@
 import "server-only";
 import { redirect } from "next/navigation";
+import { connection } from "next/server";
 import { cache } from "react";
 import type { Locale } from "@/i18n/config";
 import { createClient, supabaseConfigured } from "@/lib/supabase/server";
@@ -21,6 +22,9 @@ type Options = { permission?: Permission; directionOnly?: boolean; allowPassword
 
 /** One session + profile read per request, however many components ask for it. */
 const loadSession = cache(async () => {
+  // Staff sessions are always read at request time, never in the prerendered App Shell
+  // (getClaims compares Date.now() with the token's expiry).
+  await connection();
   const supabase = await createClient();
   const { data } = await supabase.auth.getClaims();
   const claims = data?.claims;
