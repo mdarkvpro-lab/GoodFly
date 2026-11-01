@@ -3,7 +3,7 @@ import { Header } from "@/components/header/Header";
 import { Hero } from "@/components/hero/Hero";
 import { Destinations } from "@/components/sections/Destinations";
 import { Comfort, Featured, FinalCta, Footer, Services, Why } from "@/components/sections/Sections";
-import { destinations } from "@/config/site";
+import { destinations, distanceKm, homeAirport, homeAirportName } from "@/config/site";
 import { isLocale, localeDir } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
 
@@ -27,11 +27,17 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
           title={d.title}
           unconfirmed={d.unconfirmed}
           listLabel={d.listLabel}
+          routeLabel={d.routeLabel}
           dir={localeDir[lang]}
+          lang={lang}
+          origin={{ code: homeAirport, name: homeAirportName(lang) }}
           items={destinations.map((item) => ({
             id: item.id,
             code: item.code,
             confirmed: item.confirmed,
+            image: item.image,
+            km: distanceKm(homeAirport, item.code),
+            distanceText: d.distance,
             name: d.names[item.id],
             photo: d.photo[item.id],
           }))}

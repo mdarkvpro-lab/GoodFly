@@ -1,3 +1,4 @@
+import Image from "next/image";
 import type { Dictionary } from "@/i18n/dictionaries";
 import { Reveal } from "@/components/motion/Reveal";
 import styles from "./Sections.module.css";
@@ -48,7 +49,7 @@ export function Featured({ dict }: Props) {
   return (
     <section className={`container ${styles.featuredWrap}`} aria-labelledby="featured-title">
       <div className={styles.featured}>
-        <p className={styles.mediaNote}>{t.mediaNote}</p>
+        <Image src="/images/featured-riad.jpg" alt={t.imageAlt} fill sizes="(max-width: 1264px) 100vw, 1200px" className={styles.featuredImage} />
         <div className={styles.featuredCopy}>
           <p className={styles.nightEyebrow}>{t.eyebrow}</p>
           <h2 id="featured-title">{t.title}</h2>
@@ -61,6 +62,8 @@ export function Featured({ dict }: Props) {
   );
 }
 
+const CABIN_IMAGES = ["/images/cabin-economy.jpg", "/images/cabin-business.jpg"];
+
 export function Comfort({ dict }: Props) {
   const t = dict.comfort;
   return (
@@ -70,10 +73,10 @@ export function Comfort({ dict }: Props) {
         {t.title}
       </h2>
       <Reveal className={styles.cards2}>
-        {t.cabins.map((cabin) => (
+        {t.cabins.map((cabin, i) => (
           <article key={cabin.name} className={styles.cabin}>
             <div className={styles.cabinImage}>
-              <p>{cabin.image}</p>
+              <Image src={CABIN_IMAGES[i]} alt={cabin.image} fill sizes="(max-width: 900px) 100vw, 600px" />
             </div>
             <div className={styles.cabinBody}>
               <h3>{cabin.name}</h3>

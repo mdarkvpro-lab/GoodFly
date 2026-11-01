@@ -72,17 +72,19 @@
       "dubai": "Dubaï"
     },
     "photo": {
-      "makkah-madinah": "Photographie à sourcer — Madinah, la mosquée du Prophète au lever du jour",
-      "istanbul": "Photographie à sourcer — Istanbul, le Bosphore au crépuscule",
-      "paris": "Photographie à sourcer — Paris, les quais de Seine au matin",
-      "dubai": "Photographie à sourcer — Dubaï, la ville vue du désert"
-    }
+      "makkah-madinah": "Madinah — la mosquée du Prophète dans la lumière dorée du soir",
+      "istanbul": "Istanbul — le pont du Bosphore à la tombée de la nuit",
+      "paris": "Paris — la tour Eiffel au petit matin",
+      "dubai": "Dubaï — la ville au coucher du soleil"
+    },
+    "routeLabel": "Itinéraire",
+    "distance": "≈ {km} km à vol d'oiseau"
   },
   "featured": {
     "eyebrow": "À la une · Exemple",
     "title": "Un séjour pensé dans les moindres détails.",
     "cta": "Découvrir",
-    "mediaNote": "Film — à produire ou licencier"
+    "imageAlt": "Patio d'un riad marocain avec arcades en brique, plantes et zellige"
   },
   "comfort": {
     "eyebrow": "Confort",
@@ -90,7 +92,7 @@
     "cabins": [
       {
         "name": "Économie",
-        "image": "Image à sourcer — cabine économie",
+        "image": "Rangées de sièges d'une cabine économie, écrans allumés",
         "points": [
           "Comparaison des tarifs et des bagages",
           "Choix du siège lorsque la compagnie le permet",
@@ -99,7 +101,7 @@
       },
       {
         "name": "Affaires",
-        "image": "Image à sourcer — cabine affaires",
+        "image": "Sièges privatifs d'une cabine affaires moderne",
         "points": [
           "Salons et embarquement prioritaire selon la compagnie",
           "Correspondances choisies pour leur confort",
