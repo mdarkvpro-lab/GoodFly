@@ -13,7 +13,7 @@ function vapid() {
   const privateKey = process.env.VAPID_PRIVATE_KEY;
   if (!publicKey || !privateKey) return null;
   return {
-    vapidDetails: { subject: process.env.VAPID_SUBJECT || "mailto:contact@goodfly.ma", publicKey, privateKey },
+    vapidDetails: { subject: process.env.VAPID_SUBJECT || "mailto:goodfly64@gmail.com", publicKey, privateKey },
     TTL: 12 * 3600,
     urgency: "high" as const,
     timeout: 8000,
