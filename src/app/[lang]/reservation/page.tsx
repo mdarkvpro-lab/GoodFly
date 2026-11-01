@@ -9,11 +9,14 @@ import { programFacts, programText } from "@/components/programs/format";
 import { Footer } from "@/components/sections/Sections";
 import { isLocale, type Locale } from "@/i18n/config";
 import { getDictionary, type Dictionary } from "@/i18n/dictionaries";
+import { Icon, type IconName } from "@/components/Icon";
 import { prefillFromSearch } from "@/lib/bookings/validate";
 import { getPublishedProgram, programImageUrl } from "@/lib/programs/data";
 import styles from "./reservation.module.css";
 
 type Search = Record<string, string | string[] | undefined>;
+
+const SERVICE_ICON: Record<"flight" | "stay" | "visa", IconName> = { flight: "plane", stay: "home", visa: "passport" };
 
 export async function generateMetadata({ params }: PageProps<"/[lang]/reservation">): Promise<Metadata> {
   const { lang } = await params;
@@ -26,6 +29,7 @@ export async function generateMetadata({ params }: PageProps<"/[lang]/reservatio
 /** The form, prefilled from the homepage search bar or from a programme (?programme=slug). */
 async function Request({ lang, dict, searchParams }: { lang: Locale; dict: Dictionary; searchParams: Promise<Search> }) {
   const initial = prefillFromSearch(await searchParams);
+  const service = initial.service as "" | "flight" | "stay" | "visa";
   const program = initial.program ? await getPublishedProgram(initial.program) : null;
   const t = dict.reservation;
   if (initial.program && !program) initial.program = "";
@@ -33,6 +37,11 @@ async function Request({ lang, dict, searchParams }: { lang: Locale; dict: Dicti
   const facts = program ? programFacts(program, lang, dict.programs) : null;
   return (
     <>
+      {service && !program && (
+        <p className={formStyles.serviceChip}>
+          <Icon name={SERVICE_ICON[service]} size={18} /> {dict.reservation.services[service]}
+        </p>
+      )}
       {program && (
         <div className={formStyles.program}>
           <div className={formStyles.programMedia}>{img && <Image src={img} alt="" fill sizes="120px" />}</div>

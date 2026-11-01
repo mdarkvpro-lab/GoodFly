@@ -469,5 +469,33 @@ await check("booking statistics need reports.view and contain no client details"
 });
 await check("visitors cannot read booking statistics", () => expectError(asAnon(`select * from public.staff_booking_stats()`), "permission denied"));
 
+console.log("Service of a request and Direction phone alerts");
+await check("a request keeps the chosen service; unknown services are refused", async () => {
+  const r = await submit(req({ phone: "0677777771", service: "visa" }));
+  const row = await db.query(`select service from public.booking_requests where reference = $1`, [r.rows[0].ref]);
+  if (row.rows[0].service !== "visa") throw new Error(JSON.stringify(row.rows));
+  await expectError(submit(req({ phone: "0677777772", service: "car" })), "invalid");
+});
+// X was permanently deleted earlier: a second boss Z for these checks.
+ids.Z = "00000000-0000-0000-0000-00000000000f";
+await db.query(`insert into auth.users (id, email) values ($1, 'z@exemple.ma')`, [ids.Z]);
+await db.query(`update public.profiles set role = 'direction' where id = $1`, [ids.Z]);
+await check("Direction alert targets: only the other boss's devices, only with the form key", async () => {
+  await addDevice("Z", dev(20));
+  await addDevice("Y", dev(21));
+  const r = await as("Z", `select endpoint from public.direction_push_targets($1, $2)`, [FORM_KEY, ids.Y]);
+  if (r.rows.length !== 1 || !r.rows[0].endpoint.endsWith("device-21")) throw new Error(JSON.stringify(r.rows));
+  await expectError(as("Z", `select * from public.direction_push_targets($1, $2)`, [FORM_KEY, ids.Z]), "other Direction");
+  await expectError(as("Z", `select * from public.direction_push_targets($1, $2)`, ["wrong", ids.Y]), "form_key");
+});
+await check("employees and visitors cannot list Direction devices", async () => {
+  await expectError(as("A", `select * from public.direction_push_targets($1, $2)`, [FORM_KEY, ids.Y]), "only direction");
+  await expectError(asAnon(`select * from public.direction_push_targets($1, $2)`, [FORM_KEY, ids.Y]), "permission denied");
+});
+await check("an employee is never returned as a Direction target", async () => {
+  await db.query(`insert into public.push_subscriptions (user_id, endpoint, p256dh, auth) values ($1, $2, $3, $4)`, [ids.A, dev(22).endpoint, dev(22).p256dh, dev(22).auth]);
+  await expectRows(as("Z", `select * from public.direction_push_targets($1, $2)`, [FORM_KEY, ids.A]), 0);
+});
+
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

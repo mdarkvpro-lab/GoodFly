@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { Notice } from "@/components/staff/Notice";
+import { PushToggle } from "@/components/staff/PushToggle";
 import { StaffShell } from "@/components/staff/StaffShell";
 import styles from "@/components/staff/staff.module.css";
 import { isLocale, type Locale } from "@/i18n/config";
@@ -141,6 +142,7 @@ export default async function NotificationsPage({ params, searchParams }: PagePr
       <Suspense fallback={null}>
         <Notice searchParams={searchParams} dict={dict} />
       </Suspense>
+      {process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && <PushToggle lang={lang} vapidKey={process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY} t={dict.staff.notifications.push} />}
       <Suspense fallback={<p className={styles.muted}>{dict.staff.loading}</p>}>
         <Requests lang={lang} dict={dict} searchParams={searchParams} />
       </Suspense>

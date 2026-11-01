@@ -20,8 +20,8 @@ export function Header({ lang, dict }: Props) {
         <nav aria-label={t.label} className={styles.nav}>
           <a href={`/${lang}#destinations`}>{t.destinations}</a>
           <Link href={`/${lang}/programmes`}>{t.programs}</Link>
-          <a href={`/${lang}#services`}>{t.flights}</a>
-          <a href={`/${lang}#services`}>{t.stays}</a>
+          <a href={`/${lang}/services/vols`}>{t.flights}</a>
+          <a href={`/${lang}/services/sejours`}>{t.stays}</a>
           <a href={`/${lang}#why`}>{t.agency}</a>
         </nav>
         <div className={styles.actions}>

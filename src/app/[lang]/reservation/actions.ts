@@ -16,7 +16,7 @@ export type BookingFormState =
   | { errors?: BookingErrors; error?: "check" | "tooMany" | "programGone" | "generic" | "config" | "captcha"; values: Record<string, string> }
   | undefined;
 
-const FIELDS = ["full_name", "phone", "email", "from_place", "to_place", "travel_dates", "adults", "children", "message", "program"] as const;
+const FIELDS = ["full_name", "phone", "email", "from_place", "to_place", "travel_dates", "adults", "children", "message", "program", "service"] as const;
 const echo = (form: FormData) => Object.fromEntries(FIELDS.map((k) => [k, String(form.get(k) ?? "").slice(0, 1000)]));
 
 /**
@@ -70,7 +70,7 @@ export async function submitBooking(_prev: BookingFormState, form: FormData): Pr
   // Alert the staff after the response (never delays or breaks the request): phone/computer
   // notifications (Web Push), and the Telegram group when it is configured.
   const reference = data;
-  const summary = { reference, program_title: v.program, from_place: v.from_place, to_place: v.to_place, travel_dates: v.travel_dates, adults: v.adults, children: v.children, lang };
+  const summary = { reference, service: v.service, program_title: v.program, from_place: v.from_place, to_place: v.to_place, travel_dates: v.travel_dates, adults: v.adults, children: v.children, lang };
   after(() => Promise.allSettled([pushToBookingStaff(bookingPush(summary)), sendTelegram(bookingMessage(summary, staffUrl()))]));
   return { reference };
 }

@@ -2,6 +2,7 @@
 
 import { useActionState, useState } from "react";
 import { resetEmployeePassword, type ResetPasswordState } from "@/app/[lang]/espace/employes/actions";
+import { Icon } from "@/components/Icon";
 import styles from "./staff.module.css";
 
 type T = { button: string; hint: string; confirm: string; done: string; doneHint: string; copy: string; copied: string; left: string; errors: Record<string, string> };
@@ -19,7 +20,13 @@ export function ResetPassword({ lang, id, left, t }: { lang: string; id: string;
         <p className={styles.muted}>{t.doneHint}</p>
         <div>
           <button type="button" className={styles.ghost} onClick={() => navigator.clipboard?.writeText(state.password).then(() => setCopied(true), () => setCopied(false))}>
-            {copied ? t.copied : t.copy}
+            {copied ? (
+              <>
+                <Icon name="check" size={16} /> {t.copied}
+              </>
+            ) : (
+              t.copy
+            )}
           </button>
         </div>
       </div>

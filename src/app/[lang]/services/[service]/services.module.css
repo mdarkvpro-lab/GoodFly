@@ -1,0 +1,142 @@
+.main {
+  padding-block: 48px 120px;
+}
+
+.back {
+  color: var(--blue);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.head {
+  max-width: 720px;
+  display: grid;
+  gap: 14px;
+  margin-block: 32px 48px;
+}
+
+.icon {
+  display: inline-grid;
+  place-items: center;
+  width: 60px;
+  height: 60px;
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--blue) 12%, transparent);
+  color: var(--blue);
+}
+
+.eyebrow {
+  color: var(--label);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+}
+
+.intro {
+  color: var(--muted);
+  font-size: 1.1rem;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 400px;
+  gap: 48px;
+  align-items: start;
+}
+
+.h2 {
+  margin-bottom: 18px;
+  font-size: 1.25rem;
+  font-weight: 800;
+}
+
+.points {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.points li {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  font-size: 1.05rem;
+  color: var(--ink-soft);
+}
+
+.check {
+  margin-top: 2px;
+  color: var(--blue);
+}
+
+.note {
+  margin-top: 28px;
+  padding: 14px 18px;
+  border-inline-start: 3px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg-alt);
+  color: var(--muted);
+}
+
+.aside {
+  position: sticky;
+  top: 96px;
+  display: grid;
+  gap: 16px;
+  padding: 28px;
+  border-radius: var(--radius-m);
+  background: var(--night-bg);
+  color: var(--night-ink);
+}
+
+.steps {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding-inline-start: 22px;
+  color: var(--night-ink);
+}
+
+.cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 52px;
+  padding: 0 24px;
+  border-radius: var(--radius-pill);
+  background: var(--cta-bg);
+  color: var(--cta-ink);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.cta:focus-visible,
+.secondary:focus-visible,
+.back:focus-visible {
+  outline: 3px solid var(--blue);
+  outline-offset: 3px;
+}
+
+:global([dir="rtl"]) .arrow {
+  transform: scaleX(-1);
+}
+
+.secondary {
+  text-align: center;
+  color: inherit;
+  font-weight: 700;
+}
+
+@media (max-width: 860px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .aside {
+    position: static;
+  }
+}

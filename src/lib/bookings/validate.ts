@@ -1,6 +1,14 @@
 /** Validation for booking requests (pure, unit-tested in tests/staff). The database checks the same rules. */
 
 export const BOOKING_STATUSES = ["new", "in_progress", "confirmed", "cancelled"] as const;
+
+/** Services a client can ask for (empty = general request or programme). */
+export const SERVICES = ["flight", "stay", "visa"] as const;
+export type Service = (typeof SERVICES)[number];
+/** Public page address of each service (same in French and Arabic). */
+export const SERVICE_SLUGS: Record<Service, string> = { flight: "vols", stay: "sejours", visa: "visas" };
+export const serviceFromSlug = (slug: string): Service | null =>
+  (Object.entries(SERVICE_SLUGS).find(([, v]) => v === slug)?.[0] as Service | undefined) ?? null;
 export type BookingStatus = (typeof BOOKING_STATUSES)[number];
 
 export type BookingInput = {
@@ -14,6 +22,7 @@ export type BookingInput = {
   children: number;
   message: string;
   program: string;
+  service: Service | "";
 };
 
 export type BookingErrors = Partial<Record<keyof BookingInput | "consent", string>>;
@@ -43,7 +52,11 @@ export function parseBooking(get: (k: string) => unknown): { ok: true; value: Bo
     children: int(get("children"), 0),
     message: text(get("message"), 1000),
     program: text(get("program"), 80),
+    service: "",
   };
+  const service = text(get("service"), 10);
+  if (service && !(SERVICES as readonly string[]).includes(service)) errors.service = "format";
+  else value.service = service as Service | "";
 
   if (value.full_name.length < 2) errors.full_name = "required";
   else if (value.full_name.length > 120) errors.full_name = "long";
@@ -71,7 +84,9 @@ export function prefillFromSearch(q: Record<string, string | string[] | undefine
   const travellers = /^\s*(\d{1,2})/.exec(one("travellers"));
   const adults = travellers ? Math.min(Math.max(Number(travellers[1]), 1), 20) : 1;
   const program = one("programme");
+  const service = one("service");
   return {
+    service: (SERVICES as readonly string[]).includes(service) ? service : "",
     from_place: one("from"),
     to_place: one("to"),
     travel_dates: one("dates"),

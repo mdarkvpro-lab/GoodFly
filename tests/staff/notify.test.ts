@@ -44,5 +44,10 @@ const link = waLink("0612345678", "GF-1A2B3C4D", "fr", "Salma");
 check("link is an official wa.me link with a prefilled message", !!link && link.startsWith("https://wa.me/212612345678?text=") && decodeURIComponent(link.split("text=")[1]).includes("GF-1A2B3C4D"), String(link));
 check("Arabic clients get an Arabic message", decodeURIComponent(waLink("0612345678", "GF-1", "ar", "")!.split("text=")[1]).startsWith("السلام عليكم"));
 
+console.log("Service in alerts");
+check("the service is named in the group message", bookingMessage({ ...base, service: "visa" }).includes("Service : Visa"));
+check("the service is in the phone notification", bookingPush({ ...base, service: "flight" }).body.includes("Vol"));
+check("alert titles carry no emoji", !/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/u.test(bookingPush(base).title + bookingMessage(base)));
+
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

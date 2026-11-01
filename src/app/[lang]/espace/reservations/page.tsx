@@ -66,7 +66,10 @@ async function Bookings({ lang, dict, searchParams }: { lang: Locale; dict: Dict
                   <span dir="ltr">{b.reference}</span> · {t.received.replace("{date}", date.format(new Date(b.created_at)))}
                 </span>
               </div>
-              <span className={`${styles.tag} ${tagClass[b.status]}`}>{t.statuses[b.status]}</span>
+              <span className={styles.row}>
+                {b.service && <span className={`${styles.tag} ${styles.tagNew}`}>{dict.reservation.services[b.service]}</span>}
+                <span className={`${styles.tag} ${tagClass[b.status]}`}>{t.statuses[b.status]}</span>
+              </span>
             </div>
 
             <dl className={styles.facts}>

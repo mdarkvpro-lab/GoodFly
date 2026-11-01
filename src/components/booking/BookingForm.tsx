@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useActionState, useState } from "react";
 import { submitBooking, type BookingFormState } from "@/app/[lang]/reservation/actions";
 import type { Locale } from "@/i18n/config";
+import { Icon } from "@/components/Icon";
 import { Turnstile } from "./Turnstile";
 import styles from "./booking.module.css";
 
@@ -37,7 +38,9 @@ export function BookingForm({ lang, t, initial, programLocked, turnstileSiteKey 
   if (state && "reference" in state) {
     return (
       <div className={styles.done} role="status">
-        <h2 className={styles.doneTitle}>{t.doneTitle}</h2>
+        <h2 className={styles.doneTitle}>
+          <Icon name="check" size={26} /> {t.doneTitle}
+        </h2>
         <p>{t.doneText}</p>
         <p className={styles.refLabel}>{t.doneRef}</p>
         <p className={styles.ref} dir="ltr">
@@ -80,6 +83,7 @@ export function BookingForm({ lang, t, initial, programLocked, turnstileSiteKey 
     <form action={action} className={styles.form}>
       <input type="hidden" name="lang" value={lang} />
       {programLocked && <input type="hidden" name="program" value={initial.program} />}
+      {initial.service && <input type="hidden" name="service" value={initial.service} />}
       {/* Spam trap: invisible to people, filled by bots. */}
       <div className={styles.trap} aria-hidden="true">
         <label>
@@ -107,7 +111,7 @@ export function BookingForm({ lang, t, initial, programLocked, turnstileSiteKey 
       <fieldset className={styles.group}>
         <legend>{t.fields.trip}</legend>
         <div className={styles.grid}>
-          {!programLocked && field("from_place", { maxLength: 120, autoComplete: "off" })}
+          {!programLocked && initial.service !== "visa" && field("from_place", { maxLength: 120, autoComplete: "off" })}
           {!programLocked && field("to_place", { maxLength: 120, autoComplete: "off" }, true)}
           {field("travel_dates", { maxLength: 120, autoComplete: "off" })}
           {field("adults", { type: "number", min: 1, max: 20, inputMode: "numeric" }, true)}

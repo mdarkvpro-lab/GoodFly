@@ -183,11 +183,16 @@
       "submit": "Envoyer la demande",
       "sending": "Envoi…",
       "required": "Les champs marqués * sont obligatoires.",
-      "doneTitle": "Demande envoyée ✓",
+      "doneTitle": "Demande envoyée",
       "doneText": "Merci ! Un conseiller GoodFly vous rappelle au plus vite pour confirmer votre voyage.",
       "doneRef": "Votre référence (à donner au conseiller) :",
       "doneHome": "Retour à l'accueil",
       "donePrograms": "Voir les programmes"
+    },
+    "services": {
+      "flight": "Billet d'avion",
+      "stay": "Hôtel ou séjour",
+      "visa": "Assistance visa"
     }
   },
   "staff": {
@@ -395,7 +400,7 @@
       "createdHint": "Donnez ce mot de passe temporaire à l'employé en main propre. Il ne sera plus jamais affiché ; l'employé devra le changer à sa première connexion.",
       "password": "Mot de passe temporaire",
       "copy": "Copier le mot de passe",
-      "copied": "Copié ✓",
+      "copied": "Copié",
       "another": "Ajouter un autre employé",
       "errors": {
         "email": "Adresse e-mail invalide.",
@@ -429,7 +434,7 @@
         "done": "Nouveau mot de passe temporaire :",
         "doneHint": "Donnez-le à l'employé en main propre. Il ne sera plus jamais affiché.",
         "copy": "Copier",
-        "copied": "Copié ✓",
+        "copied": "Copié",
         "left": "Encore {n} réinitialisation(s) possible(s) sur 30 jours (maximum 10).",
         "errors": {
           "limit": "Limite atteinte : 10 réinitialisations sur 30 jours pour cet employé.",
@@ -543,7 +548,7 @@
       "push": {
         "title": "Alertes sur ce téléphone / cet ordinateur",
         "intro": "Recevez une notification à chaque nouvelle demande, même quand le site est fermé. À activer sur chaque appareil.",
-        "enable": "🔔 Activer les alertes",
+        "enable": "Activer les alertes",
         "on": "Alertes activées sur cet appareil",
         "off": "Désactiver",
         "test": "Envoyer un test",
@@ -574,6 +579,18 @@
         "approved": "Acceptée",
         "rejected": "Refusée",
         "cancelled": "Annulée"
+      },
+      "push": {
+        "title": "Alertes sur ce téléphone / cet ordinateur",
+        "intro": "Recevez une notification sur ce téléphone ou cet ordinateur quand l'autre compte Direction vous envoie une demande, ou répond à la vôtre, et à chaque nouvelle réservation. À activer sur chaque appareil.",
+        "enable": "Activer les alertes",
+        "on": "Alertes activées sur cet appareil",
+        "off": "Désactiver",
+        "test": "Envoyer un test",
+        "testSent": "Notification de test envoyée.",
+        "denied": "Les notifications sont bloquées pour ce site dans le navigateur. Autorisez-les dans les réglages du navigateur, puis rechargez la page.",
+        "unsupported": "Ce navigateur ne reçoit pas les alertes. Sur iPhone : ouvrez le site dans Safari, « Partager » → « Sur l'écran d'accueil », puis ouvrez GoodFly depuis l'écran d'accueil.",
+        "error": "Impossible d'activer les alertes. Réessayez."
       }
     }
   },
@@ -593,5 +610,57 @@
     "book": "Réserver ce programme",
     "missingTitle": "Ce programme n'existe pas ou n'est plus en ligne.",
     "missingText": "Il a peut-être été retiré ou son adresse a changé. Découvrez nos autres programmes."
+  },
+  "servicePages": {
+    "back": "Retour aux services",
+    "whatTitle": "Ce que nous faisons pour vous",
+    "stepsTitle": "Comment ça se passe",
+    "steps": [
+      "Vous envoyez votre demande en deux minutes.",
+      "Un conseiller GoodFly vous rappelle pour préciser les détails et le prix.",
+      "Vous confirmez avec le conseiller. Rien n'est payé en ligne."
+    ],
+    "whatsapp": "Écrire sur WhatsApp",
+    "items": {
+      "flight": {
+        "eyebrow": "Vols",
+        "title": "Billets d'avion",
+        "intro": "Dites-nous où et quand vous voulez partir : nous comparons pour vous les compagnies, les horaires et les bagages, puis nous vous proposons le vol qui vous convient.",
+        "points": [
+          "Départs de Rabat–Salé, Casablanca et des autres aéroports du Maroc",
+          "Aller simple, aller-retour ou voyage en plusieurs étapes",
+          "Comparaison des horaires, des escales et des bagages inclus",
+          "Un conseiller joignable par téléphone ou WhatsApp pour vos questions"
+        ],
+        "note": "Le prix et les places sont confirmés par le conseiller au moment de la réservation.",
+        "cta": "Demander un vol"
+      },
+      "stay": {
+        "eyebrow": "Hôtels et séjours",
+        "title": "Hôtels et séjours",
+        "intro": "Nous cherchons l'hébergement qui correspond à votre budget, à votre rythme et à la raison de votre voyage, au Maroc comme à l'étranger.",
+        "points": [
+          "Hôtels, appartements ou formules tout compris selon la destination",
+          "Un choix selon votre budget et le quartier qui vous convient",
+          "Vol et hébergement réunis dans une seule demande",
+          "Séjours en famille, en couple ou en groupe"
+        ],
+        "note": "Les tarifs et la disponibilité sont confirmés par le conseiller au moment de la réservation.",
+        "cta": "Demander un hébergement"
+      },
+      "visa": {
+        "eyebrow": "Visas et assistance",
+        "title": "Visas et assistance",
+        "intro": "Nous vous aidons à préparer votre demande de visa sereinement : documents à réunir, formulaires et rendez-vous.",
+        "points": [
+          "La liste des documents à préparer selon le pays",
+          "De l'aide pour remplir les formulaires",
+          "De l'aide pour la prise de rendez-vous",
+          "Un contact pendant votre voyage en cas de question"
+        ],
+        "note": "La décision d'accorder un visa appartient uniquement au consulat ou à l'ambassade : GoodFly ne peut pas la garantir.",
+        "cta": "Demander une assistance visa"
+      }
+    }
   }
 }

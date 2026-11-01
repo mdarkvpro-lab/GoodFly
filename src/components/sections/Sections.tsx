@@ -1,26 +1,18 @@
 import Image from "next/image";
 import { AGENCY, agencyWhatsApp } from "@/config/site";
+import { SERVICE_SLUGS } from "@/lib/bookings/validate";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries";
+import { Icon, type IconName } from "@/components/Icon";
 import { Reveal } from "@/components/motion/Reveal";
 import styles from "./Sections.module.css";
 
 type Props = { dict: Dictionary };
 
-const serviceIcons = [
-  <path key="plane" d="M2 16l20-6-3-3-6 2-5-5-2 1 3 6-4 1-2-2-1 1 2 4z" />,
-  <g key="home">
-    <path d="M3 20V8l9-5 9 5v12" />
-    <path d="M9 20v-6h6v6" />
-  </g>,
-  <g key="passport">
-    <rect x="5" y="3" width="14" height="18" rx="2" />
-    <circle cx="12" cy="10" r="3" />
-    <path d="M9 16h6" />
-  </g>,
-];
+const serviceIcons: IconName[] = ["plane", "home", "passport"];
+const SERVICE_ORDER = ["flight", "stay", "visa"] as const;
 
-export function Services({ dict }: Props) {
+export function Services({ dict, lang }: Props & { lang: Locale }) {
   const t = dict.services;
   return (
     <section id="services" className={`container ${styles.section}`} aria-labelledby="services-title">
@@ -31,12 +23,12 @@ export function Services({ dict }: Props) {
       <Reveal className={styles.cards3}>
         {t.items.map((item, i) => (
           <article key={item.title} className={styles.card}>
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              {serviceIcons[i]}
-            </svg>
+            <span className={styles.serviceIcon}>
+              <Icon name={serviceIcons[i]} size={28} />
+            </span>
             <h3>{item.title}</h3>
             <p>{item.text}</p>
-            <a href="#booking" className={styles.more}>
+            <a href={`/${lang}/services/${SERVICE_SLUGS[SERVICE_ORDER[i]]}`} className={styles.more}>
               {t.more} <span aria-hidden="true" className={styles.arrow}>→</span>
             </a>
           </article>
@@ -175,8 +167,8 @@ export function Footer({ dict, lang }: Props & { lang: Locale }) {
         </div>
         <nav aria-label={t.explore} className={styles.footerNav}>
           <a href={`/${lang}#destinations`}>{nav.destinations}</a>
-          <a href={`/${lang}#services`}>{nav.flights}</a>
-          <a href={`/${lang}#services`}>{nav.stays}</a>
+          <a href={`/${lang}/services/vols`}>{nav.flights}</a>
+          <a href={`/${lang}/services/sejours`}>{nav.stays}</a>
         </nav>
         <nav aria-label={t.info} className={styles.footerNav}>
           <a href={wa} target="_blank" rel="noopener noreferrer">

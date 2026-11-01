@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { removePushSubscription, savePushSubscription, sendTestPush } from "@/app/[lang]/espace/push-actions";
+import { Icon } from "@/components/Icon";
 import styles from "./staff.module.css";
 
 type T = { title: string; intro: string; enable: string; on: string; off: string; test: string; testSent: string; denied: string; unsupported: string; error: string };
@@ -89,7 +90,7 @@ export function PushToggle({ lang, vapidKey, t }: { lang: string; vapidKey: stri
       {state === "off" && (
         <div>
           <button type="button" className={styles.button} onClick={enable}>
-            {t.enable}
+            <Icon name="bell" size={16} /> {t.enable}
           </button>
         </div>
       )}

@@ -40,7 +40,7 @@ export async function sendTestPush(langValue: string, endpoint: string): Promise
   const { data } = await supabase.from("push_subscriptions").select("endpoint, p256dh, auth").eq("endpoint", endpoint).maybeSingle();
   if (!data) return false;
   return pushToDevice(data, {
-    title: lang === "ar" ? "✅ تنبيهات GoodFly تعمل" : "✅ Alertes GoodFly actives",
+    title: lang === "ar" ? "تنبيهات GoodFly تعمل" : "Alertes GoodFly actives",
     body: lang === "ar" ? "ستتوصل هنا بطلبات الحجز الجديدة." : "Les nouvelles demandes de réservation arriveront ici.",
     url: `/${lang}/espace/reservations`,
     tag: "goodfly-test",

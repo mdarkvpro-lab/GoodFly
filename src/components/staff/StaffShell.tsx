@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Suspense, type ReactNode } from "react";
 import { signOut } from "@/app/[lang]/espace/actions";
 import { ThemeToggle } from "@/components/header/ThemeToggle";
+import { Icon } from "@/components/Icon";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries";
 import { can, staffNav } from "@/lib/staff/access";
@@ -22,7 +23,7 @@ async function StaffNav({ lang, t, bookingsLive }: { lang: Locale; t: Dictionary
     <>
       {staffNav(user).map((item) => (
         <Link key={item.key} href={staffPath(lang, item.page)}>
-          {item.key === "notifications" && <span aria-hidden="true">🔔 </span>}
+          {item.key === "notifications" && <Icon name="bell" size={16} className={styles.navIcon} />}
           {t[item.key]}
           {item.key === "bookings" && waiting > 0 && (
             <span className={styles.navCount} aria-label={`(${waiting})`}>

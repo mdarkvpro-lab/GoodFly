@@ -178,6 +178,7 @@ export type StaffBooking = {
   message: string;
   lang: string;
   status: BookingStatus;
+  service: "" | "flight" | "stay" | "visa";
   staff_note: string;
   handled_by: string | null;
   created_at: string;
@@ -185,7 +186,7 @@ export type StaffBooking = {
 };
 
 const BOOKING_COLUMNS =
-  "id, reference, program_title, program_id, full_name, phone, email, from_place, to_place, travel_dates, adults, children, message, lang, status, staff_note, handled_by, created_at, updated_at";
+  "id, reference, program_title, program_id, full_name, phone, email, from_place, to_place, travel_dates, adults, children, message, lang, status, service, staff_note, handled_by, created_at, updated_at";
 
 /** Booking requests, newest first (needs bookings.manage; RLS enforces the same). */
 export async function listBookings(lang: Locale, status?: BookingStatus): Promise<StaffBooking[]> {

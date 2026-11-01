@@ -2,8 +2,10 @@
 
 import { refresh } from "next/cache";
 import { redirect } from "next/navigation";
+import { after } from "next/server";
 import { defaultLocale, isLocale, type Locale } from "@/i18n/config";
 import { PERMISSIONS } from "@/lib/staff/access";
+import { pushToDirection } from "@/lib/notify/push";
 import { requireDirection, staffPath } from "@/lib/staff/dal";
 
 /**
@@ -114,6 +116,39 @@ async function run(form: FormData, call: (lang: Locale) => Promise<{ error: { me
   redirect(`${back}?${error ? `e=${errorKey(error.message)}` : `m=${ok}`}`);
 }
 
+type Supa = Awaited<ReturnType<typeof requireDirection>>["supabase"];
+
+const ALERTS = {
+  fr: {
+    asked: { remove: "Demande de retrait", restore: "Demande de réactivation" },
+    askedBody: "{boss} demande votre accord pour {employee}.",
+    decided: { approve: "Demande acceptée", reject: "Demande refusée" },
+    decidedBody: "{boss} a répondu pour {employee}.",
+  },
+  ar: {
+    asked: { remove: "طلب إزالة", restore: "طلب إعادة تفعيل" },
+    askedBody: "{boss} يطلب موافقتك بخصوص {employee}.",
+    decided: { approve: "تم قبول الطلب", reject: "تم رفض الطلب" },
+    decidedBody: "{boss} أجاب بخصوص {employee}.",
+  },
+} as const;
+
+/** Phone alert to the other Direction account(s), sent after the response (never blocks the action). */
+function alertDirection(supabase: Supa, lang: Locale, me: { id: string; name: string }, employee: string, to: string[] | "others", text: { title: string; body: string }, view: "decide" | "history") {
+  after(async () => {
+    const { data: people } = await supabase.from("profiles").select("id, full_name, email, role, disabled_at").in("role", ["direction", "agent"]);
+    const rows = people ?? [];
+    const employeeName = rows.find((r) => r.id === employee)?.full_name || "—";
+    const recipients = to === "others" ? rows.filter((r) => r.role === "direction" && !r.disabled_at && r.id !== me.id).map((r) => r.id) : to;
+    const body = text.body.replace("{boss}", me.name).replace("{employee}", employeeName);
+    await Promise.allSettled(
+      recipients.map((rid) =>
+        pushToDirection(supabase, rid, { title: text.title, body, url: `/${lang}/espace/notifications?vue=${view}`, tag: `request-${employee}` }),
+      ),
+    );
+  });
+}
+
 export async function savePermissions(form: FormData) {
   const id = String(form.get("id") ?? "");
   await run(
@@ -133,9 +168,14 @@ export async function requestRemoval(form: FormData) {
   await run(
     form,
     async (lang) => {
-      const { supabase } = await requireDirection(lang);
+      const { supabase, user } = await requireDirection(lang);
       if (!UUID.test(id)) return { error: { message: "generic" } };
-      return supabase.rpc("request_employee_removal", { employee: id, reason });
+      const res = await supabase.rpc("request_employee_removal", { employee: id, reason });
+      if (!res.error) {
+        const a = ALERTS[lang];
+        alertDirection(supabase, lang, { id: user.id, name: user.fullName || user.email }, id, "others", { title: a.asked.remove, body: a.askedBody }, "decide");
+      }
+      return res;
     },
     "removalRequested",
   );
@@ -148,9 +188,15 @@ export async function decideRemoval(form: FormData) {
   await run(
     form,
     async (lang) => {
-      const { supabase } = await requireDirection(lang);
+      const { supabase, user } = await requireDirection(lang);
       if (!UUID.test(id)) return { error: { message: "generic" } };
-      return supabase.rpc("decide_employee_removal", { request: id, approve });
+      const { data: request } = await supabase.from("employee_removal_requests").select("employee, requested_by").eq("id", id).maybeSingle();
+      const res = await supabase.rpc("decide_employee_removal", { request: id, approve });
+      if (!res.error && request?.requested_by && request.requested_by !== user.id) {
+        const a = ALERTS[lang];
+        alertDirection(supabase, lang, { id: user.id, name: user.fullName || user.email }, request.employee, [request.requested_by], { title: a.decided[approve ? "approve" : "reject"], body: a.decidedBody }, "history");
+      }
+      return res;
     },
     restore ? (approve ? "restoreApproved" : "restoreRejected") : approve ? "removalApproved" : "removalRejected",
   );
@@ -176,9 +222,14 @@ export async function requestRestore(form: FormData) {
   await run(
     form,
     async (lang) => {
-      const { supabase } = await requireDirection(lang);
+      const { supabase, user } = await requireDirection(lang);
       if (!UUID.test(id)) return { error: { message: "generic" } };
-      return supabase.rpc("request_employee_restore", { employee: id, reason });
+      const res = await supabase.rpc("request_employee_restore", { employee: id, reason });
+      if (!res.error) {
+        const a = ALERTS[lang];
+        alertDirection(supabase, lang, { id: user.id, name: user.fullName || user.email }, id, "others", { title: a.asked.restore, body: a.askedBody }, "decide");
+      }
+      return res;
     },
     "restoreRequested",
   );

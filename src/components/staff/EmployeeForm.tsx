@@ -4,6 +4,7 @@ import { useActionState, useState } from "react";
 import { createEmployee, type CreateEmployeeState } from "@/app/[lang]/espace/employes/actions";
 import type { Locale } from "@/i18n/config";
 import { PERMISSIONS } from "@/lib/staff/access";
+import { Icon } from "@/components/Icon";
 import styles from "./staff.module.css";
 
 type T = {
@@ -42,7 +43,13 @@ function Form({ lang, t, labels, onReset }: { lang: Locale; t: T; labels: Record
             className={styles.ghost}
             onClick={() => navigator.clipboard?.writeText(c.password).then(() => setCopied(true), () => setCopied(false))}
           >
-            {copied ? t.copied : t.copy}
+            {copied ? (
+              <>
+                <Icon name="check" size={16} /> {t.copied}
+              </>
+            ) : (
+              t.copy
+            )}
           </button>
           <button type="button" className={styles.button} onClick={onReset}>
             {t.another}

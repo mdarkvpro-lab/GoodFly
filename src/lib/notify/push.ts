@@ -65,3 +65,34 @@ export async function pushToBookingStaff(payload: PushPayload): Promise<number> 
   );
   return sent;
 }
+
+type DbClient = { rpc: (fn: string, args: Record<string, unknown>) => PromiseLike<{ data: unknown; error: { code?: string } | null }> };
+
+/**
+ * Phone/computer alert to ANOTHER Direction account (removal/restore requests and decisions).
+ * Called with the signed-in Direction user's client: the database checks the role and the form key.
+ */
+export async function pushToDirection(db: DbClient, recipient: string, payload: PushPayload): Promise<number> {
+  const options = vapid();
+  const formKey = process.env.BOOKING_FORM_KEY;
+  if (!options || !formKey) return 0;
+  const { data, error } = await db.rpc("direction_push_targets", { form_key: formKey, recipient });
+  if (error) {
+    console.error("[push] direction targets failed:", error.code);
+    return 0;
+  }
+  const targets = ((data ?? []) as { endpoint: string; p256dh: string; auth: string }[]).filter((t) => PUSH_ENDPOINT.test(t.endpoint));
+  const results = await Promise.allSettled(
+    targets.map((t) => webpush.sendNotification({ endpoint: t.endpoint, keys: { p256dh: t.p256dh, auth: t.auth } }, JSON.stringify(payload), options)),
+  );
+  let sent = 0;
+  await Promise.all(
+    results.map(async (r, i) => {
+      if (r.status === "fulfilled") return void sent++;
+      const code = (r.reason as { statusCode?: number })?.statusCode;
+      if (code === 404 || code === 410) await db.rpc("forget_push_endpoint", { form_key: formKey, gone: targets[i].endpoint });
+      else console.error("[push] direction send failed:", code ?? "network");
+    }),
+  );
+  return sent;
+}

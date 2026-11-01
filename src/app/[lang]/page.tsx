@@ -42,7 +42,7 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
             photo: d.photo[item.id],
           }))}
         />
-        <Services dict={dict} />
+        <Services dict={dict} lang={lang} />
         <Featured dict={dict} href={`/${lang}/programmes`} />
         <Comfort dict={dict} />
         <Why dict={dict} />

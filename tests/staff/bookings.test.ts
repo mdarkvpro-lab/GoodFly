@@ -1,6 +1,6 @@
 // Booking request validation, search-bar prefill and access.  node tests/staff/bookings.test.ts
 import { can, staffHome, staffNav } from "../../src/lib/staff/access.ts";
-import { parseBooking, prefillFromSearch } from "../../src/lib/bookings/validate.ts";
+import { parseBooking, prefillFromSearch, serviceFromSlug, SERVICE_SLUGS } from "../../src/lib/bookings/validate.ts";
 
 let pass = 0;
 let fail = 0;
@@ -41,6 +41,12 @@ const writer = { role: "agent" as const, permissions: ["programs.manage" as cons
 check("bookings need the permission", can(booker, "bookings.manage") && !can(writer, "bookings.manage"));
 check("a booking agent lands on Réservations", staffHome(booker) === "reservations");
 check("the menu shows Réservations only with the permission", staffNav(booker).some((i) => i.key === "bookings") && !staffNav(writer).some((i) => i.key === "bookings"));
+
+console.log("Services");
+check("a known service is kept", parseBooking(form({ ...good, service: "visa" })).ok && (parseBooking(form({ ...good, service: "visa" })) as { value: { service: string } }).value.service === "visa");
+check("an unknown service is refused", !parseBooking(form({ ...good, service: "car" })).ok);
+check("the search bar keeps a known service only", prefillFromSearch({ service: "stay" }).service === "stay" && prefillFromSearch({ service: "<x>" }).service === "");
+check("page addresses map to services and back", serviceFromSlug("vols") === "flight" && serviceFromSlug(SERVICE_SLUGS.visa) === "visa" && serviceFromSlug("admin") === null);
 
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

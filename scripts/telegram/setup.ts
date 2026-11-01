@@ -123,7 +123,7 @@ chmodSync(ENV, 0o600); // readable by you only
 
 await api(token, "sendMessage", {
   chat_id: chosen.id,
-  text: "✅ GoodFly : les nouvelles demandes de réservation arriveront ici (référence et voyage, sans les coordonnées du client).",
+  text: "GoodFly : les nouvelles demandes de réservation arriveront ici (référence et voyage, sans les coordonnées du client).",
 });
 console.log(`\nC'est prêt : message de test envoyé dans « ${chosen.title ?? "le groupe"} ».`);
 console.log("Redémarrez le site (npm run build puis npm run start) pour activer les alertes.");

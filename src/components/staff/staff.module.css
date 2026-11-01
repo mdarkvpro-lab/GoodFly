@@ -844,3 +844,7 @@
 .notif[data-kind="restore"] {
   border-inline-start-color: var(--blue);
 }
+
+.navIcon {
+  margin-inline-end: 6px;
+}

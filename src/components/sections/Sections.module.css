@@ -672,3 +672,8 @@
   color: var(--ink);
   text-decoration: underline;
 }
+
+.serviceIcon {
+  display: inline-flex;
+  color: var(--blue);
+}
