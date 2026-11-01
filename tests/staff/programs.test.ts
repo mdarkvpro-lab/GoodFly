@@ -40,12 +40,12 @@ console.log("Staff access");
 const boss = { role: "direction" as const, permissions: [] };
 const writer = { role: "agent" as const, permissions: ["programs.manage" as const] };
 const nobody = { role: "agent" as const, permissions: [] };
-check("Direction can do everything", can(boss, "programs.manage") && can(boss, "clients.view") && can(boss, "reports.view"));
-check("an employee only has granted permissions", can(writer, "programs.manage") && !can(writer, "clients.view") && !can(writer, "reports.view"));
+check("Direction can do everything", can(boss, "programs.manage") && can(boss, "bookings.manage") && can(boss, "reports.view"));
+check("an employee only has granted permissions", can(writer, "programs.manage") && !can(writer, "bookings.manage") && !can(writer, "reports.view"));
 check("home page follows permissions", staffHome(boss) === "" && staffHome(writer) === "programmes" && staffHome(nobody) === "mon-compte");
 const nav = (u: Parameters<typeof staffNav>[0]) => staffNav(u).map((i) => i.key).join(",");
 check("employees never see Employés or Journal", !/employees|journal/.test(nav(writer)), nav(writer));
-check("Direction sees the full menu", nav(boss) === "overview,bookings,programs,accounts,employees,journal,me", nav(boss));
+check("Direction sees the full menu", nav(boss) === "overview,bookings,programs,employees,journal,me", nav(boss));
 
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

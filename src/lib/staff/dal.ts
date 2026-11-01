@@ -68,12 +68,14 @@ export async function requireStaff(lang: Locale, opts: Options = {}) {
 export const requireDirection = (lang: Locale, opts: { allowPasswordChange?: boolean } = {}) =>
   requireStaff(lang, { ...opts, directionOnly: true });
 
-/** Accounts visible to the caller (Direction: all; employee with clients.view: clients). */
+/** Staff accounts (Direction and employees), for the Employés page and the journal. Direction only. */
 export async function listProfiles(lang: Locale): Promise<ProfileRow[]> {
-  const { supabase, user } = await requireStaff(lang, { permission: "clients.view" });
-  let query = supabase.from("profiles").select("id, full_name, email, role, disabled_at, created_at, permissions");
-  if (user.role !== "direction") query = query.eq("role", "client");
-  const { data, error } = await query.order("created_at", { ascending: false });
+  const { supabase } = await requireDirection(lang);
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("id, full_name, email, role, disabled_at, created_at, permissions")
+    .in("role", ["direction", "agent"])
+    .order("created_at", { ascending: false });
   if (error) throw new Error(error.message);
   return (data ?? []) as ProfileRow[];
 }
@@ -106,6 +108,7 @@ export async function listAudit(lang: Locale, limit = 100): Promise<AuditRow[]> 
 
 export type RemovalRequest = {
   id: string;
+  kind: "remove" | "restore";
   employee: string;
   requested_by: string | null;
   reason: string;
@@ -116,7 +119,7 @@ export async function listPendingRemovals(lang: Locale): Promise<RemovalRequest[
   const { supabase } = await requireDirection(lang);
   const { data, error } = await supabase
     .from("employee_removal_requests")
-    .select("id, employee, requested_by, reason, created_at")
+    .select("id, kind, employee, requested_by, reason, created_at")
     .eq("status", "pending")
     .order("created_at", { ascending: true });
   if (error) throw new Error(error.message);

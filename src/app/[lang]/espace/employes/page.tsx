@@ -9,8 +9,7 @@ import { isLocale, type Locale } from "@/i18n/config";
 import { getDictionary, type Dictionary } from "@/i18n/dictionaries";
 import { PERMISSIONS } from "@/lib/staff/access";
 import { listPendingRemovals, listProfiles, recentPasswordResets, requireDirection } from "@/lib/staff/dal";
-import { accountAction } from "../actions";
-import { cancelRemoval, decideRemoval, requestRemoval, savePermissions } from "./actions";
+import { cancelRemoval, decideRemoval, requestRemoval, requestRestore, savePermissions } from "./actions";
 
 async function Employees({ lang, dict }: { lang: Locale; dict: Dictionary }) {
   const t = dict.staff.employees;
@@ -20,6 +19,9 @@ async function Employees({ lang, dict }: { lang: Locale; dict: Dictionary }) {
   const pendingFor = new Map(pending.map((p) => [p.employee, p]));
   const active = rows.filter((r) => r.role === "agent" && !r.disabled_at);
   const removed = rows.filter((r) => r.role === "agent" && r.disabled_at);
+  // Removing or bringing back an employee needs a second, active Direction account to approve.
+  const bosses = rows.filter((r) => r.role === "direction" && !r.disabled_at).length;
+  const alone = bosses < 2;
   const date = new Intl.DateTimeFormat(lang === "ar" ? "ar-MA" : "fr-MA", { dateStyle: "medium" });
   const hidden = (name: string, value: string) => <input type="hidden" name={name} value={value} />;
 
@@ -35,7 +37,9 @@ async function Employees({ lang, dict }: { lang: Locale; dict: Dictionary }) {
             return (
               <article key={p.id} className={`${styles.card} ${styles.employee}`}>
                 <div className={styles.employeeHead}>
-                  <strong>{names.get(p.employee) ?? "—"}</strong>
+                  <strong>
+                    {p.kind === "restore" ? t.kindRestore : t.kindRemove} · {names.get(p.employee) ?? "—"}
+                  </strong>
                   <span className={styles.muted}>
                     {t.requestedBy.replace("{name}", (p.requested_by && names.get(p.requested_by)) || "—")} · {date.format(new Date(p.created_at))}
                   </span>
@@ -62,14 +66,16 @@ async function Employees({ lang, dict }: { lang: Locale; dict: Dictionary }) {
                     <form action={decideRemoval} className={styles.inlineForm}>
                       {hidden("lang", lang)}
                       {hidden("request", p.id)}
+                      {hidden("kind", p.kind)}
                       {hidden("decision", "approve")}
-                      <button className={styles.danger} type="submit">
+                      <button className={p.kind === "restore" ? styles.button : styles.danger} type="submit">
                         {t.approve}
                       </button>
                     </form>
                     <form action={decideRemoval} className={styles.inlineForm}>
                       {hidden("lang", lang)}
                       {hidden("request", p.id)}
+                      {hidden("kind", p.kind)}
                       {hidden("decision", "reject")}
                       <button className={styles.ghost} type="submit">
                         {t.reject}
@@ -81,6 +87,12 @@ async function Employees({ lang, dict }: { lang: Locale; dict: Dictionary }) {
             );
           })}
         </section>
+      )}
+
+      {alone && (
+        <p className={`${styles.notice} ${styles.warn}`} role="status">
+          {t.aloneWarning}
+        </p>
       )}
 
       <section className={`${styles.card} ${styles.section}`} aria-labelledby="add-title">
@@ -133,7 +145,7 @@ async function Employees({ lang, dict }: { lang: Locale; dict: Dictionary }) {
               <ResetPassword lang={lang} id={r.id} left={Math.max(0, 10 - (resets.get(r.id) ?? 0))} t={t.reset} />
               {req ? (
                 <p className={`${styles.notice} ${styles.warn}`}>{t.removalPending}</p>
-              ) : (
+              ) : alone ? null : (
                 <details className={styles.more}>
                   <summary>{t.requestRemoval}</summary>
                   <form action={requestRemoval} className={styles.form}>
@@ -176,15 +188,17 @@ async function Employees({ lang, dict }: { lang: Locale; dict: Dictionary }) {
                     </td>
                     <td className={styles.muted}>{date.format(new Date(r.disabled_at!))}</td>
                     <td>
-                      <form action={accountAction} className={styles.inlineForm}>
-                        {hidden("lang", lang)}
-                        {hidden("id", r.id)}
-                        {hidden("op", "restore")}
-                        {hidden("back", "employes")}
-                        <button className={styles.ghost} type="submit">
-                          {dict.staff.accounts.restore}
-                        </button>
-                      </form>
+                      {pendingFor.get(r.id) ? (
+                        <span className={styles.muted}>{t.restorePending}</span>
+                      ) : alone ? null : (
+                        <form action={requestRestore} className={styles.inlineForm}>
+                          {hidden("lang", lang)}
+                          {hidden("id", r.id)}
+                          <button className={styles.ghost} type="submit">
+                            {t.requestRestore}
+                          </button>
+                        </form>
+                      )}
                     </td>
                   </tr>
                 ))}

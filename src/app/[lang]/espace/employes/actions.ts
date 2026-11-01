@@ -1,5 +1,6 @@
 "use server";
 
+import { refresh } from "next/cache";
 import { redirect } from "next/navigation";
 import { defaultLocale, isLocale, type Locale } from "@/i18n/config";
 import { PERMISSIONS } from "@/lib/staff/access";
@@ -59,6 +60,7 @@ export async function createEmployee(_prev: CreateEmployeeState, form: FormData)
     return { error, email, fullName };
   }
   // Shown once on screen, never stored by the site, never put in a URL.
+  refresh(); // the new employee appears in the team list right away
   return { created: { email: body.email ?? email, password: body.password, fullName } };
 }
 
@@ -84,7 +86,10 @@ export async function resetEmployeePassword(_prev: ResetPasswordState, form: For
       signal: AbortSignal.timeout(15_000),
     });
     const body = (await res.json().catch(() => ({}))) as { password?: string; error?: string };
-    if (res.ok && body.password) return { password: body.password }; // shown once, never stored by the site
+    if (res.ok && body.password) {
+      refresh(); // updates the "resets left" counters
+      return { password: body.password }; // shown once, never stored by the site
+    }
     return { error: body.error === "limit" ? "limit" : body.error === "notEmployee" ? "notEmployee" : "generic" };
   } catch {
     return { error: "generic" };
@@ -93,6 +98,8 @@ export async function resetEmployeePassword(_prev: ResetPasswordState, form: For
 
 function errorKey(message: string) {
   if (/already pending/.test(message)) return "pending";
+  if (/30-day/.test(message)) return "window";
+  if (/only removed employees/.test(message)) return "notRemoved";
   if (/other Direction account/.test(message)) return "otherBoss";
   if (/active employees/.test(message)) return "notEmployee";
   if (/42501|only|forbidden/.test(message)) return "forbidden";
@@ -136,6 +143,7 @@ export async function requestRemoval(form: FormData) {
 export async function decideRemoval(form: FormData) {
   const id = String(form.get("request") ?? "");
   const approve = String(form.get("decision") ?? "") === "approve";
+  const restore = form.get("kind") === "restore";
   await run(
     form,
     async (lang) => {
@@ -143,7 +151,7 @@ export async function decideRemoval(form: FormData) {
       if (!UUID.test(id)) return { error: { message: "generic" } };
       return supabase.rpc("decide_employee_removal", { request: id, approve });
     },
-    approve ? "removalApproved" : "removalRejected",
+    restore ? (approve ? "restoreApproved" : "restoreRejected") : approve ? "removalApproved" : "removalRejected",
   );
 }
 
@@ -157,5 +165,20 @@ export async function cancelRemoval(form: FormData) {
       return supabase.rpc("cancel_employee_removal", { request: id });
     },
     "removalCancelled",
+  );
+}
+
+/** Bring a removed employee back: like a removal, the other Direction account must approve. */
+export async function requestRestore(form: FormData) {
+  const id = String(form.get("id") ?? "");
+  const reason = String(form.get("reason") ?? "").trim().slice(0, 500);
+  await run(
+    form,
+    async (lang) => {
+      const { supabase } = await requireDirection(lang);
+      if (!UUID.test(id)) return { error: { message: "generic" } };
+      return supabase.rpc("request_employee_restore", { employee: id, reason });
+    },
+    "restoreRequested",
   );
 }

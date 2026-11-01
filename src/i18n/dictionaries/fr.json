@@ -196,7 +196,6 @@
     "nav": {
       "label": "Espace GoodFly",
       "overview": "Vue d'ensemble",
-      "accounts": "Comptes",
       "journal": "Journal",
       "me": "Mon compte",
       "logout": "Se déconnecter",
@@ -330,7 +329,10 @@
         "program_deleted": "Programme supprimé",
         "booking_updated": "Réservation mise à jour",
         "booking_deleted": "Réservation supprimée",
-        "reset_employee_password": "Mot de passe réinitialisé"
+        "reset_employee_password": "Mot de passe réinitialisé",
+        "request_employee_restore": "Réactivation demandée",
+        "approve_employee_restore": "Réactivation acceptée",
+        "reject_employee_restore": "Réactivation refusée"
       }
     },
     "me": {
@@ -356,27 +358,30 @@
       "programDeleted": "Programme supprimé.",
       "role": "Le client est maintenant employé. Choisissez ses accès dans « Employés ».",
       "bookingSaved": "Demande mise à jour.",
-      "bookingDeleted": "Demande supprimée."
+      "bookingDeleted": "Demande supprimée.",
+      "restoreRequested": "Demande de réactivation envoyée à l'autre compte Direction.",
+      "restoreApproved": "Réactivation acceptée : l'employé a de nouveau accès.",
+      "restoreRejected": "Réactivation refusée : l'employé reste retiré."
     },
     "errors": {
       "forbidden": "Action refusée : ce compte est protégé.",
-      "window": "Le délai de 30 jours pour réactiver ce compte est dépassé.",
+      "window": "Le délai de 30 jours pour réactiver cet employé est dépassé.",
       "generic": "Une erreur est survenue. Réessayez.",
       "name": "Le nom est obligatoire.",
       "removalNeeded": "Un employé se retire par une demande acceptée par l'autre compte Direction.",
       "pending": "Une demande est déjà en attente pour cet employé.",
       "otherBoss": "C'est l'autre compte Direction qui doit décider.",
-      "notEmployee": "Ce compte n’est pas un employé actif."
+      "notEmployee": "Ce compte n’est pas un employé actif.",
+      "notRemoved": "Cet employé n'est pas retiré."
     },
     "permissions": {
       "programs.manage": "Publier les programmes",
-      "clients.view": "Voir les clients",
       "reports.view": "Voir les statistiques",
       "bookings.manage": "Gérer les réservations"
     },
     "employees": {
       "title": "Employés",
-      "intro": "Ajoutez les employés et choisissez ce que chacun peut faire. Pour retirer un employé, l'autre compte Direction doit accepter.",
+      "intro": "Ajoutez les employés et choisissez ce que chacun peut faire. Pour retirer ou réactiver un employé, l'autre compte Direction doit accepter.",
       "addTitle": "Ajouter un employé",
       "fullName": "Nom complet",
       "email": "E-mail",
@@ -395,7 +400,7 @@
         "config": "La création d'employés n'est pas configurée sur ce serveur.",
         "generic": "Impossible de créer l'employé. Réessayez."
       },
-      "pendingTitle": "Demandes de retrait en attente",
+      "pendingTitle": "Demandes en attente",
       "requestedBy": "Demandé par {name}",
       "reason": "Motif",
       "waitingOther": "En attente de la décision de l'autre compte Direction.",
@@ -411,7 +416,7 @@
       "removalHint": "La demande est envoyée à l'autre compte Direction. S'il accepte, l'employé perd l'accès ; s'il refuse, l'employé reste.",
       "sendRequest": "Envoyer la demande",
       "removedTitle": "Employés retirés (réactivables 30 jours)",
-      "pendingBanner": "{n} demande(s) de retrait d'employé attendent votre décision.",
+      "pendingBanner": "{n} demande(s) concernant un employé attendent votre décision.",
       "pendingLink": "Voir les demandes",
       "reset": {
         "button": "Mot de passe oublié",
@@ -428,7 +433,12 @@
           "config": "La réinitialisation n'est pas configurée sur ce serveur.",
           "generic": "Impossible de réinitialiser le mot de passe. Réessayez."
         }
-      }
+      },
+      "kindRemove": "Retrait",
+      "kindRestore": "Réactivation",
+      "requestRestore": "Demander la réactivation",
+      "restorePending": "Demande de réactivation en attente",
+      "aloneWarning": "Il n'y a qu'un seul compte Direction actif. Pour retirer ou réactiver un employé, l'autre compte Direction doit accepter : le propriétaire doit d'abord créer le deuxième compte Direction."
     },
     "programs": {
       "title": "Programmes",

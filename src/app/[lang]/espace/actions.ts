@@ -2,12 +2,11 @@
 
 import { redirect } from "next/navigation";
 import { defaultLocale, isLocale, type Locale } from "@/i18n/config";
-import { requireDirection, requireStaff, staffHome, staffPath } from "@/lib/staff/dal";
+import { requireStaff, staffHome, staffPath } from "@/lib/staff/dal";
 import { createClient, supabaseConfigured } from "@/lib/supabase/server";
 
 export type FormState = { error?: string; email?: string; as?: "agent" | "direction" } | undefined;
 
-const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 const MIN_PASSWORD = 12;
 
 const langOf = (form: FormData): Locale => {
@@ -83,41 +82,3 @@ export async function updateOwnName(form: FormData) {
  * Deactivate / restore a client, restore a removed employee, or hire a client as an employee.
  * Removing an employee goes through a removal request (see employes/actions.ts). The database refuses anything else.
  */
-export async function accountAction(form: FormData) {
-  const lang = langOf(form);
-  const { supabase } = await requireDirection(lang);
-  const id = String(form.get("id") ?? "");
-  const op = String(form.get("op") ?? "");
-  const back = staffPath(lang, form.get("back") === "employes" ? "employes" : "comptes");
-  if (!UUID.test(id)) redirect(`${back}?e=generic`);
-
-  let error: { message: string } | null = null;
-  let message = "";
-  if (op === "deactivate") {
-    ({ error } = await supabase.rpc("deactivate_account", { target: id }));
-    message = "deactivated";
-  } else if (op === "restore") {
-    ({ error } = await supabase.rpc("restore_account", { target: id }));
-    message = "restored";
-  } else if (op === "role") {
-    // Only client → employee here; an employee leaves through an approved removal request.
-    if (String(form.get("role") ?? "") !== "agent") redirect(`${back}?e=generic`);
-    const res = await supabase.from("profiles").update({ role: "agent" }).eq("id", id).eq("role", "client").select("id");
-    error = res.error ?? (res.data?.length ? null : { message: "forbidden" });
-    message = "role";
-  } else {
-    redirect(`${back}?e=generic`);
-  }
-
-  if (error) {
-    const key = /removal request/.test(error.message)
-      ? "removalNeeded"
-      : /owner console|forbidden|42501/.test(error.message)
-        ? "forbidden"
-        : /30-day/.test(error.message)
-          ? "window"
-          : "generic";
-    redirect(`${back}?e=${key}`);
-  }
-  redirect(`${back}?m=${message}`);
-}

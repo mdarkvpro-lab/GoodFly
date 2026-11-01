@@ -3,7 +3,7 @@
 // The secret key never leaves Supabase. Returns a one-time temporary password.
 import { createClient } from "npm:@supabase/supabase-js@2.118.0";
 
-const PERMISSIONS = ["programs.manage", "clients.view", "reports.view", "bookings.manage"];
+const PERMISSIONS = ["programs.manage", "reports.view", "bookings.manage"];
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 const json = (status: number, body: unknown) =>
