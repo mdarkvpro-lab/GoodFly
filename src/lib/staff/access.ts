@@ -23,14 +23,14 @@ export function staffHome(user: Pick<StaffUser, "role" | "permissions">): string
   return "mon-compte";
 }
 
-export type NavItem = { page: string; key: "overview" | "bookings" | "programs" | "employees" | "journal" | "me" };
+export type NavItem = { page: string; key: "overview" | "notifications" | "bookings" | "programs" | "employees" | "journal" | "me" };
 
 export function staffNav(user: Pick<StaffUser, "role" | "permissions">): NavItem[] {
   const items: NavItem[] = [];
   if (can(user, "reports.view")) items.push({ page: "", key: "overview" });
   if (can(user, "bookings.manage")) items.push({ page: "reservations", key: "bookings" });
   if (can(user, "programs.manage")) items.push({ page: "programmes", key: "programs" });
-  if (user.role === "direction") items.push({ page: "employes", key: "employees" }, { page: "journal", key: "journal" });
+  if (user.role === "direction") items.push({ page: "employes", key: "employees" }, { page: "notifications", key: "notifications" }, { page: "journal", key: "journal" });
   items.push({ page: "mon-compte", key: "me" });
   return items;
 }

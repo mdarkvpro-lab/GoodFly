@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 test.describe("Staff area (signed out)", () => {
-  for (const page of ["", "/reservations", "/journal", "/mon-compte", "/mot-de-passe", "/employes", "/programmes", "/programmes/nouveau", "/programmes/00000000-0000-0000-0000-000000000000"]) {
+  for (const page of ["", "/reservations", "/notifications", "/journal", "/mon-compte", "/mot-de-passe", "/employes", "/programmes", "/programmes/nouveau", "/programmes/00000000-0000-0000-0000-000000000000"]) {
     test(`/fr/espace${page} sends visitors to the sign-in page`, async ({ page: p }) => {
       await p.goto(`/fr/espace${page}`);
       await expect(p).toHaveURL(/\/fr\/espace\/connexion/);

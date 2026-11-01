@@ -825,3 +825,22 @@
     display: none;
   }
 }
+
+/* ───── Notifications ───── */
+.notifList {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.notif {
+  display: grid;
+  gap: 12px;
+  border-inline-start: 4px solid #c0392b;
+}
+
+.notif[data-kind="restore"] {
+  border-inline-start-color: var(--blue);
+}

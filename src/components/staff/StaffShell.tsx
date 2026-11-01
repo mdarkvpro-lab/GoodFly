@@ -6,22 +6,32 @@ import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries";
 import { can, staffNav } from "@/lib/staff/access";
 import { BookingAlerts } from "./BookingAlerts";
-import { countNewBookings, requireStaff, staffPath } from "@/lib/staff/dal";
+import { countAwaitingDecision, countNewBookings, requireStaff, staffPath } from "@/lib/staff/dal";
 import styles from "./staff.module.css";
 
 type Props = { lang: Locale; dict: Dictionary; children: ReactNode; withNav?: boolean };
 
 /** Links the signed-in account may use (session read, so rendered inside Suspense). */
 async function StaffNav({ lang, t, bookingsLive }: { lang: Locale; t: Dictionary["staff"]["nav"]; bookingsLive: Dictionary["staff"]["bookings"]["live"] }) {
-  const [{ user }, waiting] = await Promise.all([requireStaff(lang, { allowPasswordChange: true }), countNewBookings(lang)]);
+  const [{ user }, waiting, toDecide] = await Promise.all([
+    requireStaff(lang, { allowPasswordChange: true }),
+    countNewBookings(lang),
+    countAwaitingDecision(lang),
+  ]);
   return (
     <>
       {staffNav(user).map((item) => (
         <Link key={item.key} href={staffPath(lang, item.page)}>
+          {item.key === "notifications" && <span aria-hidden="true">🔔 </span>}
           {t[item.key]}
           {item.key === "bookings" && waiting > 0 && (
             <span className={styles.navCount} aria-label={`(${waiting})`}>
               {waiting}
+            </span>
+          )}
+          {item.key === "notifications" && toDecide > 0 && (
+            <span className={styles.navCount} aria-label={`(${toDecide})`}>
+              {toDecide}
             </span>
           )}
         </Link>

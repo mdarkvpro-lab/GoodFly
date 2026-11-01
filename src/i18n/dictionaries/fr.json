@@ -205,7 +205,8 @@
       "bookings": "Réservations",
       "signedInAs": "Connecté :",
       "roleDirection": "Direction",
-      "roleEmployee": "Employé"
+      "roleEmployee": "Employé",
+      "notifications": "Notifications"
     },
     "login": {
       "title": "Connexion équipe",
@@ -550,6 +551,29 @@
         "denied": "Les notifications sont bloquées pour ce site dans le navigateur. Autorisez-les dans les réglages du navigateur, puis rechargez la page.",
         "unsupported": "Ce navigateur ne reçoit pas les alertes. Sur iPhone : ouvrez le site dans Safari, « Partager » → « Sur l'écran d'accueil », puis ouvrez GoodFly depuis l'écran d'accueil.",
         "error": "Impossible d'activer les alertes. Réessayez."
+      }
+    },
+    "notifications": {
+      "title": "Notifications",
+      "intro": "Les demandes de retrait et de réactivation entre les deux comptes Direction.",
+      "tabsLabel": "Type de notifications",
+      "tabs": {
+        "decide": "À décider",
+        "mine": "Mes demandes",
+        "history": "Historique"
+      },
+      "empty": {
+        "decide": "Rien à décider pour l'instant.",
+        "mine": "Vous n'avez aucune demande en attente.",
+        "history": "Aucune décision ces 90 derniers jours."
+      },
+      "by": "Demandé par {name}",
+      "decidedBy": "Décidé par {name}",
+      "statuses": {
+        "pending": "En attente",
+        "approved": "Acceptée",
+        "rejected": "Refusée",
+        "cancelled": "Annulée"
       }
     }
   },

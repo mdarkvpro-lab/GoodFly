@@ -71,7 +71,7 @@ async function PendingBanner({ lang, dict }: { lang: Locale; dict: Dictionary })
   const t = dict.staff.employees;
   return (
     <p className={`${styles.notice} ${styles.warn}`} role="status">
-      {t.pendingBanner.replace("{n}", String(waiting))} <Link href={staffPath(lang, "employes")}>{t.pendingLink}</Link>
+      {t.pendingBanner.replace("{n}", String(waiting))} <Link href={staffPath(lang, "notifications")}>{t.pendingLink}</Link>
     </p>
   );
 }

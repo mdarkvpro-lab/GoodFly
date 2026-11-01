@@ -234,3 +234,44 @@ export async function listBookingStats(lang: Locale): Promise<{ created_at: stri
   if (error) throw new Error(error.message);
   return (data ?? []) as { created_at: string; status: string }[];
 }
+
+export type StaffRequest = {
+  id: string;
+  kind: "remove" | "restore";
+  status: "pending" | "approved" | "rejected" | "cancelled";
+  employee: string;
+  requested_by: string | null;
+  decided_by: string | null;
+  reason: string;
+  created_at: string;
+  decided_at: string | null;
+};
+
+/** Request time (staff pages are always rendered at request time). */
+export const requestNow = () => Date.now();
+
+/** Direction notifications: every pending request, plus decisions of the last 90 days, newest first. */
+export async function listStaffRequests(lang: Locale): Promise<StaffRequest[]> {
+  const { supabase } = await requireDirection(lang);
+  const since = new Date(Date.now() - 90 * 24 * 3600 * 1000).toISOString();
+  const { data, error } = await supabase
+    .from("employee_removal_requests")
+    .select("id, kind, status, employee, requested_by, decided_by, reason, created_at, decided_at")
+    .or(`status.eq.pending,created_at.gt.${since}`)
+    .order("created_at", { ascending: false })
+    .limit(300);
+  if (error) throw new Error(error.message);
+  return (data ?? []) as StaffRequest[];
+}
+
+/** Requests from the other Direction account waiting for this account's decision (0 for employees). */
+export async function countAwaitingDecision(lang: Locale): Promise<number> {
+  const { supabase, user } = await requireStaff(lang, { allowPasswordChange: true });
+  if (user.role !== "direction") return 0;
+  const { count } = await supabase
+    .from("employee_removal_requests")
+    .select("id", { count: "exact", head: true })
+    .eq("status", "pending")
+    .neq("requested_by", user.id);
+  return count ?? 0;
+}

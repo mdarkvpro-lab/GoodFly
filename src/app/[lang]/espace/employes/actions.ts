@@ -108,7 +108,8 @@ function errorKey(message: string) {
 
 async function run(form: FormData, call: (lang: Locale) => Promise<{ error: { message: string } | null }>, ok: string) {
   const lang = langOf(form);
-  const back = staffPath(lang, "employes");
+  // Decisions can be taken from the Employés page or from the Notifications page.
+  const back = staffPath(lang, form.get("back") === "notifications" ? "notifications" : "employes");
   const { error } = await call(lang);
   redirect(`${back}?${error ? `e=${errorKey(error.message)}` : `m=${ok}`}`);
 }
