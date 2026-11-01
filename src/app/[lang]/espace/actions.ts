@@ -5,7 +5,7 @@ import { defaultLocale, isLocale, type Locale } from "@/i18n/config";
 import { requireDirection, requireStaff, staffHome, staffPath } from "@/lib/staff/dal";
 import { createClient, supabaseConfigured } from "@/lib/supabase/server";
 
-export type FormState = { error?: string; email?: string } | undefined;
+export type FormState = { error?: string; email?: string; as?: "agent" | "direction" } | undefined;
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 const MIN_PASSWORD = 12;
@@ -20,17 +20,24 @@ export async function signIn(_prev: FormState, form: FormData): Promise<FormStat
   if (!supabaseConfigured()) return { error: "config" };
   const email = String(form.get("email") ?? "").trim().toLowerCase();
   const password = String(form.get("password") ?? "");
-  if (!email || !password) return { error: "credentials", email };
+  // The tab chosen on the login page: an employee or a Direction account.
+  const as = form.get("as") === "direction" ? "direction" : "agent";
+  if (!email || !password) return { error: "credentials", email, as };
 
   const supabase = await createClient();
   const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-  if (error || !data.user) return { error: error?.status === 429 ? "rate" : "credentials", email };
+  if (error || !data.user) return { error: error?.status === 429 ? "rate" : "credentials", email, as };
 
   // Only active Direction and employee accounts may enter this area.
   const { data: profile } = await supabase.from("profiles").select("role, disabled_at, permissions").eq("id", data.user.id).maybeSingle();
   if (!profile || (profile.role !== "direction" && profile.role !== "agent") || profile.disabled_at) {
     await supabase.auth.signOut();
-    return { error: "forbidden", email };
+    return { error: "forbidden", email, as };
+  }
+  // Wrong tab: say which one to use (the password was right, so this reveals nothing to a stranger).
+  if (profile.role !== as) {
+    await supabase.auth.signOut();
+    return { error: profile.role === "direction" ? "useDirection" : "useEmployee", email, as };
   }
   redirect(staffPath(lang, staffHome({ role: profile.role, permissions: profile.permissions ?? [] })));
 }

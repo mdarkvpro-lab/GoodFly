@@ -57,3 +57,41 @@ export function kpis(rows: ProfileRow[], now = new Date()): Kpis {
     lostLastMonth: last.lost,
   };
 }
+
+export type BookingRow = { created_at: string; status: string };
+export type BookingPoint = { key: string; requests: number; confirmed: number };
+
+/** Booking requests received and confirmed per month (by request month), oldest first. */
+export function bookingsByMonth(rows: BookingRow[], now = new Date(), months = 12): BookingPoint[] {
+  const points: BookingPoint[] = [];
+  const index = new Map<string, BookingPoint>();
+  for (let i = months - 1; i >= 0; i--) {
+    const d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - i, 1));
+    const p = { key: monthKey(d), requests: 0, confirmed: 0 };
+    points.push(p);
+    index.set(p.key, p);
+  }
+  for (const r of rows) {
+    const p = index.get(monthKey(new Date(r.created_at)));
+    if (!p) continue;
+    p.requests++;
+    if (r.status === "confirmed") p.confirmed++;
+  }
+  return points;
+}
+
+export type BookingKpis = { thisMonth: number; lastMonth: number; confirmedThisMonth: number; waiting: number; confirmRate: number | null };
+
+/** Headline numbers; the confirmation rate covers requests that were decided (confirmed or cancelled). */
+export function bookingKpis(rows: BookingRow[], now = new Date()): BookingKpis {
+  const [last, current] = bookingsByMonth(rows, now, 2);
+  const decided = rows.filter((r) => r.status === "confirmed" || r.status === "cancelled").length;
+  const confirmed = rows.filter((r) => r.status === "confirmed").length;
+  return {
+    thisMonth: current.requests,
+    lastMonth: last.requests,
+    confirmedThisMonth: current.confirmed,
+    waiting: rows.filter((r) => r.status === "new").length,
+    confirmRate: decided ? Math.round((confirmed / decided) * 100) : null,
+  };
+}

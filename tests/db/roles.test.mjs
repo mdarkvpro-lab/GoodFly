@@ -35,7 +35,7 @@ for (const sql of migrations) await db.exec(sql);
 // Supabase grants table privileges to API roles by default; RLS does the filtering.
 await db.exec(`
   grant usage on schema public to authenticated, anon;
-  grant select, insert, update, delete on public.profiles, public.audit_log, public.programs, public.employee_removal_requests, public.booking_requests, public.push_subscriptions to authenticated;
+  grant select, insert, update, delete on public.profiles, public.audit_log, public.programs, public.employee_removal_requests, public.booking_requests, public.push_subscriptions, public.password_resets to authenticated;
   grant select on public.programs to anon;
 `);
 
@@ -413,6 +413,37 @@ await check("expired devices are forgotten only with the form key", async () => 
   await asAnon(`select public.forget_push_endpoint($1, $2)`, [FORM_KEY, dev(1).endpoint]);
   await expectRows(db.query(`select 1 from public.push_subscriptions where endpoint = $1`, [dev(1).endpoint]), 0);
 });
+
+console.log("Password resets and booking statistics");
+await check("the website cannot add a reset (only the Edge Function with the secret key)", () =>
+  expectError(as("Y", `insert into public.password_resets (target, requested_by) values ($1, $2)`, [ids.A, ids.Y]), "row-level security"));
+await check("at most 10 resets per account in 30 days", async () => {
+  for (let i = 0; i < 10; i++) await db.query(`insert into public.password_resets (target, requested_by) values ($1, $2)`, [ids.A, ids.Y]);
+  await expectError(db.query(`insert into public.password_resets (target, requested_by) values ($1, $2)`, [ids.A, ids.Y]), "reset_limit");
+});
+await check("the date cannot be faked to get around the limit", async () => {
+  await expectError(db.query(`insert into public.password_resets (target, requested_by, created_at) values ($1, $2, now() - interval '60 days')`, [ids.A, ids.Y]), "reset_limit");
+});
+await check("older resets no longer count", async () => {
+  await db.query(`update public.password_resets set created_at = now() - interval '31 days' where target = $1`, [ids.A]);
+  await db.query(`insert into public.password_resets (target, requested_by) values ($1, $2)`, [ids.A, ids.Y]);
+});
+await check("Direction sees resets, employees do not", async () => {
+  await expectRows(as("Y", `select 1 from public.password_resets where target = $1`, [ids.A]), 11);
+  await expectRows(as("A", `select 1 from public.password_resets`), 0);
+});
+await check("booking statistics need reports.view and contain no client details", async () => {
+  await as("Y", `select public.set_employee_permissions($1, array[]::text[])`, [ids.A]);
+  await expectError(as("A", `select * from public.staff_booking_stats()`), "reports.view");
+  await as("Y", `select public.set_employee_permissions($1, array['reports.view'])`, [ids.A]);
+  const r = await as("A", `select * from public.staff_booking_stats()`);
+  const cols = r.fields.map((f) => f.name).sort().join(",");
+  if (cols !== "created_at,status") throw new Error(cols);
+  if (!r.rows.length) throw new Error("no rows");
+  await expectRows(as("A", `select id from public.booking_requests`), 0); // still no access to the requests themselves
+  await as("Y", `select public.set_employee_permissions($1, array[]::text[])`, [ids.A]);
+});
+await check("visitors cannot read booking statistics", () => expectError(asAnon(`select * from public.staff_booking_stats()`), "permission denied"));
 
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

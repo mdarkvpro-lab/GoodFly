@@ -184,6 +184,7 @@ export function Footer({ dict, lang }: Props & { lang: Locale }) {
           </a>
           <a href="#">{t.legal}</a>
           <a href="#">{t.privacy}</a>
+          <a href={`/${lang}/espace/connexion`}>{t.staff}</a>
         </nav>
       </div>
     </footer>

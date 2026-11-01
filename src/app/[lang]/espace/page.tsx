@@ -1,24 +1,48 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { BookingsChart } from "@/components/staff/BookingsChart";
 import { ClientsChart } from "@/components/staff/ClientsChart";
 import { Notice } from "@/components/staff/Notice";
 import { StaffShell } from "@/components/staff/StaffShell";
 import styles from "@/components/staff/staff.module.css";
 import { isLocale, type Locale } from "@/i18n/config";
 import { getDictionary, type Dictionary } from "@/i18n/dictionaries";
-import { countNewBookings, listPendingRemovals, listStatsRows, requireStaff, staffPath } from "@/lib/staff/dal";
-import { clientsByMonth, kpis } from "@/lib/staff/stats";
+import { countNewBookings, listBookingStats, listPendingRemovals, listStatsRows, requireStaff, staffPath } from "@/lib/staff/dal";
+import { bookingKpis, bookingsByMonth, clientsByMonth, kpis } from "@/lib/staff/stats";
 
 async function Overview({ lang, dict }: { lang: Locale; dict: Dictionary }) {
   const t = dict.staff.overview;
-  const rows = await listStatsRows(lang);
+  const [rows, bookingRows] = await Promise.all([listStatsRows(lang), listBookingStats(lang)]);
+  const b = bookingKpis(bookingRows, new Date());
+  const tb = t.bookings;
   const now = new Date();
   const k = kpis(rows, now);
   const nf = new Intl.NumberFormat(lang === "ar" ? "ar-MA" : "fr-MA");
   const last = (n: number) => t.lastMonth.replace("{n}", nf.format(n));
   return (
     <>
+      <div className={styles.kpis}>
+        <div className={`${styles.card} ${styles.kpi}`}>
+          <span className={styles.muted}>{tb.thisMonth}</span>
+          <strong>{nf.format(b.thisMonth)}</strong>
+          <span className={styles.muted}>{last(b.lastMonth)}</span>
+        </div>
+        <div className={`${styles.card} ${styles.kpi}`}>
+          <span className={styles.muted}>{tb.confirmedThisMonth}</span>
+          <strong>{nf.format(b.confirmedThisMonth)}</strong>
+        </div>
+        <div className={`${styles.card} ${styles.kpi}`}>
+          <span className={styles.muted}>{tb.waiting}</span>
+          <strong>{nf.format(b.waiting)}</strong>
+        </div>
+        <div className={`${styles.card} ${styles.kpi}`}>
+          <span className={styles.muted}>{tb.rate}</span>
+          <strong>{b.confirmRate === null ? "—" : `${nf.format(b.confirmRate)} %`}</strong>
+          <span className={styles.muted}>{tb.rateHint}</span>
+        </div>
+      </div>
+      <BookingsChart lang={lang} points={bookingsByMonth(bookingRows, now)} t={{ ...tb.chart, tableView: t.tableView, month: t.month }} />
       <div className={styles.kpis}>
         <div className={`${styles.card} ${styles.kpi}`}>
           <span className={styles.muted}>{t.activeClients}</span>

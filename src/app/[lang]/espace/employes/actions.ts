@@ -62,6 +62,35 @@ export async function createEmployee(_prev: CreateEmployeeState, form: FormData)
   return { created: { email: body.email ?? email, password: body.password, fullName } };
 }
 
+export type ResetPasswordState = { password: string } | { error: "limit" | "notEmployee" | "generic" | "config" } | undefined;
+
+/** Forgotten password: a new temporary password for an employee (max 10 per 30 days, enforced by the database). */
+export async function resetEmployeePassword(_prev: ResetPasswordState, form: FormData): Promise<ResetPasswordState> {
+  const lang = langOf(form);
+  const { supabase } = await requireDirection(lang);
+  const id = String(form.get("id") ?? "");
+  if (!UUID.test(id)) return { error: "generic" };
+  const { data: session } = await supabase.auth.getSession();
+  const token = session.session?.access_token;
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+  if (!token || !url || !key) return { error: "config" };
+  try {
+    const res = await fetch(`${url}/functions/v1/reset-employee-password`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}`, apikey: key, "content-type": "application/json" },
+      body: JSON.stringify({ id }),
+      cache: "no-store",
+      signal: AbortSignal.timeout(15_000),
+    });
+    const body = (await res.json().catch(() => ({}))) as { password?: string; error?: string };
+    if (res.ok && body.password) return { password: body.password }; // shown once, never stored by the site
+    return { error: body.error === "limit" ? "limit" : body.error === "notEmployee" ? "notEmployee" : "generic" };
+  } catch {
+    return { error: "generic" };
+  }
+}
+
 function errorKey(message: string) {
   if (/already pending/.test(message)) return "pending";
   if (/other Direction account/.test(message)) return "otherBoss";

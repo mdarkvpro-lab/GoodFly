@@ -645,3 +645,164 @@
   display: grid;
   gap: 12px;
 }
+
+/* ───── Booking chart (palette validated for light and dark) ───── */
+.bookingsChart {
+  --series-requests: #0858f8;
+  --series-confirmed: #eb6834;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+  min-width: 0;
+}
+
+:global([data-theme="dark"]) .bookingsChart {
+  --series-requests: #3987e5;
+  --series-confirmed: #d95926;
+}
+
+.seriesRequests {
+  background: var(--series-requests);
+}
+
+.seriesConfirmed {
+  background: var(--series-confirmed);
+}
+
+.lineChart {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.lineChart svg {
+  display: block;
+  overflow: visible;
+}
+
+.gridLine {
+  stroke: var(--line);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.axisText {
+  fill: var(--muted);
+  font-size: 11px;
+}
+
+.crosshair {
+  stroke: var(--muted);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+  vector-effect: non-scaling-stroke;
+}
+
+.lineRequests,
+.lineConfirmed {
+  fill: none;
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.lineRequests {
+  stroke: var(--series-requests);
+}
+
+.lineConfirmed {
+  stroke: var(--series-confirmed);
+}
+
+.dotRequests,
+.dotConfirmed {
+  stroke: var(--surface);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
+.dotRequests {
+  fill: var(--series-requests);
+}
+
+.dotConfirmed {
+  fill: var(--series-confirmed);
+}
+
+.hitArea {
+  fill: transparent;
+  cursor: crosshair;
+}
+
+.chartTip {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  display: grid;
+  gap: 4px;
+  min-width: 160px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: var(--shadow-card);
+  font-size: 13px;
+  pointer-events: none;
+}
+
+.chartTip span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink-soft);
+}
+
+/* Login: Employé / Direction */
+.segmented {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.segmented legend {
+  grid-column: 1 / -1;
+  margin-bottom: 6px;
+}
+
+.segment {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  color: var(--ink-soft);
+}
+
+.segment input {
+  position: absolute;
+  opacity: 0;
+  inset: 0;
+  margin: 0;
+  cursor: pointer;
+}
+
+.segment[data-active="true"] {
+  border-color: var(--blue);
+  background: color-mix(in srgb, var(--blue) 10%, transparent);
+  color: var(--ink);
+}
+
+.segment:focus-within {
+  outline: 3px solid var(--blue);
+  outline-offset: 2px;
+}

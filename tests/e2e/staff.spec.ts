@@ -38,3 +38,22 @@ test.describe("Staff area (signed out)", () => {
     await expect(page.getByRole("main").getByRole("alert")).toHaveCount(0);
   });
 });
+
+test.describe("Staff login choices", () => {
+  test("the login page offers Employé and Direction", async ({ page }) => {
+    await page.goto("/fr/espace/connexion");
+    const employee = page.getByRole("radio", { name: "Employé" });
+    const direction = page.getByRole("radio", { name: "Direction" });
+    await expect(employee).toBeChecked();
+    await direction.check();
+    await expect(direction).toBeChecked();
+    await page.goto("/ar/espace/connexion");
+    await expect(page.getByRole("radio", { name: "الإدارة" })).toBeVisible();
+  });
+
+  test("the footer links to the staff area", async ({ page }) => {
+    await page.goto("/fr/programmes");
+    await page.getByRole("contentinfo").getByRole("link", { name: "Espace équipe" }).click();
+    await expect(page).toHaveURL(/\/fr\/espace\/connexion$/);
+  });
+});

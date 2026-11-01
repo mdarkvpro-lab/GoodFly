@@ -208,3 +208,22 @@ export async function staffNames(lang: Locale): Promise<Map<string, string>> {
   }
   return map;
 }
+
+/** Password resets per employee over the last 30 days (Direction only), for the "10 per 30 days" limit. */
+export async function recentPasswordResets(lang: Locale): Promise<Map<string, number>> {
+  const { supabase } = await requireDirection(lang);
+  const since = new Date(Date.now() - 30 * 24 * 3600 * 1000).toISOString();
+  const { data, error } = await supabase.from("password_resets").select("target").gt("created_at", since);
+  if (error) throw new Error(error.message);
+  const map = new Map<string, number>();
+  for (const r of data ?? []) map.set(r.target, (map.get(r.target) ?? 0) + 1);
+  return map;
+}
+
+/** Booking dates and statuses only (no client details) for the dashboard; needs reports.view. */
+export async function listBookingStats(lang: Locale): Promise<{ created_at: string; status: string }[]> {
+  const { supabase } = await requireStaff(lang, { permission: "reports.view" });
+  const { data, error } = await supabase.rpc("staff_booking_stats");
+  if (error) throw new Error(error.message);
+  return (data ?? []) as { created_at: string; status: string }[];
+}

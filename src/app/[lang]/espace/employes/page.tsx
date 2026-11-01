@@ -2,19 +2,20 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { EmployeeForm } from "@/components/staff/EmployeeForm";
 import { Notice } from "@/components/staff/Notice";
+import { ResetPassword } from "@/components/staff/ResetPassword";
 import { StaffShell } from "@/components/staff/StaffShell";
 import styles from "@/components/staff/staff.module.css";
 import { isLocale, type Locale } from "@/i18n/config";
 import { getDictionary, type Dictionary } from "@/i18n/dictionaries";
 import { PERMISSIONS } from "@/lib/staff/access";
-import { listPendingRemovals, listProfiles, requireDirection } from "@/lib/staff/dal";
+import { listPendingRemovals, listProfiles, recentPasswordResets, requireDirection } from "@/lib/staff/dal";
 import { accountAction } from "../actions";
 import { cancelRemoval, decideRemoval, requestRemoval, savePermissions } from "./actions";
 
 async function Employees({ lang, dict }: { lang: Locale; dict: Dictionary }) {
   const t = dict.staff.employees;
   const labels = dict.staff.permissions as Record<string, string>;
-  const [{ user }, rows, pending] = await Promise.all([requireDirection(lang), listProfiles(lang), listPendingRemovals(lang)]);
+  const [{ user }, rows, pending, resets] = await Promise.all([requireDirection(lang), listProfiles(lang), listPendingRemovals(lang), recentPasswordResets(lang)]);
   const names = new Map(rows.map((r) => [r.id, r.full_name || r.email]));
   const pendingFor = new Map(pending.map((p) => [p.employee, p]));
   const active = rows.filter((r) => r.role === "agent" && !r.disabled_at);
@@ -129,6 +130,7 @@ async function Employees({ lang, dict }: { lang: Locale; dict: Dictionary }) {
                   </button>
                 </div>
               </form>
+              <ResetPassword lang={lang} id={r.id} left={Math.max(0, 10 - (resets.get(r.id) ?? 0))} t={t.reset} />
               {req ? (
                 <p className={`${styles.notice} ${styles.warn}`}>{t.removalPending}</p>
               ) : (

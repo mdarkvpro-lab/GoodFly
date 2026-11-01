@@ -1,5 +1,5 @@
 // Direction dashboard statistics.  node tests/staff/stats.test.ts
-import { clientsByMonth, kpis, type ProfileRow } from "../../src/lib/staff/stats.ts";
+import { bookingKpis, bookingsByMonth, clientsByMonth, kpis, type ProfileRow } from "../../src/lib/staff/stats.ts";
 
 const now = new Date("2026-10-15T12:00:00Z");
 const row = (role: ProfileRow["role"], created: string, disabled: string | null = null): ProfileRow => ({
@@ -40,6 +40,23 @@ check("active clients exclude deactivated ones", k.activeClients === 4, String(k
 check("active agents exclude deactivated ones", k.activeAgents === 1, String(k.activeAgents));
 check("this month vs last month", k.newThisMonth === 2 && k.newLastMonth === 2 && k.lostThisMonth === 1 && k.lostLastMonth === 0, JSON.stringify(k));
 check("January rolls back to December of the previous year", clientsByMonth([], new Date("2026-01-10T00:00:00Z"), 2)[0].key === "2025-12");
+
+console.log("Booking statistics");
+const bk = [
+  { created_at: "2026-10-02T10:00:00Z", status: "new" },
+  { created_at: "2026-10-03T10:00:00Z", status: "confirmed" },
+  { created_at: "2026-10-04T10:00:00Z", status: "cancelled" },
+  { created_at: "2026-09-10T10:00:00Z", status: "confirmed" },
+  { created_at: "2026-09-11T10:00:00Z", status: "in_progress" },
+  { created_at: "2025-01-01T10:00:00Z", status: "confirmed" }, // outside the 12 months
+];
+const bseries = bookingsByMonth(bk, now);
+check("12 months, oldest first, ending this month", bseries.length === 12 && bseries[11].key === "2026-10" && bseries[0].key === "2025-11", JSON.stringify(bseries.map((p) => p.key)));
+check("requests and confirmed are counted per month", bseries[11].requests === 3 && bseries[11].confirmed === 1 && bseries[10].requests === 2 && bseries[10].confirmed === 1, JSON.stringify(bseries.slice(10)));
+const bkk = bookingKpis(bk, now);
+check("headline numbers", bkk.thisMonth === 3 && bkk.lastMonth === 2 && bkk.confirmedThisMonth === 1 && bkk.waiting === 1, JSON.stringify(bkk));
+check("confirmation rate counts decided requests only (3 confirmed / 4 decided)", bkk.confirmRate === 75, String(bkk.confirmRate));
+check("no decided request: no rate (not 0 %)", bookingKpis([{ created_at: "2026-10-02T10:00:00Z", status: "new" }], now).confirmRate === null);
 
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

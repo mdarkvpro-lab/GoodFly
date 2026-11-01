@@ -139,7 +139,8 @@
     "info": "Informations",
     "contactLink": "Contact",
     "legal": "Mentions légales",
-    "privacy": "Confidentialité"
+    "privacy": "Confidentialité",
+    "staff": "Espace équipe"
   },
   "reservation": {
     "title": "Demande de réservation",
@@ -214,8 +215,13 @@
         "credentials": "E-mail ou mot de passe incorrect.",
         "forbidden": "Ce compte n'a pas accès à l'espace GoodFly.",
         "rate": "Trop de tentatives. Réessayez dans quelques minutes.",
-        "config": "La connexion n'est pas encore configurée sur ce serveur."
-      }
+        "config": "La connexion n'est pas encore configurée sur ce serveur.",
+        "useDirection": "Ce compte est un compte Direction : choisissez « Direction ».",
+        "useEmployee": "Ce compte est un compte employé : choisissez « Employé »."
+      },
+      "accountType": "Je suis",
+      "employee": "Employé",
+      "direction": "Direction"
     },
     "password": {
       "title": "Choisissez votre mot de passe",
@@ -245,7 +251,19 @@
       "tableView": "Voir en tableau",
       "month": "Mois",
       "bookingsSoon": "Le chiffre d'affaires apparaîtra avec le paiement en ligne.",
-      "newBookings": "Demandes de réservation à traiter"
+      "newBookings": "Demandes de réservation à traiter",
+      "bookings": {
+        "thisMonth": "Demandes ce mois",
+        "confirmedThisMonth": "Confirmées ce mois",
+        "waiting": "En attente d'appel",
+        "rate": "Taux de confirmation",
+        "rateHint": "Confirmées sur les demandes traitées (12 mois)",
+        "chart": {
+          "title": "Demandes de réservation par mois",
+          "requests": "Demandes",
+          "confirmed": "Confirmées"
+        }
+      }
     },
     "accounts": {
       "title": "Comptes",
@@ -310,7 +328,8 @@
         "program_updated": "Programme modifié",
         "program_deleted": "Programme supprimé",
         "booking_updated": "Réservation mise à jour",
-        "booking_deleted": "Réservation supprimée"
+        "booking_deleted": "Réservation supprimée",
+        "reset_employee_password": "Mot de passe réinitialisé"
       }
     },
     "me": {
@@ -392,7 +411,23 @@
       "sendRequest": "Envoyer la demande",
       "removedTitle": "Employés retirés (réactivables 30 jours)",
       "pendingBanner": "{n} demande(s) de retrait d'employé attendent votre décision.",
-      "pendingLink": "Voir les demandes"
+      "pendingLink": "Voir les demandes",
+      "reset": {
+        "button": "Mot de passe oublié",
+        "hint": "Un nouveau mot de passe temporaire est créé. L'employé devra en choisir un nouveau à sa prochaine connexion.",
+        "confirm": "Créer un mot de passe temporaire",
+        "done": "Nouveau mot de passe temporaire :",
+        "doneHint": "Donnez-le à l'employé en main propre. Il ne sera plus jamais affiché.",
+        "copy": "Copier",
+        "copied": "Copié ✓",
+        "left": "Encore {n} réinitialisation(s) possible(s) sur 30 jours (maximum 10).",
+        "errors": {
+          "limit": "Limite atteinte : 10 réinitialisations sur 30 jours pour cet employé.",
+          "notEmployee": "Ce compte n'est pas un employé actif.",
+          "config": "La réinitialisation n'est pas configurée sur ce serveur.",
+          "generic": "Impossible de réinitialiser le mot de passe. Réessayez."
+        }
+      }
     },
     "programs": {
       "title": "Programmes",
