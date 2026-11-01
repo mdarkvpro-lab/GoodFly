@@ -35,7 +35,7 @@ for (const sql of migrations) await db.exec(sql);
 // Supabase grants table privileges to API roles by default; RLS does the filtering.
 await db.exec(`
   grant usage on schema public to authenticated, anon;
-  grant select, insert, update, delete on public.profiles, public.audit_log, public.programs, public.employee_removal_requests to authenticated;
+  grant select, insert, update, delete on public.profiles, public.audit_log, public.programs, public.employee_removal_requests, public.booking_requests to authenticated;
   grant select on public.programs to anon;
 `);
 
@@ -284,6 +284,96 @@ await check("foreign keys and the journal are indexed", async () => {
   for (const n of ["audit_log_actor_idx", "audit_log_target_idx", "audit_log_created_at_idx", "profiles_disabled_by_idx"]) {
     if (!names.includes(n)) throw new Error(`missing ${n}`);
   }
+});
+
+console.log("Booking requests");
+const req = (extra = {}) => ({ full_name: "Salma B.", phone: "+212 6 12 34 56 78", email: "salma@exemple.ma", to_place: "Istanbul", travel_dates: "fin décembre", adults: "2", children: "1", message: "Hôtel proche du centre", lang: "fr", consent: "true", ...extra });
+await db.exec(`insert into public.programs (slug, status, title_fr) values ('omra-test', 'published', 'Omra test'), ('brouillon-test', 'draft', 'Brouillon test')`);
+const FORM_KEY = "test-form-key-0123456789";
+await db.query(`insert into private.settings values ('booking_form_key_sha256', encode(sha256(convert_to($1, 'UTF8')), 'hex'))`, [FORM_KEY]);
+let ipSeq = 0;
+const ip = () => (++ipSeq).toString(16).padStart(64, "0");
+const submit = (p, key = FORM_KEY, ipHash = ip()) => asAnon(`select public.submit_booking_request($1, $2, $3) as ref`, [p, key, ipHash]);
+let bookingRef = "";
+await check("a visitor can send a request and gets a reference", async () => {
+  const r = await submit(req());
+  bookingRef = r.rows[0].ref;
+  if (!/^GF-[0-9A-F]{8}$/.test(bookingRef)) throw new Error(bookingRef);
+});
+await check("a request for a published programme keeps its title", async () => {
+  const r = await submit(req({ program: "omra-test", to_place: "", phone: "0611111111" }));
+  const row = await db.query(`select program_title, program_id is not null as linked from public.booking_requests where reference = $1`, [r.rows[0].ref]);
+  if (row.rows[0].program_title !== "Omra test" || !row.rows[0].linked) throw new Error(JSON.stringify(row.rows));
+});
+await check("a draft programme cannot be booked", () => expectError(submit(req({ program: "brouillon-test" })), "program_unavailable"));
+await check("consent is required", () => expectError(submit(req({ consent: "false" })), "consent"));
+await check("bad phone, e-mail, traveller count and missing destination are refused", async () => {
+  for (const bad of [{ phone: "abc" }, { phone: "12" }, { email: "pas-un-email" }, { adults: "0" }, { adults: "x" }, { children: "50" }, { to_place: "" }, { full_name: "a" }, { message: "x".repeat(1001) }, { lang: "en" }]) {
+    await expectError(submit(req(bad)), "invalid");
+  }
+});
+await check("visitors cannot choose the status or the reference", async () => {
+  const r = await submit(req({ phone: "0622222222", status: "confirmed", reference: "GF-00000000" }));
+  const row = await db.query(`select status, reference from public.booking_requests where reference = $1`, [r.rows[0].ref]);
+  if (row.rows[0].status !== "new" || row.rows[0].reference === "GF-00000000") throw new Error(JSON.stringify(row.rows));
+});
+await check("one phone number is limited to 3 requests per day", async () => {
+  await submit(req({ phone: "0633333333" }));
+  await submit(req({ phone: "06 33 33 33 33" }));
+  await submit(req({ phone: "06.33.33.33.33" }));
+  await expectError(submit(req({ phone: "0633333333" })), "too_many");
+});
+await check("a request without the site's form key is refused", async () => {
+  await expectError(submit(req({ phone: "0644444444" }), null), "form_key");
+  await expectError(submit(req({ phone: "0644444444" }), "wrong-key"), "form_key");
+});
+await check("the form key hash is out of reach of the API", async () => {
+  await expectError(asAnon(`select * from private.settings`), "permission denied");
+  await expectError(as("Y", `select * from private.settings`), "permission denied");
+});
+await check("one visitor (IP) is limited to 5 requests per hour", async () => {
+  const visitor = "ab".repeat(32);
+  for (let i = 0; i < 5; i++) await submit(req({ phone: `065555555${i}` }), FORM_KEY, visitor);
+  await expectError(submit(req({ phone: "0655555559" }), FORM_KEY, visitor), "too_many");
+  await expectError(submit(req({ phone: "0655555558" }), FORM_KEY, "not-a-hash"), "invalid");
+});
+await check("visitors cannot read, change or delete requests", async () => {
+  await expectError(asAnon(`select * from public.booking_requests`), "permission denied");
+  await expectError(asAnon(`select public.update_booking_request(id, 'confirmed', '') from public.booking_requests`), "permission denied");
+});
+await check("an employee without bookings.manage sees no request", async () => {
+  await as("Y", `select public.set_employee_permissions($1, array[]::text[])`, [ids.A]);
+  await expectRows(as("A", `select id from public.booking_requests`), 0);
+  const id = (await db.query(`select id from public.booking_requests where reference = $1`, [bookingRef])).rows[0].id;
+  await expectError(as("A", `select public.update_booking_request($1, 'confirmed', '')`, [id]), "bookings.manage");
+});
+await check("an employee with bookings.manage reads and follows up requests (journaled)", async () => {
+  await as("Y", `select public.set_employee_permissions($1, array['bookings.manage'])`, [ids.A]);
+  const r = await as("A", `select id from public.booking_requests where reference = $1`, [bookingRef]);
+  if (r.rows.length !== 1) throw new Error("not visible");
+  await as("A", `select public.update_booking_request($1, 'in_progress', 'Rappelée à 10h')`, [r.rows[0].id]);
+  const row = await db.query(`select status, staff_note, handled_by from public.booking_requests where id = $1`, [r.rows[0].id]);
+  if (row.rows[0].status !== "in_progress" || row.rows[0].handled_by !== ids.A) throw new Error(JSON.stringify(row.rows));
+  const log = await db.query(`select details from public.audit_log where action = 'booking_updated' and target = $1`, [r.rows[0].id]);
+  if (log.rows[0]?.details?.reference !== bookingRef) throw new Error(JSON.stringify(log.rows));
+});
+await check("staff cannot edit requests directly or set an unknown status", async () => {
+  await expectRows(as("A", `update public.booking_requests set full_name = 'x' where reference = $1`, [bookingRef]), 0);
+  await expectError(as("A", `select public.update_booking_request(id, 'paid', '') from public.booking_requests where reference = $1`, [bookingRef]), "invalid");
+});
+await check("only Direction can delete a request; the journal keeps no personal data", async () => {
+  const id = (await db.query(`select id from public.booking_requests where reference = $1`, [bookingRef])).rows[0].id;
+  await expectError(as("A", `select public.delete_booking_request($1)`, [id]), "only direction");
+  await as("Y", `select public.delete_booking_request($1)`, [id]);
+  await expectRows(db.query(`select 1 from public.booking_requests where id = $1`, [id]), 0);
+  const log = await db.query(`select details::text as d from public.audit_log where action = 'booking_deleted' and target = $1`, [id]);
+  if (!log.rows[0] || /Salma|612|exemple/.test(log.rows[0].d)) throw new Error(JSON.stringify(log.rows));
+  await as("Y", `select public.set_employee_permissions($1, array[]::text[])`, [ids.A]);
+});
+await check("deleting a programme keeps its requests", async () => {
+  await db.exec(`delete from public.programs where slug in ('omra-test', 'brouillon-test')`);
+  const r = await db.query(`select count(*)::int as n from public.booking_requests where program_title = 'Omra test'`);
+  if (r.rows[0].n !== 1) throw new Error(JSON.stringify(r.rows));
 });
 
 console.log(`\n${pass} passed, ${fail} failed`);

@@ -29,7 +29,7 @@ async function Journal({ lang, dict }: { lang: Locale; dict: Dictionary }) {
             <tr key={e.id}>
               <td className={styles.muted}>{when.format(new Date(e.created_at))}</td>
               <td>{actions[e.action] ?? e.action}</td>
-              <td>{(e.target && names.get(e.target)) || String(e.details.email ?? "—")}</td>
+              <td>{(e.target && names.get(e.target)) || String(e.details.email ?? e.details.reference ?? e.details.title ?? "—")}</td>
               <td>{e.actor ? (names.get(e.actor) ?? "—") : t.system}</td>
             </tr>
           ))}

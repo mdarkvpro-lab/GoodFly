@@ -45,7 +45,7 @@ check("an employee only has granted permissions", can(writer, "programs.manage")
 check("home page follows permissions", staffHome(boss) === "" && staffHome(writer) === "programmes" && staffHome(nobody) === "mon-compte");
 const nav = (u: Parameters<typeof staffNav>[0]) => staffNav(u).map((i) => i.key).join(",");
 check("employees never see Employés or Journal", !/employees|journal/.test(nav(writer)), nav(writer));
-check("Direction sees the full menu", nav(boss) === "overview,programs,accounts,employees,journal,me", nav(boss));
+check("Direction sees the full menu", nav(boss) === "overview,bookings,programs,accounts,employees,journal,me", nav(boss));
 
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

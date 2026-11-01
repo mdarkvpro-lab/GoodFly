@@ -7,7 +7,7 @@ import { StaffShell } from "@/components/staff/StaffShell";
 import styles from "@/components/staff/staff.module.css";
 import { isLocale, type Locale } from "@/i18n/config";
 import { getDictionary, type Dictionary } from "@/i18n/dictionaries";
-import { listPendingRemovals, listStatsRows, requireStaff, staffPath } from "@/lib/staff/dal";
+import { countNewBookings, listPendingRemovals, listStatsRows, requireStaff, staffPath } from "@/lib/staff/dal";
 import { clientsByMonth, kpis } from "@/lib/staff/stats";
 
 async function Overview({ lang, dict }: { lang: Locale; dict: Dictionary }) {
@@ -45,6 +45,18 @@ async function Overview({ lang, dict }: { lang: Locale; dict: Dictionary }) {
   );
 }
 
+/** Booking requests nobody has called back yet. */
+async function BookingsBanner({ lang, dict }: { lang: Locale; dict: Dictionary }) {
+  const waiting = await countNewBookings(lang);
+  if (!waiting) return null;
+  return (
+    <p className={`${styles.notice} ${styles.warn}`} role="status">
+      {dict.staff.overview.newBookings} : <strong>{waiting}</strong> ·{" "}
+      <Link href={`${staffPath(lang, "reservations")}?statut=new`}>{dict.staff.bookings.title}</Link>
+    </p>
+  );
+}
+
 /** Direction only: removal requests waiting for this boss's decision. */
 async function PendingBanner({ lang, dict }: { lang: Locale; dict: Dictionary }) {
   const { user } = await requireStaff(lang, { permission: "reports.view" });
@@ -71,6 +83,9 @@ export default async function StaffHome({ params, searchParams }: PageProps<"/[l
       </Suspense>
       <Suspense fallback={null}>
         <PendingBanner lang={lang} dict={dict} />
+      </Suspense>
+      <Suspense fallback={null}>
+        <BookingsBanner lang={lang} dict={dict} />
       </Suspense>
       <Suspense fallback={<p className={styles.muted}>{dict.staff.loading}</p>}>
         <Overview lang={lang} dict={dict} />

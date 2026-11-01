@@ -535,3 +535,95 @@
   align-items: center;
   gap: 12px;
 }
+
+/* ───── Booking requests ───── */
+.tagNew {
+  background: color-mix(in srgb, var(--blue) 16%, transparent);
+  color: var(--blue);
+}
+
+.tagWarn {
+  background: color-mix(in srgb, #d68910 18%, transparent);
+  color: #8a5a00;
+}
+
+:global([data-theme="dark"]) .tagWarn {
+  color: #f5c46b;
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr));
+  gap: 12px 20px;
+  margin: 0;
+}
+
+.facts dt {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.facts dd {
+  margin: 2px 0 0;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.facts a {
+  color: var(--blue);
+}
+
+.quote {
+  padding: 12px 16px;
+  border-inline-start: 3px solid var(--line);
+  background: var(--bg-alt);
+  border-radius: 8px;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.navCount {
+  display: inline-grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  margin-inline-start: 6px;
+  padding: 0 6px;
+  border-radius: var(--radius-pill);
+  background: var(--cta-bg);
+  color: var(--cta-ink);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.liveAlert {
+  position: fixed;
+  inset-inline-end: 16px;
+  bottom: 16px;
+  z-index: 50;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+  max-width: min(420px, calc(100vw - 32px));
+  padding: 16px 18px;
+  border-radius: 16px;
+  background: var(--night-bg);
+  color: var(--night-ink);
+  box-shadow: var(--shadow-card);
+}
+
+.liveAlert a {
+  color: inherit;
+  font-weight: 700;
+}
+
+.liveAlert .ghost {
+  color: inherit;
+}
+
+.alertsButton {
+  font-size: 13px;
+  min-height: 36px;
+}

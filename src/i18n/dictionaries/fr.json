@@ -143,10 +143,52 @@
     "privacy": "Confidentialité"
   },
   "reservation": {
-    "title": "Votre demande",
-    "intro": "La réservation en ligne arrive bientôt. Un conseiller GoodFly vous recontactera avec ces informations.",
-    "back": "Retour à l'accueil",
-    "empty": "Non précisé"
+    "title": "Demande de réservation",
+    "intro": "Dites-nous où et quand vous voulez partir. Un conseiller GoodFly vous rappelle pour confirmer les détails et le prix. Rien n'est payé en ligne.",
+    "forProgram": "Programme choisi",
+    "form": {
+      "fields": {
+        "contact": "Vos coordonnées",
+        "trip": "Votre voyage",
+        "full_name": "Nom complet",
+        "phone": "Téléphone",
+        "email": "E-mail",
+        "from_place": "Départ",
+        "to_place": "Destination",
+        "travel_dates": "Dates souhaitées",
+        "adults": "Adultes",
+        "children": "Enfants",
+        "message": "Précisions (hôtel, bagages, budget…)"
+      },
+      "hints": {
+        "phone": "Le conseiller vous appellera sur ce numéro.",
+        "email": "Facultatif.",
+        "travel_dates": "Ex. : du 20 au 27 décembre, ou « flexible »."
+      },
+      "errors": {
+        "check": "Vérifiez les champs signalés.",
+        "required": "Ce champ est obligatoire.",
+        "long": "Texte trop long.",
+        "range": "Nombre invalide.",
+        "phone.format": "Numéro invalide (ex. : 06 12 34 56 78 ou +212 6 12 34 56 78).",
+        "email.format": "Adresse e-mail invalide.",
+        "consent.required": "Votre accord est nécessaire pour traiter la demande.",
+        "tooMany": "Plusieurs demandes ont déjà été envoyées avec ce numéro aujourd'hui. Un conseiller va vous rappeler.",
+        "programGone": "Ce programme n'est plus disponible. Choisissez-en un autre ou indiquez votre destination.",
+        "config": "Les demandes en ligne ne sont pas encore configurées sur ce serveur.",
+        "generic": "La demande n'a pas pu être envoyée. Réessayez dans un instant.",
+        "captcha": "La vérification anti-robot a échoué. Cochez la case de vérification puis réessayez."
+      },
+      "consent": "J'accepte que GoodFly utilise ces informations pour me recontacter au sujet de cette demande (loi 09-08). Elles ne sont jamais revendues.",
+      "submit": "Envoyer la demande",
+      "sending": "Envoi…",
+      "required": "Les champs marqués * sont obligatoires.",
+      "doneTitle": "Demande envoyée ✓",
+      "doneText": "Merci ! Un conseiller GoodFly vous rappelle au plus vite pour confirmer votre voyage.",
+      "doneRef": "Votre référence (à donner au conseiller) :",
+      "doneHome": "Retour à l'accueil",
+      "donePrograms": "Voir les programmes"
+    }
   },
   "staff": {
     "title": "Espace GoodFly",
@@ -160,7 +202,8 @@
       "logout": "Se déconnecter",
       "site": "Voir le site",
       "programs": "Programmes",
-      "employees": "Employés"
+      "employees": "Employés",
+      "bookings": "Réservations"
     },
     "login": {
       "title": "Connexion équipe",
@@ -202,7 +245,8 @@
       "lost": "Perdus",
       "tableView": "Voir en tableau",
       "month": "Mois",
-      "bookingsSoon": "Les rapports de réservations et de chiffre d'affaires apparaîtront avec la réservation en ligne."
+      "bookingsSoon": "Le chiffre d'affaires apparaîtra avec le paiement en ligne.",
+      "newBookings": "Demandes de réservation à traiter"
     },
     "accounts": {
       "title": "Comptes",
@@ -265,7 +309,9 @@
         "cancel_employee_removal": "Demande de retrait annulée",
         "program_created": "Programme créé",
         "program_updated": "Programme modifié",
-        "program_deleted": "Programme supprimé"
+        "program_deleted": "Programme supprimé",
+        "booking_updated": "Réservation mise à jour",
+        "booking_deleted": "Réservation supprimée"
       }
     },
     "me": {
@@ -289,7 +335,9 @@
       "removalCancelled": "Demande annulée.",
       "programSaved": "Programme enregistré.",
       "programDeleted": "Programme supprimé.",
-      "role": "Le client est maintenant employé. Choisissez ses accès dans « Employés »."
+      "role": "Le client est maintenant employé. Choisissez ses accès dans « Employés ».",
+      "bookingSaved": "Demande mise à jour.",
+      "bookingDeleted": "Demande supprimée."
     },
     "errors": {
       "forbidden": "Action refusée : ce compte est protégé.",
@@ -305,7 +353,7 @@
       "programs.manage": "Publier les programmes",
       "clients.view": "Voir les clients",
       "reports.view": "Voir les statistiques",
-      "bookings.manage": "Gérer les réservations (bientôt)"
+      "bookings.manage": "Gérer les réservations"
     },
     "employees": {
       "title": "Employés",
@@ -404,6 +452,46 @@
       "save": "Enregistrer",
       "removeImage": "Retirer la photo",
       "currentImage": "Photo actuelle"
+    },
+    "bookings": {
+      "title": "Réservations",
+      "intro": "Demandes envoyées depuis le site. Appelez le client, puis mettez à jour le statut.",
+      "empty": "Aucune demande pour l'instant.",
+      "emptyFilter": "Aucune demande avec ce statut.",
+      "filterLabel": "Filtrer par statut",
+      "all": "Toutes",
+      "statuses": {
+        "new": "Nouvelle",
+        "in_progress": "En cours",
+        "confirmed": "Confirmée",
+        "cancelled": "Annulée"
+      },
+      "reference": "Référence",
+      "received": "Reçue le {date}",
+      "program": "Programme",
+      "trip": "Voyage",
+      "dates": "Dates",
+      "travellers": "Voyageurs",
+      "adults": "{n} adulte(s)",
+      "children": "{n} enfant(s)",
+      "message": "Message du client",
+      "call": "Appeler",
+      "status": "Statut",
+      "note": "Note interne",
+      "save": "Enregistrer",
+      "handledBy": "Suivi par {name}",
+      "delete": "Supprimer la demande",
+      "deleteHint": "À faire seulement si le client demande l'effacement de ses données. Action définitive.",
+      "deleteConfirm": "Supprimer définitivement",
+      "langAr": "Client arabophone",
+      "count": "{n} demande(s)",
+      "live": {
+        "title": "Nouvelle demande de réservation",
+        "open": "Voir",
+        "enable": "🔔 Activer les alertes",
+        "enabled": "Alertes activées",
+        "dismiss": "Fermer"
+      }
     }
   },
   "programs": {

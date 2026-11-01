@@ -4,6 +4,7 @@ import { cache } from "react";
 import type { Locale } from "@/i18n/config";
 import { createClient, supabaseConfigured } from "@/lib/supabase/server";
 import { can, PERMISSIONS, staffHome, type Permission, type StaffUser } from "./access";
+import type { BookingStatus } from "@/lib/bookings/validate";
 import type { ProfileRow } from "./stats";
 
 /**
@@ -152,4 +153,58 @@ export async function getStaffProgram(lang: Locale, id: string): Promise<StaffPr
   if (!/^[0-9a-f-]{36}$/.test(id)) return null;
   const { data } = await supabase.from("programs").select(PROGRAM_COLUMNS).eq("id", id).maybeSingle();
   return (data as StaffProgram | null) ?? null;
+}
+
+export type StaffBooking = {
+  id: string;
+  reference: string;
+  program_title: string;
+  program_id: string | null;
+  full_name: string;
+  phone: string;
+  email: string;
+  from_place: string;
+  to_place: string;
+  travel_dates: string;
+  adults: number;
+  children: number;
+  message: string;
+  lang: string;
+  status: BookingStatus;
+  staff_note: string;
+  handled_by: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+const BOOKING_COLUMNS =
+  "id, reference, program_title, program_id, full_name, phone, email, from_place, to_place, travel_dates, adults, children, message, lang, status, staff_note, handled_by, created_at, updated_at";
+
+/** Booking requests, newest first (needs bookings.manage; RLS enforces the same). */
+export async function listBookings(lang: Locale, status?: BookingStatus): Promise<StaffBooking[]> {
+  const { supabase } = await requireStaff(lang, { permission: "bookings.manage" });
+  let query = supabase.from("booking_requests").select(BOOKING_COLUMNS);
+  if (status) query = query.eq("status", status);
+  const { data, error } = await query.order("created_at", { ascending: false }).limit(200);
+  if (error) throw new Error(error.message);
+  return (data ?? []) as StaffBooking[];
+}
+
+/** Requests still waiting for a first call (0 when the account cannot see bookings). */
+export async function countNewBookings(lang: Locale): Promise<number> {
+  const { supabase, user } = await requireStaff(lang, { allowPasswordChange: true });
+  if (!can(user, "bookings.manage")) return 0;
+  const { count } = await supabase.from("booking_requests").select("id", { count: "exact", head: true }).eq("status", "new");
+  return count ?? 0;
+}
+
+/** Names of staff accounts for "handled by" (Direction sees all; others only themselves). */
+export async function staffNames(lang: Locale): Promise<Map<string, string>> {
+  const { supabase, user } = await requireStaff(lang, { permission: "bookings.manage" });
+  const map = new Map<string, string>([[user.id, user.fullName || user.email]]);
+  if (user.role === "direction") {
+    const { data } = await supabase.from("profiles").select("id, full_name, email").in("role", ["direction", "agent"]);
+    for (const r of data ?? []) map.set(r.id, r.full_name || r.email);
+  }
+  return map;
 }

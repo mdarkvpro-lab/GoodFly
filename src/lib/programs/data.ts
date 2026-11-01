@@ -28,7 +28,7 @@ export type Program = {
 const COLUMNS =
   "id, slug, title_fr, title_ar, summary_fr, summary_ar, description_fr, description_ar, destination, start_date, end_date, duration_days, price_from_mad, image_path, published_at";
 
-function publicClient() {
+export function publicClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
   if (!url || !key) return null;

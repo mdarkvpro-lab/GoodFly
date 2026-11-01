@@ -82,7 +82,7 @@ async function Detail({ lang, dict, params }: { lang: Locale; dict: Dictionary; 
               </div>
             )}
           </dl>
-          <Link className={styles.asideButton} href={`/${lang}/reservation?to=${encodeURIComponent(p.destination || text.title)}`}>
+          <Link className={styles.asideButton} href={`/${lang}/reservation?programme=${p.slug}`}>
             {t.book}
           </Link>
         </aside>

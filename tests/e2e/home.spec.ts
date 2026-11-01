@@ -41,7 +41,9 @@ test.describe("homepage", () => {
     await form.getByLabel("Destination").fill("Istanbul");
     await form.getByRole("button", { name: "Rechercher" }).click();
     await expect(page).toHaveURL(/\/fr\/reservation\?/);
-    await expect(page.getByText("Istanbul")).toBeVisible();
+    const request = page.getByRole("main");
+    await expect(request.getByRole("textbox", { name: /^Destination/ })).toHaveValue("Istanbul");
+    await expect(request.getByRole("textbox", { name: /^Départ/ })).toHaveValue("Rabat–Salé (RBA)");
   });
 
   test("theme toggle switches to dark and is remembered", async ({ page }) => {

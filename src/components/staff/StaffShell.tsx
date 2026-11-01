@@ -4,22 +4,29 @@ import { signOut } from "@/app/[lang]/espace/actions";
 import { ThemeToggle } from "@/components/header/ThemeToggle";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries";
-import { staffNav } from "@/lib/staff/access";
-import { requireStaff, staffPath } from "@/lib/staff/dal";
+import { can, staffNav } from "@/lib/staff/access";
+import { BookingAlerts } from "./BookingAlerts";
+import { countNewBookings, requireStaff, staffPath } from "@/lib/staff/dal";
 import styles from "./staff.module.css";
 
 type Props = { lang: Locale; dict: Dictionary; children: ReactNode; withNav?: boolean };
 
 /** Links the signed-in account may use (session read, so rendered inside Suspense). */
-async function StaffNav({ lang, t }: { lang: Locale; t: Dictionary["staff"]["nav"] }) {
-  const { user } = await requireStaff(lang, { allowPasswordChange: true });
+async function StaffNav({ lang, t, bookingsLive }: { lang: Locale; t: Dictionary["staff"]["nav"]; bookingsLive: Dictionary["staff"]["bookings"]["live"] }) {
+  const [{ user }, waiting] = await Promise.all([requireStaff(lang, { allowPasswordChange: true }), countNewBookings(lang)]);
   return (
     <>
       {staffNav(user).map((item) => (
         <Link key={item.key} href={staffPath(lang, item.page)}>
           {t[item.key]}
+          {item.key === "bookings" && waiting > 0 && (
+            <span className={styles.navCount} aria-label={`(${waiting})`}>
+              {waiting}
+            </span>
+          )}
         </Link>
       ))}
+      {can(user, "bookings.manage") && <BookingAlerts href={staffPath(lang, "reservations")} t={bookingsLive} />}
     </>
   );
 }
@@ -39,7 +46,7 @@ export function StaffShell({ lang, dict, children, withNav = true }: Props) {
           {withNav && (
             <nav aria-label={t.label} className={styles.nav}>
               <Suspense fallback={null}>
-                <StaffNav lang={lang} t={t} />
+                <StaffNav lang={lang} t={t} bookingsLive={dict.staff.bookings.live} />
               </Suspense>
             </nav>
           )}
