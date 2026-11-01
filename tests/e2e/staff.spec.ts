@@ -1,18 +1,18 @@
 import { expect, test } from "@playwright/test";
 
-test.describe("Direction area (signed out)", () => {
-  for (const page of ["", "/comptes", "/journal", "/mon-compte", "/mot-de-passe"]) {
+test.describe("Staff area (signed out)", () => {
+  for (const page of ["", "/comptes", "/journal", "/mon-compte", "/mot-de-passe", "/employes", "/programmes", "/programmes/nouveau", "/programmes/00000000-0000-0000-0000-000000000000"]) {
     test(`/fr/espace${page} sends visitors to the sign-in page`, async ({ page: p }) => {
       await p.goto(`/fr/espace${page}`);
       await expect(p).toHaveURL(/\/fr\/espace\/connexion/);
-      await expect(p.getByRole("heading", { level: 1 })).toHaveText("Connexion Direction");
+      await expect(p.getByRole("heading", { level: 1 })).toHaveText("Connexion équipe");
     });
   }
 
   test("Arabic sign-in page is right-to-left", async ({ page }) => {
     await page.goto("/ar/espace/connexion");
     await expect(page.locator("html")).toHaveAttribute("dir", "rtl");
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText("دخول الإدارة");
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("دخول الفريق");
   });
 
   test("wrong credentials show a clear error", async ({ page }) => {

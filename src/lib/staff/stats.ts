@@ -7,6 +7,7 @@ export type ProfileRow = {
   role: "owner" | "direction" | "agent" | "client";
   disabled_at: string | null;
   created_at: string;
+  permissions?: string[];
 };
 
 export type MonthPoint = { key: string; gained: number; lost: number };

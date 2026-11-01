@@ -1,15 +1,30 @@
 import Link from "next/link";
-import type { ReactNode } from "react";
+import { Suspense, type ReactNode } from "react";
 import { signOut } from "@/app/[lang]/espace/actions";
 import { ThemeToggle } from "@/components/header/ThemeToggle";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries";
-import { staffPath } from "@/lib/staff/dal";
+import { staffNav } from "@/lib/staff/access";
+import { requireStaff, staffPath } from "@/lib/staff/dal";
 import styles from "./staff.module.css";
 
 type Props = { lang: Locale; dict: Dictionary; children: ReactNode; withNav?: boolean };
 
-/** Static chrome of the Direction area (no session read here, so it prerenders). */
+/** Links the signed-in account may use (session read, so rendered inside Suspense). */
+async function StaffNav({ lang, t }: { lang: Locale; t: Dictionary["staff"]["nav"] }) {
+  const { user } = await requireStaff(lang, { allowPasswordChange: true });
+  return (
+    <>
+      {staffNav(user).map((item) => (
+        <Link key={item.key} href={staffPath(lang, item.page)}>
+          {t[item.key]}
+        </Link>
+      ))}
+    </>
+  );
+}
+
+/** Static chrome of the staff area; only the nav links depend on the session. */
 export function StaffShell({ lang, dict, children, withNav = true }: Props) {
   const t = dict.staff.nav;
   return (
@@ -23,10 +38,9 @@ export function StaffShell({ lang, dict, children, withNav = true }: Props) {
           </Link>
           {withNav && (
             <nav aria-label={t.label} className={styles.nav}>
-              <Link href={staffPath(lang)}>{t.overview}</Link>
-              <Link href={staffPath(lang, "comptes")}>{t.accounts}</Link>
-              <Link href={staffPath(lang, "journal")}>{t.journal}</Link>
-              <Link href={staffPath(lang, "mon-compte")}>{t.me}</Link>
+              <Suspense fallback={null}>
+                <StaffNav lang={lang} t={t} />
+              </Suspense>
             </nav>
           )}
           <div className={styles.topActions}>

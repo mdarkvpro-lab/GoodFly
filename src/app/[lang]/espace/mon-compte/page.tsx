@@ -6,12 +6,12 @@ import { StaffShell } from "@/components/staff/StaffShell";
 import styles from "@/components/staff/staff.module.css";
 import { isLocale, type Locale } from "@/i18n/config";
 import { getDictionary, type Dictionary } from "@/i18n/dictionaries";
-import { requireDirection, staffPath } from "@/lib/staff/dal";
+import { requireStaff, staffPath } from "@/lib/staff/dal";
 import { updateOwnName } from "../actions";
 
 async function Me({ lang, dict }: { lang: Locale; dict: Dictionary }) {
   const t = dict.staff.me;
-  const { user } = await requireDirection(lang);
+  const { user } = await requireStaff(lang);
   return (
     <section className={styles.card}>
       <form action={updateOwnName} className={styles.row}>
@@ -27,6 +27,12 @@ async function Me({ lang, dict }: { lang: Locale; dict: Dictionary }) {
       <p>
         <span className={styles.muted}>{t.email} : </span>
         <span dir="ltr">{user.email}</span>
+      </p>
+      <p>
+        <span className={styles.muted}>{t.access} : </span>
+        {user.role === "direction"
+          ? t.allAccess
+          : user.permissions.map((p) => (dict.staff.permissions as Record<string, string>)[p]).join(" · ") || "—"}
       </p>
       <p>
         <Link href={staffPath(lang, "mot-de-passe")}>{t.changePassword}</Link>

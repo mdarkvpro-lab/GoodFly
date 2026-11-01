@@ -44,7 +44,7 @@ export function Services({ dict }: Props) {
   );
 }
 
-export function Featured({ dict }: Props) {
+export function Featured({ dict, href }: Props & { href: string }) {
   const t = dict.featured;
   return (
     <section className={`container ${styles.featuredWrap}`} aria-labelledby="featured-title">
@@ -53,7 +53,7 @@ export function Featured({ dict }: Props) {
         <div className={styles.featuredCopy}>
           <p className={styles.nightEyebrow}>{t.eyebrow}</p>
           <h2 id="featured-title">{t.title}</h2>
-          <a href="#booking" className={styles.lightButton}>
+          <a href={href} className={styles.lightButton}>
             {t.cta}
           </a>
         </div>

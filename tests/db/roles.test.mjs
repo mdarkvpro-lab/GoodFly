@@ -20,12 +20,23 @@ await db.exec(`
     $$ select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid $$;
   grant usage on schema auth to authenticated, anon;
   grant execute on function auth.uid() to authenticated, anon;
+  -- Minimal stand-in for Supabase Storage (buckets, objects, foldername()).
+  create schema storage;
+  create table storage.buckets (id text primary key, name text, public boolean, file_size_limit bigint, allowed_mime_types text[]);
+  create table storage.objects (id uuid primary key default gen_random_uuid(), bucket_id text, name text);
+  alter table storage.objects enable row level security;
+  create function storage.foldername(name text) returns text[] language sql immutable as
+    $$ select (string_to_array(name, '/'))[1:array_length(string_to_array(name, '/'), 1) - 1] $$;
+  grant usage on schema storage to authenticated, anon;
+  grant select, insert, update, delete on storage.objects to authenticated;
+  grant execute on function storage.foldername(text) to authenticated;
 `);
 for (const sql of migrations) await db.exec(sql);
 // Supabase grants table privileges to API roles by default; RLS does the filtering.
 await db.exec(`
   grant usage on schema public to authenticated, anon;
-  grant select, insert, update, delete on public.profiles, public.audit_log to authenticated;
+  grant select, insert, update, delete on public.profiles, public.audit_log, public.programs, public.employee_removal_requests to authenticated;
+  grant select on public.programs to anon;
 `);
 
 
@@ -100,16 +111,66 @@ await check("X cannot hide Y by setting disabled_at directly", () => expectRows(
 console.log("Bosses manage their own account and the agency's agents/clients");
 await check("X edits his own name", () => expectRows(as("X", `update public.profiles set full_name = 'Patron X' where id = $1`, [ids.X]), 1));
 await check("X sees every profile (reports)", () => expectRows(as("X", `select id from public.profiles`), 5));
-await check("X deactivates agent A", () => as("X", `select public.deactivate_account($1)`, [ids.A]));
-await check("deactivation is written to the audit log", () => expectRows(db.query(`select 1 from public.audit_log where action = 'deactivate_account' and target = $1`, [ids.A]), 1));
+console.log("Removing an employee needs the other boss");
+await check("X cannot deactivate employee A directly", () => expectError(as("X", `select public.deactivate_account($1)`, [ids.A]), "removal request"));
+await check("X cannot demote employee A to client directly", () => expectError(as("X", `update public.profiles set role = 'client' where id = $1`, [ids.A]), "removal request"));
+let requestId;
+await check("X asks to remove employee A", async () => {
+  const r = await as("X", `select public.request_employee_removal($1, 'Fin de contrat') as id`, [ids.A]);
+  requestId = r.rows[0].id;
+  if (!requestId) throw new Error("no request id");
+});
+await check("a second request for A is refused while one is pending", () => expectError(as("Y", `select public.request_employee_removal($1)`, [ids.A]), "already pending"));
+await check("X cannot approve his own request", () => expectError(as("X", `select public.decide_employee_removal($1, true)`, [requestId]), "other Direction"));
+await check("employee A is still active while the request is pending", async () => {
+  const r = await db.query(`select disabled_at from public.profiles where id = $1`, [ids.A]);
+  if (r.rows[0].disabled_at) throw new Error("already disabled");
+});
+await check("an employee cannot request removals", () => expectError(as("A", `select public.request_employee_removal($1)`, [ids.A]), "only direction"));
+await check("Y approves: employee A is deactivated", async () => {
+  await as("Y", `select public.decide_employee_removal($1, true)`, [requestId]);
+  const r = await db.query(`select disabled_at, disabled_by from public.profiles where id = $1`, [ids.A]);
+  if (!r.rows[0].disabled_at || r.rows[0].disabled_by !== ids.Y) throw new Error(JSON.stringify(r.rows[0]));
+});
+await check("a decided request cannot be decided again", () => expectError(as("Y", `select public.decide_employee_removal($1, false)`, [requestId]), "already decided"));
+await check("request and approval are in the journal", () =>
+  expectRows(db.query(`select 1 from public.audit_log where target = $1 and action in ('request_employee_removal', 'approve_employee_removal')`, [ids.A]), 2));
 await check("deactivated agent A loses access (cannot edit own profile)", () => expectRows(as("A", `update public.profiles set full_name = 'x' where id = $1`, [ids.A]), 0));
 await check("Y (other boss) restores agent A", () => as("Y", `select public.restore_account($1)`, [ids.A]));
+await check("if Y refuses, employee A stays", async () => {
+  const r = await as("X", `select public.request_employee_removal($1) as id`, [ids.A]);
+  await as("Y", `select public.decide_employee_removal($1, false)`, [r.rows[0].id]);
+  const p = await db.query(`select disabled_at from public.profiles where id = $1`, [ids.A]);
+  if (p.rows[0].disabled_at) throw new Error("removed anyway");
+});
+await check("only the requester can cancel a pending request", async () => {
+  const r = await as("Y", `select public.request_employee_removal($1) as id`, [ids.A]);
+  await expectError(as("X", `select public.cancel_employee_removal($1)`, [r.rows[0].id]), "only the requester");
+  await as("Y", `select public.cancel_employee_removal($1)`, [r.rows[0].id]);
+  const q = await db.query(`select status from public.employee_removal_requests where id = $1`, [r.rows[0].id]);
+  if (q.rows[0].status !== "cancelled") throw new Error(q.rows[0].status);
+});
+await check("employees and clients cannot read removal requests", () => expectRows(as("A", `select id from public.employee_removal_requests`), 0));
+
+console.log("Employee permissions");
+await check("agent A without permission sees only himself", async () => {
+  const r = await as("A", `select role from public.profiles`);
+  if (r.rows.map((x) => x.role).join() !== "agent") throw new Error(JSON.stringify(r.rows));
+});
+await check("X grants A the clients.view and programs.manage permissions", () =>
+  as("X", `select public.set_employee_permissions($1, array['clients.view', 'programs.manage'])`, [ids.A]));
+await check("an unknown permission is refused", () => expectError(as("X", `select public.set_employee_permissions($1, array['admin.all'])`, [ids.A]), "unknown permission"));
+await check("permissions only apply to employees (not to Y)", () => expectError(as("X", `select public.set_employee_permissions($1, array['clients.view'])`, [ids.Y]), "active employees"));
+await check("A cannot change his own permissions", () =>
+  expectError(as("A", `update public.profiles set permissions = array['reports.view'] where id = $1`, [ids.A]), "set_employee_permissions"));
+await check("an employee cannot grant permissions", () => expectError(as("A", `select public.set_employee_permissions($1, array['reports.view'])`, [ids.A]), "only direction"));
 await check("X promotes client C to agent", () => expectRows(as("X", `update public.profiles set role = 'agent' where id = $1`, [ids.C]), 1));
 await check("X cannot promote C to direction", () => expectError(as("X", `update public.profiles set role = 'direction' where id = $1`, [ids.C]), "only the owner"));
 await db.exec(`update public.profiles set role = 'client' where id = '${ids.C}'`);
 
 console.log("Agents and clients");
-await check("agent A reads client profiles but not bosses", async () => {
+await as("X", `select public.set_employee_permissions($1, array['clients.view', 'programs.manage'])`, [ids.A]);
+await check("agent A (with clients.view) reads client profiles but not bosses", async () => {
   const r = await as("A", `select role from public.profiles`);
   const roles = r.rows.map((x) => x.role).sort().join(",");
   if (roles !== "agent,client") throw new Error(roles);
@@ -119,6 +180,62 @@ await check("client C only sees himself", () => expectRows(as("C", `select id fr
 await check("client C cannot read the audit log", () => expectRows(as("C", `select id from public.audit_log`), 0));
 await check("client C cannot make himself an agent", () => expectError(as("C", `update public.profiles set role = 'agent' where id = $1`, [ids.C]), "only direction"));
 await check("nobody can hard-delete a profile from the website", () => expectRows(as("X", `delete from public.profiles where id = $1`, [ids.C]), 0));
+
+console.log("Programmes");
+async function asAnon(sql, params = []) {
+  await db.exec(`set role anon; select set_config('request.jwt.claim.sub', '', false);`);
+  try {
+    return await db.query(sql, params);
+  } finally {
+    await db.exec(`reset role;`);
+  }
+}
+let programId;
+await check("an employee with programs.manage creates a draft (author stamped by the database)", async () => {
+  const r = await as("A", `insert into public.programs (slug, title_fr, created_by) values ('omra-printemps', 'Omra de printemps', $1) returning id, created_by, status`, [ids.X]);
+  programId = r.rows[0].id;
+  if (r.rows[0].created_by !== ids.A || r.rows[0].status !== "draft") throw new Error(JSON.stringify(r.rows[0]));
+});
+await check("visitors do not see drafts", () => expectRows(asAnon(`select id from public.programs`), 0));
+await check("clients do not see drafts", () => expectRows(as("C", `select id from public.programs`), 0));
+await check("publishing sets the publication date; visitors then see it", async () => {
+  const r = await as("A", `update public.programs set status = 'published' where id = $1 returning published_at`, [programId]);
+  if (!r.rows[0].published_at) throw new Error("no published_at");
+  await expectRows(asAnon(`select id from public.programs`), 1);
+});
+await check("visitors cannot change programmes", () => expectError(asAnon(`update public.programs set title_fr = 'Piraté' where id = $1`, [programId]), "permission denied"));
+await check("a client cannot create programmes", () => expectError(as("C", `insert into public.programs (slug, title_fr) values ('x-y', 'Test client')`), "row-level security"));
+await check("invalid slugs are refused", () => expectError(as("A", `insert into public.programs (slug, title_fr) values ('Bad Slug!', 'Titre')`), "check constraint"));
+await check("an employee cannot delete a programme", () => expectRows(as("A", `delete from public.programs where id = $1`, [programId]), 0));
+await check("every programme change is in the journal", () =>
+  expectRows(db.query(`select 1 from public.audit_log where target = $1 and action in ('program_created', 'program_updated')`, [programId]), 2));
+await check("an employee with programs.manage can upload a programme image (programs/ folder only)", async () => {
+  await as("A", `insert into storage.objects (bucket_id, name) values ('program-images', 'programs/omra/cover.webp')`);
+  await expectError(as("A", `insert into storage.objects (bucket_id, name) values ('program-images', 'other/cover.webp')`), "row-level security");
+});
+await check("a client cannot upload images", () =>
+  expectError(as("C", `insert into storage.objects (bucket_id, name) values ('program-images', 'programs/x.webp')`), "row-level security"));
+await check("Direction deletes a programme", async () => {
+  await expectRows(as("X", `delete from public.programs where id = $1`, [programId]), 1);
+  await expectRows(db.query(`select 1 from public.audit_log where target = $1 and action = 'program_deleted'`, [programId]), 1);
+});
+await check("removing a permission takes effect immediately", async () => {
+  await as("X", `select public.set_employee_permissions($1, array[]::text[])`, [ids.A]);
+  await expectError(as("A", `insert into public.programs (slug, title_fr) values ('apres-retrait', 'Après retrait')`), "row-level security");
+});
+
+console.log("Dashboard statistics");
+await check("an employee without reports.view cannot read statistics", () => expectError(as("A", `select * from public.staff_profile_stats()`), "reports.view"));
+await check("with reports.view, statistics contain dates only (no names or e-mails)", async () => {
+  await as("X", `select public.set_employee_permissions($1, array['reports.view'])`, [ids.A]);
+  const r = await as("A", `select * from public.staff_profile_stats()`);
+  const cols = r.fields.map((f) => f.name).sort().join(",");
+  if (cols !== "created_at,disabled_at,role") throw new Error(cols);
+  if (r.rows.some((x) => x.role !== "client" && x.role !== "agent")) throw new Error("bosses or owner listed");
+  await expectRows(as("A", `select id from public.profiles where role = 'client'`), 0); // still no client details
+  await as("X", `select public.set_employee_permissions($1, array[]::text[])`, [ids.A]);
+});
+await check("visitors cannot call the statistics function", () => expectError(asAnon(`select * from public.staff_profile_stats()`), "permission denied"));
 
 console.log("Owner console (service role / postgres)");
 await check("owner can permanently delete a boss who had deactivated someone (journal kept)", async () => {

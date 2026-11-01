@@ -15,7 +15,8 @@
     "otherLanguageShort": "ع",
     "currentLanguageShort": "FR",
     "toggleTheme": "Changer de thème",
-    "skipToContent": "Aller au contenu"
+    "skipToContent": "Aller au contenu",
+    "programs": "Programmes"
   },
   "hero": {
     "eyebrow": "Bienvenue chez GoodFly · Au départ de {airport}",
@@ -148,26 +149,28 @@
     "empty": "Non précisé"
   },
   "staff": {
-    "title": "Espace Direction",
+    "title": "Espace GoodFly",
     "loading": "Chargement…",
     "nav": {
-      "label": "Espace Direction",
+      "label": "Espace GoodFly",
       "overview": "Vue d'ensemble",
       "accounts": "Comptes",
       "journal": "Journal",
       "me": "Mon compte",
       "logout": "Se déconnecter",
-      "site": "Voir le site"
+      "site": "Voir le site",
+      "programs": "Programmes",
+      "employees": "Employés"
     },
     "login": {
-      "title": "Connexion Direction",
-      "intro": "Accès réservé à la direction de l'agence.",
+      "title": "Connexion équipe",
+      "intro": "Accès réservé à la direction et aux employés de l'agence.",
       "email": "E-mail",
       "password": "Mot de passe",
       "submit": "Se connecter",
       "errors": {
         "credentials": "E-mail ou mot de passe incorrect.",
-        "forbidden": "Ce compte n'a pas accès à l'espace Direction.",
+        "forbidden": "Ce compte n'a pas accès à l'espace GoodFly.",
         "rate": "Trop de tentatives. Réessayez dans quelques minutes.",
         "config": "La connexion n'est pas encore configurée sur ce serveur."
       }
@@ -190,7 +193,7 @@
     "overview": {
       "title": "Vue d'ensemble",
       "activeClients": "Clients actifs",
-      "activeAgents": "Agents actifs",
+      "activeAgents": "Employés actifs",
       "newClients": "Nouveaux clients ce mois",
       "lostClients": "Clients perdus ce mois",
       "lastMonth": "{n} le mois dernier",
@@ -203,12 +206,12 @@
     },
     "accounts": {
       "title": "Comptes",
-      "intro": "Agents et clients de l'agence. Les comptes Direction sont protégés : seul le propriétaire peut les modifier.",
+      "intro": "Clients de l'agence. Les comptes Direction sont protégés (propriétaire seulement) ; les employés se gèrent dans « Employés ».",
       "filters": {
         "label": "Filtrer",
         "all": "Tous",
         "client": "Clients",
-        "agent": "Agents",
+        "agent": "Employés",
         "direction": "Direction"
       },
       "name": "Nom",
@@ -223,16 +226,17 @@
       "you": "Vous",
       "deactivate": "Désactiver",
       "restore": "Réactiver",
-      "makeAgent": "Passer agent",
+      "makeAgent": "Embaucher comme employé",
       "makeClient": "Repasser client",
       "empty": "Aucun compte pour l'instant.",
       "noName": "(sans nom)",
       "roles": {
         "owner": "Propriétaire",
         "direction": "Direction",
-        "agent": "Agent",
+        "agent": "Employé",
         "client": "Client"
-      }
+      },
+      "manageEmployee": "Gérer dans Employés"
     },
     "journal": {
       "title": "Journal",
@@ -252,7 +256,16 @@
         "owner_restore": "Compte réactivé",
         "owner_delete": "Compte supprimé",
         "owner_recovery_link": "Lien de réinitialisation",
-        "owner_purge": "Purge (30 jours)"
+        "owner_purge": "Purge (30 jours)",
+        "create_employee": "Employé créé",
+        "set_employee_permissions": "Accès modifiés",
+        "request_employee_removal": "Retrait demandé",
+        "approve_employee_removal": "Retrait accepté",
+        "reject_employee_removal": "Retrait refusé",
+        "cancel_employee_removal": "Demande de retrait annulée",
+        "program_created": "Programme créé",
+        "program_updated": "Programme modifié",
+        "program_deleted": "Programme supprimé"
       }
     },
     "me": {
@@ -260,20 +273,154 @@
       "name": "Nom affiché",
       "save": "Enregistrer",
       "email": "E-mail",
-      "changePassword": "Changer le mot de passe"
+      "changePassword": "Changer le mot de passe",
+      "access": "Vos accès",
+      "allAccess": "Tous les accès (Direction)"
     },
     "messages": {
       "password": "Mot de passe enregistré.",
       "name": "Nom mis à jour.",
       "deactivated": "Compte désactivé (récupérable 30 jours).",
       "restored": "Compte réactivé.",
-      "role": "Rôle mis à jour."
+      "permissions": "Accès enregistrés.",
+      "removalRequested": "Demande envoyée à l'autre compte Direction.",
+      "removalApproved": "Retrait accepté : l'employé n'a plus accès.",
+      "removalRejected": "Retrait refusé : l'employé reste.",
+      "removalCancelled": "Demande annulée.",
+      "programSaved": "Programme enregistré.",
+      "programDeleted": "Programme supprimé.",
+      "role": "Le client est maintenant employé. Choisissez ses accès dans « Employés »."
     },
     "errors": {
       "forbidden": "Action refusée : ce compte est protégé.",
       "window": "Le délai de 30 jours pour réactiver ce compte est dépassé.",
       "generic": "Une erreur est survenue. Réessayez.",
-      "name": "Le nom est obligatoire."
+      "name": "Le nom est obligatoire.",
+      "removalNeeded": "Un employé se retire par une demande acceptée par l'autre compte Direction.",
+      "pending": "Une demande est déjà en attente pour cet employé.",
+      "otherBoss": "C'est l'autre compte Direction qui doit décider.",
+      "notEmployee": "Ce compte n’est pas un employé actif."
+    },
+    "permissions": {
+      "programs.manage": "Publier les programmes",
+      "clients.view": "Voir les clients",
+      "reports.view": "Voir les statistiques",
+      "bookings.manage": "Gérer les réservations (bientôt)"
+    },
+    "employees": {
+      "title": "Employés",
+      "intro": "Ajoutez les employés et choisissez ce que chacun peut faire. Pour retirer un employé, l'autre compte Direction doit accepter.",
+      "addTitle": "Ajouter un employé",
+      "fullName": "Nom complet",
+      "email": "E-mail",
+      "permissionsLegend": "Ce que cet employé peut faire",
+      "submit": "Créer l'employé",
+      "createdTitle": "Compte créé pour {name}",
+      "createdHint": "Donnez ce mot de passe temporaire à l'employé en main propre. Il ne sera plus jamais affiché ; l'employé devra le changer à sa première connexion.",
+      "password": "Mot de passe temporaire",
+      "copy": "Copier le mot de passe",
+      "copied": "Copié ✓",
+      "another": "Ajouter un autre employé",
+      "errors": {
+        "email": "Adresse e-mail invalide.",
+        "name": "Le nom est obligatoire.",
+        "exists": "Un compte existe déjà avec cet e-mail.",
+        "config": "La création d'employés n'est pas configurée sur ce serveur.",
+        "generic": "Impossible de créer l'employé. Réessayez."
+      },
+      "pendingTitle": "Demandes de retrait en attente",
+      "requestedBy": "Demandé par {name}",
+      "reason": "Motif",
+      "waitingOther": "En attente de la décision de l'autre compte Direction.",
+      "cancel": "Annuler ma demande",
+      "approve": "Accepter : retirer l'employé",
+      "reject": "Refuser : garder l'employé",
+      "teamTitle": "L'équipe",
+      "empty": "Aucun employé pour l'instant.",
+      "since": "Depuis le",
+      "savePermissions": "Enregistrer les accès",
+      "removalPending": "Une demande de retrait est en attente pour cet employé.",
+      "requestRemoval": "Demander le retrait de cet employé",
+      "removalHint": "La demande est envoyée à l'autre compte Direction. S'il accepte, l'employé perd l'accès ; s'il refuse, l'employé reste.",
+      "sendRequest": "Envoyer la demande",
+      "removedTitle": "Employés retirés (réactivables 30 jours)",
+      "pendingBanner": "{n} demande(s) de retrait d'employé attendent votre décision.",
+      "pendingLink": "Voir les demandes"
+    },
+    "programs": {
+      "title": "Programmes",
+      "intro": "Les programmes publiés apparaissent tout de suite sur la page publique « Programmes ».",
+      "new": "Nouveau programme",
+      "newTitle": "Nouveau programme",
+      "editTitle": "Modifier le programme",
+      "empty": "Aucun programme pour l'instant. Créez le premier !",
+      "photo": "Photo",
+      "updated": "Modifié le",
+      "edit": "Modifier",
+      "view": "Voir",
+      "delete": "Supprimer",
+      "fields": {
+        "title_fr": "Titre (français)",
+        "title_ar": "Titre (arabe)",
+        "slug": "Adresse de la page",
+        "destination": "Destination",
+        "summary_fr": "Résumé (français)",
+        "summary_ar": "Résumé (arabe)",
+        "description_fr": "Description (français)",
+        "description_ar": "Description (arabe)",
+        "start_date": "Date de départ",
+        "end_date": "Date de retour",
+        "duration_days": "Durée (jours)",
+        "price_from_mad": "Prix à partir de (MAD)",
+        "image": "Photo",
+        "status": "Statut"
+      },
+      "statuses": {
+        "draft": "Brouillon",
+        "published": "Publié",
+        "archived": "Archivé"
+      },
+      "hints": {
+        "slug": "Lettres minuscules, chiffres et tirets. Laissez vide pour la créer depuis le titre.",
+        "image": "JPEG, PNG ou WebP, 5 Mo maximum."
+      },
+      "errors": {
+        "check": "Vérifiez les champs signalés.",
+        "generic": "Impossible d'enregistrer. Réessayez.",
+        "taken": "Cette adresse de page est déjà utilisée par un autre programme.",
+        "length": "Texte trop long.",
+        "title_fr.length": "Le titre doit faire entre 3 et 120 caractères.",
+        "slug.format": "Utilisez seulement des lettres minuscules, des chiffres et des tirets.",
+        "start_date.invalid": "Date invalide.",
+        "end_date.invalid": "Date invalide.",
+        "end_date.before": "La date de retour doit être après la date de départ.",
+        "duration_days.range": "Entre 1 et 90 jours.",
+        "price_from_mad.range": "Prix invalide.",
+        "status.invalid": "Statut invalide.",
+        "image.type": "Format non accepté (JPEG, PNG ou WebP uniquement).",
+        "image.size": "Photo trop lourde (5 Mo maximum).",
+        "image.upload": "La photo n'a pas pu être envoyée. Réessayez."
+      },
+      "save": "Enregistrer",
+      "removeImage": "Retirer la photo",
+      "currentImage": "Photo actuelle"
     }
+  },
+  "programs": {
+    "metaTitle": "Programmes de voyage · GoodFly",
+    "eyebrow": "Programmes GoodFly",
+    "title": "Nos programmes de voyage",
+    "intro": "Omra, circuits et séjours organisés par l'agence : dates, durée et prix de départ, mis à jour par notre équipe.",
+    "empty": "Nos prochains programmes arrivent très bientôt. En attendant, dites-nous où vous voulez partir : l'agence vous prépare une offre.",
+    "emptyCta": "Demander une offre",
+    "days": "{n} jours",
+    "from": "À partir de {price}",
+    "back": "← Tous les programmes",
+    "factsLabel": "En bref",
+    "dates": "Dates",
+    "duration": "Durée",
+    "book": "Réserver ce programme",
+    "missingTitle": "Ce programme n'existe pas ou n'est plus en ligne.",
+    "missingText": "Il a peut-être été retiré ou son adresse a changé. Découvrez nos autres programmes."
   }
 }

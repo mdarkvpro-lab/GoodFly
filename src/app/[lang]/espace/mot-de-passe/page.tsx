@@ -5,11 +5,11 @@ import { StaffShell } from "@/components/staff/StaffShell";
 import styles from "@/components/staff/staff.module.css";
 import { isLocale, type Locale } from "@/i18n/config";
 import { getDictionary, type Dictionary } from "@/i18n/dictionaries";
-import { requireDirection } from "@/lib/staff/dal";
+import { requireStaff } from "@/lib/staff/dal";
 
 async function Gate({ lang, dict }: { lang: Locale; dict: Dictionary }) {
   // Reachable with a temporary password (that is the point of this page).
-  await requireDirection(lang, { allowPasswordChange: true });
+  await requireStaff(lang, { allowPasswordChange: true });
   return <PasswordForm lang={lang} t={dict.staff.password} />;
 }
 

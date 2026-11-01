@@ -1,33 +1,43 @@
 import "server-only";
 import { redirect } from "next/navigation";
+import { cache } from "react";
 import type { Locale } from "@/i18n/config";
 import { createClient, supabaseConfigured } from "@/lib/supabase/server";
+import { can, PERMISSIONS, staffHome, type Permission, type StaffUser } from "./access";
 import type { ProfileRow } from "./stats";
 
 /**
- * Data access layer for the Direction area. Every staff page and action goes through
- * requireDirection(): the JWT is verified (getClaims), then the profile must be an
- * active Direction account. Database RLS rules still apply to every query.
+ * Data access layer for the staff area (Direction and employees). Every staff page and action
+ * goes through requireStaff(): the JWT is verified (getClaims), then the profile must be an
+ * active Direction or employee account with the needed permission. RLS still applies to every query.
  */
 
-export type StaffUser = { id: string; email: string; fullName: string; mustChangePassword: boolean };
+export { can, staffHome, type Permission, type StaffUser };
 
 export const staffPath = (lang: Locale, page = "") => `/${lang}/espace${page ? `/${page}` : ""}`;
 
-export async function requireDirection(lang: Locale, opts: { allowPasswordChange?: boolean } = {}) {
-  if (!supabaseConfigured()) redirect(`${staffPath(lang, "connexion")}?e=config`);
+type Options = { permission?: Permission; directionOnly?: boolean; allowPasswordChange?: boolean };
+
+/** One session + profile read per request, however many components ask for it. */
+const loadSession = cache(async () => {
   const supabase = await createClient();
   const { data } = await supabase.auth.getClaims();
   const claims = data?.claims;
-  if (!claims?.sub) redirect(staffPath(lang, "connexion"));
-
+  if (!claims?.sub) return { supabase, claims: null, profile: null };
   const { data: profile } = await supabase
     .from("profiles")
-    .select("id, full_name, email, role, disabled_at")
+    .select("id, full_name, email, role, disabled_at, permissions")
     .eq("id", claims.sub)
     .maybeSingle();
+  return { supabase, claims, profile };
+});
 
-  if (!profile || profile.role !== "direction" || profile.disabled_at) {
+export async function requireStaff(lang: Locale, opts: Options = {}) {
+  if (!supabaseConfigured()) redirect(`${staffPath(lang, "connexion")}?e=config`);
+  const { supabase, claims, profile } = await loadSession();
+  if (!claims) redirect(staffPath(lang, "connexion"));
+
+  if (!profile || (profile.role !== "direction" && profile.role !== "agent") || profile.disabled_at) {
     await supabase.auth.signOut();
     redirect(`${staffPath(lang, "connexion")}?e=forbidden`);
   }
@@ -37,21 +47,43 @@ export async function requireDirection(lang: Locale, opts: { allowPasswordChange
     id: profile.id,
     email: profile.email || String(claims.email ?? ""),
     fullName: profile.full_name,
+    role: profile.role,
+    permissions: ((profile.permissions ?? []) as string[]).filter((p): p is Permission => (PERMISSIONS as readonly string[]).includes(p)),
     mustChangePassword: meta.must_change_password === true,
   };
   // First sign-in with a temporary password: change it before anything else.
   if (user.mustChangePassword && !opts.allowPasswordChange) redirect(staffPath(lang, "mot-de-passe"));
+  // Pages an account may not use send it to its own home page instead.
+  if ((opts.directionOnly && user.role !== "direction") || (opts.permission && !can(user, opts.permission))) {
+    redirect(staffPath(lang, staffHome(user)));
+  }
   return { supabase, user };
 }
 
+export const requireDirection = (lang: Locale, opts: { allowPasswordChange?: boolean } = {}) =>
+  requireStaff(lang, { ...opts, directionOnly: true });
+
+/** Accounts visible to the caller (Direction: all; employee with clients.view: clients). */
 export async function listProfiles(lang: Locale): Promise<ProfileRow[]> {
-  const { supabase } = await requireDirection(lang);
-  const { data, error } = await supabase
-    .from("profiles")
-    .select("id, full_name, email, role, disabled_at, created_at")
-    .order("created_at", { ascending: false });
+  const { supabase, user } = await requireStaff(lang, { permission: "clients.view" });
+  let query = supabase.from("profiles").select("id, full_name, email, role, disabled_at, created_at, permissions");
+  if (user.role !== "direction") query = query.eq("role", "client");
+  const { data, error } = await query.order("created_at", { ascending: false });
   if (error) throw new Error(error.message);
   return (data ?? []) as ProfileRow[];
+}
+
+/** Dates only (no names or e-mails) for the dashboard; needs reports.view. */
+export async function listStatsRows(lang: Locale): Promise<ProfileRow[]> {
+  const { supabase } = await requireStaff(lang, { permission: "reports.view" });
+  const { data, error } = await supabase.rpc("staff_profile_stats");
+  if (error) throw new Error(error.message);
+  return ((data ?? []) as Pick<ProfileRow, "role" | "created_at" | "disabled_at">[]).map((r, i) => ({
+    id: String(i),
+    full_name: "",
+    email: "",
+    ...r,
+  }));
 }
 
 export type AuditRow = { id: number; actor: string | null; action: string; target: string | null; details: Record<string, unknown>; created_at: string };
@@ -65,4 +97,59 @@ export async function listAudit(lang: Locale, limit = 100): Promise<AuditRow[]> 
     .limit(limit);
   if (error) throw new Error(error.message);
   return (data ?? []) as AuditRow[];
+}
+
+export type RemovalRequest = {
+  id: string;
+  employee: string;
+  requested_by: string | null;
+  reason: string;
+  created_at: string;
+};
+
+export async function listPendingRemovals(lang: Locale): Promise<RemovalRequest[]> {
+  const { supabase } = await requireDirection(lang);
+  const { data, error } = await supabase
+    .from("employee_removal_requests")
+    .select("id, employee, requested_by, reason, created_at")
+    .eq("status", "pending")
+    .order("created_at", { ascending: true });
+  if (error) throw new Error(error.message);
+  return (data ?? []) as RemovalRequest[];
+}
+
+export type StaffProgram = {
+  id: string;
+  slug: string;
+  status: "draft" | "published" | "archived";
+  title_fr: string;
+  title_ar: string;
+  summary_fr: string;
+  summary_ar: string;
+  description_fr: string;
+  description_ar: string;
+  destination: string;
+  start_date: string | null;
+  end_date: string | null;
+  duration_days: number | null;
+  price_from_mad: number | null;
+  image_path: string | null;
+  updated_at: string;
+};
+
+const PROGRAM_COLUMNS =
+  "id, slug, status, title_fr, title_ar, summary_fr, summary_ar, description_fr, description_ar, destination, start_date, end_date, duration_days, price_from_mad, image_path, updated_at";
+
+export async function listStaffPrograms(lang: Locale): Promise<StaffProgram[]> {
+  const { supabase } = await requireStaff(lang, { permission: "programs.manage" });
+  const { data, error } = await supabase.from("programs").select(PROGRAM_COLUMNS).order("updated_at", { ascending: false }).limit(200);
+  if (error) throw new Error(error.message);
+  return (data ?? []) as StaffProgram[];
+}
+
+export async function getStaffProgram(lang: Locale, id: string): Promise<StaffProgram | null> {
+  const { supabase } = await requireStaff(lang, { permission: "programs.manage" });
+  if (!/^[0-9a-f-]{36}$/.test(id)) return null;
+  const { data } = await supabase.from("programs").select(PROGRAM_COLUMNS).eq("id", id).maybeSingle();
+  return (data as StaffProgram | null) ?? null;
 }

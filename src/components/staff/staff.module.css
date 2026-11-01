@@ -401,3 +401,137 @@
   font-weight: 600;
   font-size: 14px;
 }
+
+/* ───── Employees, permissions, programmes ───── */
+.warn {
+  background: color-mix(in srgb, #e0a100 18%, transparent);
+  color: #6b4a00;
+}
+
+.warn a {
+  color: inherit;
+  text-decoration: underline;
+}
+
+:global([data-theme="dark"]) .warn {
+  color: #ffd76a;
+}
+
+.section {
+  display: grid;
+  gap: 16px;
+  margin-top: 28px;
+}
+
+.h2 {
+  font-size: 1.2rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+
+.checks legend {
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.check {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.95rem;
+}
+
+.check input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--blue);
+}
+
+.secret {
+  display: grid;
+  gap: 8px;
+  padding: 18px;
+  border-radius: 14px;
+  border: 2px dashed var(--blue);
+  background: var(--blue-soft);
+  color: var(--ink);
+}
+
+.secret code {
+  font-size: 1.15rem;
+  font-weight: 700;
+  word-break: break-all;
+  user-select: all;
+}
+
+.employee {
+  display: grid;
+  gap: 14px;
+}
+
+.employeeHead {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px 16px;
+  align-items: baseline;
+}
+
+.more {
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+}
+
+.more summary {
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.grid2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.textarea {
+  composes: input;
+  min-height: 120px;
+  padding: 12px 14px;
+  resize: vertical;
+  font: inherit;
+}
+
+.fieldError {
+  color: #a3271b;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+:global([data-theme="dark"]) .fieldError {
+  color: #ff9d94;
+}
+
+.thumb {
+  width: 96px;
+  height: 64px;
+  object-fit: cover;
+  border-radius: 10px;
+  background: var(--line);
+}
+
+.headRow {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}

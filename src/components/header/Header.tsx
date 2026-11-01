@@ -18,11 +18,11 @@ export function Header({ lang, dict }: Props) {
           <img src="/brand/goodfly-logo.webp" width={86} height={48} alt="GoodFly" />
         </Link>
         <nav aria-label={t.label} className={styles.nav}>
-          <a href="#destinations">{t.destinations}</a>
-          <a href="#services">{t.flights}</a>
-          <a href="#services">{t.stays}</a>
-          <a href="#why">{t.business}</a>
-          <a href="#why">{t.agency}</a>
+          <a href={`/${lang}#destinations`}>{t.destinations}</a>
+          <Link href={`/${lang}/programmes`}>{t.programs}</Link>
+          <a href={`/${lang}#services`}>{t.flights}</a>
+          <a href={`/${lang}#services`}>{t.stays}</a>
+          <a href={`/${lang}#why`}>{t.agency}</a>
         </nav>
         <div className={styles.actions}>
           <Link href={`/${other}`} hrefLang={other} lang={other} className={styles.langButton} aria-label={t.switchLanguage}>
@@ -31,7 +31,7 @@ export function Header({ lang, dict }: Props) {
             </span>
           </Link>
           <ThemeToggle label={t.toggleTheme} />
-          <a href="#booking" className={styles.book}>
+          <a href={`/${lang}#booking`} className={styles.book}>
             {t.book}
           </a>
         </div>
