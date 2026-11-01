@@ -39,6 +39,15 @@ const int = (v: unknown, fallback: number) => {
   return /^\d{1,3}$/.test(s) ? Number(s) : NaN;
 };
 
+/** The 6-digit code typed by the client (spaces and dashes tolerated), or null. */
+export const parseCode = (v: unknown) => {
+  // Arabic keyboards may type ٠١٢… or ۰۱۲…: read them as 0-9.
+  const s = String(v ?? "")
+    .replace(/[\u0660-\u0669\u06f0-\u06f9]/g, (d) => String(d.charCodeAt(0) & 0xf))
+    .replace(/[\s-]/g, "");
+  return /^\d{6}$/.test(s) ? s : null;
+};
+
 export function parseBooking(get: (k: string) => unknown): { ok: true; value: BookingInput } | { ok: false; errors: BookingErrors } {
   const errors: BookingErrors = {};
   const value: BookingInput = {
@@ -63,7 +72,9 @@ export function parseBooking(get: (k: string) => unknown): { ok: true; value: Bo
   const digits = value.phone.replace(/\D/g, "");
   if (!value.phone) errors.phone = "required";
   else if (!PHONE.test(value.phone) || digits.length < 8 || digits.length > 15) errors.phone = "format";
-  if (value.email && (value.email.length > 254 || !EMAIL.test(value.email))) errors.email = "format";
+  // Required: the address is proven with a 6-digit code before the request is saved.
+  if (!value.email) errors.email = "required";
+  else if (value.email.length > 254 || !EMAIL.test(value.email)) errors.email = "format";
   if (value.program && !SLUG.test(value.program)) errors.program = "format";
   if (!value.program && !value.to_place) errors.to_place = "required";
   for (const k of ["from_place", "to_place", "travel_dates"] as const) if (value[k].length > 120) errors[k] = "long";

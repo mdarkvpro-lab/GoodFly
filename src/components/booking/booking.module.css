@@ -235,3 +235,55 @@
   color: var(--ink);
   font-weight: 700;
 }
+
+.codeTitle {
+  font-size: 1.25rem;
+  font-weight: 800;
+}
+
+.codeInput {
+  max-width: 220px;
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: 0.3em;
+  font-variant-numeric: tabular-nums;
+}
+
+.notice {
+  padding: 12px 16px;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--blue) 12%, transparent);
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.codeActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 20px;
+}
+
+.linkButton {
+  min-height: 44px;
+  padding: 0 4px;
+  border: 0;
+  background: none;
+  color: var(--blue);
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.linkButton:disabled {
+  color: var(--muted);
+  text-decoration: none;
+  cursor: default;
+}
+
+.linkButton:focus-visible {
+  outline: 3px solid var(--blue);
+  outline-offset: 2px;
+}

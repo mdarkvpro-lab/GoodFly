@@ -162,7 +162,7 @@
       },
       "hints": {
         "phone": "Le conseiller vous appellera sur ce numéro.",
-        "email": "Facultatif.",
+        "email": "Obligatoire : vous recevrez un code à 6 chiffres pour la confirmer.",
         "travel_dates": "Ex. : du 20 au 27 décembre, ou « flexible »."
       },
       "errors": {
@@ -175,9 +175,14 @@
         "consent.required": "Votre accord est nécessaire pour traiter la demande.",
         "tooMany": "Plusieurs demandes ont déjà été envoyées avec ce numéro aujourd'hui. Un conseiller va vous rappeler.",
         "programGone": "Ce programme n'est plus disponible. Choisissez-en un autre ou indiquez votre destination.",
-        "config": "Les demandes en ligne ne sont pas encore configurées sur ce serveur.",
+        "config": "Les demandes en ligne ne sont pas encore configurées sur ce serveur. Appelez-nous au 05 30 16 43 43.",
         "generic": "La demande n'a pas pu être envoyée. Réessayez dans un instant.",
-        "captcha": "La vérification anti-robot a échoué. Cochez la case de vérification puis réessayez."
+        "captcha": "La vérification anti-robot a échoué. Cochez la case de vérification puis réessayez.",
+        "email.domain": "Ce domaine e-mail n'existe pas. Vérifiez l'adresse (ex. : nom@gmail.com).",
+        "email.disposable": "Les adresses e-mail temporaires ne sont pas acceptées. Utilisez votre adresse habituelle.",
+        "mail": "Le code n'a pas pu être envoyé. Vérifiez l'adresse e-mail ou réessayez dans un instant.",
+        "wait": "Un code vient d'être envoyé. Attendez une minute avant d'en demander un autre.",
+        "codeTooMany": "Trop de codes demandés pour cette adresse. Réessayez dans une heure ou appelez-nous au 05 30 16 43 43."
       },
       "consent": "J'accepte que GoodFly utilise ces informations pour me recontacter au sujet de cette demande (loi 09-08). Elles ne sont jamais revendues.",
       "submit": "Envoyer la demande",
@@ -187,7 +192,25 @@
       "doneText": "Merci ! Un conseiller GoodFly vous rappelle au plus vite pour confirmer votre voyage.",
       "doneRef": "Votre référence (à donner au conseiller) :",
       "doneHome": "Retour à l'accueil",
-      "donePrograms": "Voir les programmes"
+      "donePrograms": "Voir les programmes",
+      "code": {
+        "title": "Confirmez votre adresse e-mail",
+        "text": "Nous avons envoyé un code à 6 chiffres à {email}. Saisissez-le pour envoyer votre demande.",
+        "label": "Code reçu par e-mail",
+        "hint": "Pas reçu ? Regardez dans le dossier Spam ou « Courrier indésirable ». Le code est valable 10 minutes.",
+        "verify": "Confirmer et envoyer",
+        "verifying": "Vérification…",
+        "resend": "Renvoyer le code",
+        "resendIn": "Renvoyer le code ({s} s)",
+        "resent": "Un nouveau code vient d'être envoyé.",
+        "edit": "Modifier mes informations",
+        "errors": {
+          "format": "Le code contient 6 chiffres.",
+          "wrong": "Code incorrect. Vérifiez le dernier e-mail reçu.",
+          "expired": "Ce code a expiré. Demandez un nouveau code.",
+          "locked": "Trop d'essais avec ce code. Demandez un nouveau code."
+        }
+      }
     },
     "services": {
       "flight": "Billet d'avion",

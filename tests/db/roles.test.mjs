@@ -317,7 +317,13 @@ const FORM_KEY = "test-form-key-0123456789";
 await db.query(`insert into private.settings values ('booking_form_key_sha256', encode(sha256(convert_to($1, 'UTF8')), 'hex'))`, [FORM_KEY]);
 let ipSeq = 0;
 const ip = () => (++ipSeq).toString(16).padStart(64, "0");
-const submit = (p, key = FORM_KEY, ipHash = ip()) => asAnon(`select public.submit_booking_request($1, $2, $3) as ref`, [p, key, ipHash]);
+// A verified e-mail proof (as if the visitor typed the right code), then the request.
+const proveEmail = (email) =>
+  db.query(`insert into private.email_codes (email, code_hash, ip_hash, verified_at) values (lower($1), repeat('c', 64), repeat('d', 64), now())`, [email]);
+const submit = async (p, key = FORM_KEY, ipHash = ip(), { verified = true } = {}) => {
+  if (verified && p.email) await proveEmail(p.email);
+  return asAnon(`select public.submit_booking_request($1, $2, $3) as ref`, [p, key, ipHash]);
+};
 let bookingRef = "";
 await check("a visitor can send a request and gets a reference", async () => {
   const r = await submit(req());
@@ -335,6 +341,72 @@ await check("bad phone, e-mail, traveller count and missing destination are refu
   for (const bad of [{ phone: "abc" }, { phone: "12" }, { email: "pas-un-email" }, { adults: "0" }, { adults: "x" }, { children: "50" }, { to_place: "" }, { full_name: "a" }, { message: "x".repeat(1001) }, { lang: "en" }]) {
     await expectError(submit(req(bad)), "invalid");
   }
+});
+await check("a request needs an e-mail address proven with a code", async () => {
+  await expectError(submit(req({ phone: "0612000001", email: "" })), "invalid");
+  await expectError(submit(req({ phone: "0612000002", email: "jamais@verifie.ma" }), FORM_KEY, ip(), { verified: false }), "email_unverified");
+});
+await check("each e-mail proof is used once", async () => {
+  await proveEmail("une-fois@exemple.ma");
+  await asAnon(`select public.submit_booking_request($1, $2, $3)`, [req({ phone: "0612000003", email: "une-fois@exemple.ma" }), FORM_KEY, ip()]);
+  await expectError(asAnon(`select public.submit_booking_request($1, $2, $3)`, [req({ phone: "0612000004", email: "une-fois@exemple.ma" }), FORM_KEY, ip()]), "email_unverified");
+});
+await check("an old proof (over 30 minutes) is refused", async () => {
+  await db.query(`insert into private.email_codes (email, code_hash, ip_hash, verified_at) values ('vieux@exemple.ma', repeat('c', 64), repeat('d', 64), now() - interval '31 minutes')`);
+  await expectError(submit(req({ phone: "0612000005", email: "vieux@exemple.ma" }), FORM_KEY, ip(), { verified: false }), "email_unverified");
+});
+
+console.log("E-mail codes");
+const H = (c) => c.repeat(64);
+const newCode = (email, hash = H("a"), ipHash = H("1"), key = FORM_KEY) => asAnon(`select public.create_email_code($1, $2, $3, $4)`, [key, email, hash, ipHash]);
+const checkCode = async (email, hash) => (await asAnon(`select public.check_email_code($1, $2, $3) as s`, [FORM_KEY, email, hash])).rows[0].s;
+await check("codes need the site's form key and valid values", async () => {
+  await expectError(newCode("a@exemple.ma", H("a"), H("1"), "wrong-key"), "form_key");
+  await expectError(newCode("pas-un-email"), "invalid");
+  await expectError(newCode("a@exemple.ma", "zz"), "invalid");
+  await expectError(asAnon(`select public.check_email_code($1, $2, $3)`, ["wrong-key", "a@exemple.ma", H("a")]), "form_key");
+});
+await check("the right code is accepted, a wrong one is counted", async () => {
+  await newCode("code@exemple.ma", H("a"));
+  if ((await checkCode("code@exemple.ma", H("b"))) !== "wrong") throw new Error("wrong code accepted");
+  if ((await checkCode("CODE@exemple.ma", H("a"))) !== "ok") throw new Error("right code refused");
+  const r = await db.query(`select attempts, verified_at is not null as v from private.email_codes where email = 'code@exemple.ma'`);
+  if (r.rows[0].attempts !== 1 || !r.rows[0].v) throw new Error(JSON.stringify(r.rows));
+});
+await check("5 wrong tries lock the code, even with the right one after", async () => {
+  await newCode("bloque@exemple.ma", H("a"));
+  for (let i = 0; i < 4; i++) if ((await checkCode("bloque@exemple.ma", H("b"))) !== "wrong") throw new Error(`try ${i}`);
+  if ((await checkCode("bloque@exemple.ma", H("b"))) !== "locked") throw new Error("not locked");
+  if ((await checkCode("bloque@exemple.ma", H("a"))) !== "locked") throw new Error("right code after lock");
+});
+await check("an expired or unknown code is refused", async () => {
+  await db.query(`insert into private.email_codes (email, code_hash, ip_hash, created_at, expires_at) values ('expire@exemple.ma', $1, $2, now() - interval '20 minutes', now() - interval '10 minutes')`, [H("a"), H("1")]);
+  if ((await checkCode("expire@exemple.ma", H("a"))) !== "expired") throw new Error("expired accepted");
+  if ((await checkCode("inconnu@exemple.ma", H("a"))) !== "expired") throw new Error("unknown accepted");
+});
+await check("one address gets at most 1 code per minute and 3 per hour", async () => {
+  await newCode("limite@exemple.ma", H("a"), H("2"));
+  await expectError(newCode("limite@exemple.ma", H("a"), H("2")), "wait");
+  await db.exec(`update private.email_codes set created_at = created_at - interval '2 minutes' where email = 'limite@exemple.ma'`);
+  await newCode("limite@exemple.ma", H("a"), H("2"));
+  await db.exec(`update private.email_codes set created_at = created_at - interval '2 minutes' where email = 'limite@exemple.ma'`);
+  await newCode("limite@exemple.ma", H("a"), H("2"));
+  await db.exec(`update private.email_codes set created_at = created_at - interval '2 minutes' where email = 'limite@exemple.ma'`);
+  await expectError(newCode("limite@exemple.ma", H("a"), H("2")), "too_many");
+});
+await check("one visitor (IP) gets at most 10 codes per hour", async () => {
+  for (let i = 0; i < 10; i++) await newCode(`v${i}@exemple.ma`, H("a"), H("3"));
+  await expectError(newCode("v10@exemple.ma", H("a"), H("3")), "too_many");
+});
+await check("codes are out of reach of the API", async () => {
+  await expectError(asAnon(`select * from private.email_codes`), "permission denied");
+  await expectError(as("Y", `select * from private.email_codes`), "permission denied");
+});
+await check("Direction e-mails only for the server, only active Direction accounts", async () => {
+  await expectError(asAnon(`select * from public.direction_emails($1)`, ["wrong"]), "form_key");
+  const r = await asAnon(`select * from public.direction_emails($1) as e`, [FORM_KEY]);
+  const roles = await db.query(`select role, disabled_at from public.profiles where email = any($1)`, [r.rows.map((x) => x.e)]);
+  if (!r.rows.length || roles.rows.some((x) => x.role !== "direction" || x.disabled_at)) throw new Error(JSON.stringify(roles.rows));
 });
 await check("visitors cannot choose the status or the reference", async () => {
   const r = await submit(req({ phone: "0622222222", status: "confirmed", reference: "GF-00000000" }));

@@ -1,6 +1,7 @@
 // Telegram alert text: no personal data, no injected lines or links.  node tests/staff/notify.test.ts
 import { bookingMessage, bookingPush } from "../../src/lib/notify/booking-message.ts";
 import { waLink, waNumber } from "../../src/lib/bookings/whatsapp.ts";
+import { codeMail, confirmationMail, directionMail, staffBookingMail } from "../../src/lib/notify/mail-text.ts";
 
 let pass = 0;
 let fail = 0;
@@ -48,6 +49,21 @@ console.log("Service in alerts");
 check("the service is named in the group message", bookingMessage({ ...base, service: "visa" }).includes("Service : Visa"));
 check("the service is in the phone notification", bookingPush({ ...base, service: "flight" }).body.includes("Vol"));
 check("alert titles carry no emoji", !/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/u.test(bookingPush(base).title + bookingMessage(base)));
+
+console.log("E-mails");
+const code = codeMail("fr", "042917");
+check("the code is in the subject and the text", code.subject.includes("042917") && code.text.includes("042917") && code.html.includes("042917"));
+check("the code e-mail says it expires and must not be shared", code.text.includes("10 minutes") && code.text.includes("Ne le communiquez"));
+check("Arabic clients get an Arabic, right-to-left code e-mail", codeMail("ar", "042917").html.includes('dir="rtl"') && codeMail("ar", "1").subject.startsWith("رمز"));
+const hostile = { ...base, to_place: '<img src=x onerror="alert(1)">', travel_dates: "<b>demain</b>" };
+const conf = confirmationMail("fr", "<script>Salma</script>", hostile);
+check("visitor values are escaped in the HTML e-mail", !/<script|<img|<b>/.test(conf.html) && conf.html.includes("&lt;script&gt;"), conf.html);
+check("the client's confirmation carries the reference", conf.subject.includes(base.reference) && conf.text.includes(base.reference));
+const staff = staffBookingMail({ ...base, service: "stay" }, "https://goodfly.ma/fr/espace/reservations?statut=new");
+check("the team e-mail has the reference, the service and the link", staff.subject.includes(base.reference) && staff.text.includes("Hôtel") && staff.text.includes("https://goodfly.ma/fr/espace"));
+check("the team e-mail has no client contact details", !/Salma|06 ?12|@/.test(staff.text), staff.text);
+const boss = directionMail("Demande de retrait", "Mohamed demande\nvotre accord", "https://goodfly.ma/fr/espace/notifications");
+check("Direction e-mails are one clean line plus the link", boss.subject === "GoodFly : Demande de retrait" && boss.text.startsWith("Mohamed demande votre accord") && boss.text.endsWith("/notifications"));
 
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

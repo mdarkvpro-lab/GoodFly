@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { submitBooking, type BookingFormState } from "@/app/[lang]/reservation/actions";
 import type { Locale } from "@/i18n/config";
 import { Icon } from "@/components/Icon";
@@ -21,6 +21,19 @@ export type BookingFormText = {
   doneRef: string;
   doneHome: string;
   donePrograms: string;
+  code: {
+    title: string;
+    text: string;
+    label: string;
+    hint: string;
+    verify: string;
+    verifying: string;
+    resend: string;
+    resendIn: string;
+    resent: string;
+    edit: string;
+    errors: Record<string, string>;
+  };
 };
 
 type Props = { lang: Locale; t: BookingFormText; initial: Record<string, string>; programLocked: boolean; turnstileSiteKey?: string };
@@ -53,6 +66,8 @@ export function BookingForm({ lang, t, initial, programLocked, turnstileSiteKey 
       </div>
     );
   }
+
+  if (state && "step" in state) return <CodeStep lang={lang} t={t} state={state} pending={pending} action={action} />;
 
   const values = state?.values;
   const errors = (state && "errors" in state ? state.errors : undefined) as Record<string, string> | undefined;
@@ -104,7 +119,7 @@ export function BookingForm({ lang, t, initial, programLocked, turnstileSiteKey 
         <div className={styles.grid}>
           {field("full_name", { autoComplete: "name", maxLength: 120, minLength: 2 }, true)}
           {field("phone", { type: "tel", autoComplete: "tel", inputMode: "tel", maxLength: 25, dir: "ltr" }, true)}
-          {field("email", { type: "email", autoComplete: "email", maxLength: 254, dir: "ltr" })}
+          {field("email", { type: "email", autoComplete: "email", maxLength: 254, dir: "ltr" }, true)}
         </div>
       </fieldset>
 
@@ -133,10 +148,97 @@ export function BookingForm({ lang, t, initial, programLocked, turnstileSiteKey 
       {turnstileSiteKey && <Turnstile siteKey={turnstileSiteKey} lang={lang} resetKey={attempt} />}
 
       <div>
-        <button className={styles.submit} type="submit" disabled={pending}>
+        <button className={styles.submit} type="submit" name="intent" value="send" disabled={pending}>
           {pending ? t.sending : t.submit}
         </button>
       </div>
     </form>
+  );
+}
+
+type CodeState = Extract<BookingFormState, { step: "code" }>;
+
+/** Step 2: the client types the code received by e-mail. The form values travel in hidden fields. */
+function CodeStep({ lang, t, state, pending, action }: { lang: Locale; t: BookingFormText; state: CodeState; pending: boolean; action: (form: FormData) => void }) {
+  const c = t.code;
+  const codeError = state.codeError ? (c.errors[state.codeError] ?? t.errors.generic) : null;
+  const topError = state.error ? (t.errors[state.error] ?? t.errors.generic) : null;
+  const [before, after] = c.text.split("{email}");
+  return (
+    <form action={action} className={styles.form}>
+      <input type="hidden" name="lang" value={lang} />
+      <input type="hidden" name="consent" value="on" />
+      {Object.entries(state.values).map(([k, v]) => (
+        <input key={k} type="hidden" name={k} value={v} />
+      ))}
+      <div className={styles.group} role="group" aria-labelledby="code-title">
+        <h2 id="code-title" className={styles.codeTitle}>
+          {c.title}
+        </h2>
+        <p>
+          {before}
+          <strong dir="ltr">{state.email}</strong>
+          {after}
+        </p>
+        {topError && (
+          <p className={styles.alert} role="alert">
+            {topError}
+          </p>
+        )}
+        {state.resent && !topError && (
+          <p className={styles.notice} role="status">
+            {c.resent}
+          </p>
+        )}
+        <label className={styles.label}>
+          <span>
+            {c.label}
+            <span aria-hidden="true"> *</span>
+          </span>
+          <input
+            key={`${state.codeError ?? ""}-${state.resent ?? ""}`}
+            className={`${styles.input} ${styles.codeInput}`}
+            name="code"
+            required
+            autoFocus
+            autoComplete="one-time-code"
+            inputMode="numeric"
+            maxLength={9}
+            dir="ltr"
+            {...(codeError ? { "aria-invalid": true as const, "aria-describedby": "code-error" } : {})}
+          />
+          <span className={styles.hint}>{c.hint}</span>
+          {codeError && (
+            <span className={styles.fieldError} id="code-error" role="alert">
+              {codeError}
+            </span>
+          )}
+        </label>
+        <div className={styles.codeActions}>
+          <button className={styles.submit} type="submit" name="intent" value="verify" disabled={pending}>
+            {pending ? c.verifying : c.verify}
+          </button>
+          <ResendButton key={`${state.resent ?? ""}-${state.error ?? ""}`} t={c} disabled={pending} />
+          <button className={styles.linkButton} type="submit" name="intent" value="edit" formNoValidate disabled={pending}>
+            {c.edit}
+          </button>
+        </div>
+      </div>
+    </form>
+  );
+}
+
+/** "Resend the code", usable 60 seconds after a code was sent (the database enforces the same pause). */
+function ResendButton({ t, disabled }: { t: BookingFormText["code"]; disabled: boolean }) {
+  const [left, setLeft] = useState(60);
+  useEffect(() => {
+    if (left <= 0) return;
+    const id = setTimeout(() => setLeft((n) => n - 1), 1000);
+    return () => clearTimeout(id);
+  }, [left]);
+  return (
+    <button className={styles.linkButton} type="submit" name="intent" value="resend" formNoValidate disabled={disabled || left > 0}>
+      {left > 0 ? t.resendIn.replace("{s}", String(left)) : t.resend}
+    </button>
   );
 }

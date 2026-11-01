@@ -1,6 +1,6 @@
 // Booking request validation, search-bar prefill and access.  node tests/staff/bookings.test.ts
 import { can, staffHome, staffNav } from "../../src/lib/staff/access.ts";
-import { parseBooking, prefillFromSearch, serviceFromSlug, SERVICE_SLUGS } from "../../src/lib/bookings/validate.ts";
+import { parseBooking, parseCode, prefillFromSearch, serviceFromSlug, SERVICE_SLUGS } from "../../src/lib/bookings/validate.ts";
 
 let pass = 0;
 let fail = 0;
@@ -10,7 +10,7 @@ const check = (name: string, ok: boolean, info = "") => {
   console.log(ok ? "  ✓" : "  ✘", name, ok ? "" : `— ${info}`);
 };
 const form = (v: Record<string, string>) => (k: string) => v[k] ?? (k === "consent" ? null : "");
-const good = { full_name: "Salma Bennani", phone: "06 12 34 56 78", to_place: "Istanbul", adults: "2", consent: "on" };
+const good = { full_name: "Salma Bennani", phone: "06 12 34 56 78", email: "Salma@Exemple.ma", to_place: "Istanbul", adults: "2", consent: "on" };
 
 console.log("Booking form");
 const ok = parseBooking(form(good));
@@ -26,6 +26,14 @@ check("letters in the phone are refused", !parseBooking(form({ ...good, phone: "
 check("a programme replaces the destination", parseBooking(form({ ...good, to_place: "", program: "omra-ramadan-2027" })).ok);
 check("a malformed programme address is refused", !parseBooking(form({ ...good, program: "../../etc" })).ok);
 check("consent is required", !parseBooking(form({ ...good, consent: "" })).ok);
+const noEmail = parseBooking(form({ ...good, email: "" }));
+check("the e-mail address is required", !noEmail.ok && noEmail.errors.email === "required", JSON.stringify(noEmail));
+check("the e-mail is stored in lower case", ok.ok && ok.value.email === "salma@exemple.ma");
+
+console.log("Verification code");
+check("6 digits are read, spaces and dashes ignored", parseCode("123456") === "123456" && parseCode(" 123 456 ") === "123456" && parseCode("123-456") === "123456");
+check("Arabic-Indic digits are read", parseCode("١٢٣٤٥٦") === "123456" && parseCode("۱۲۳۴۵۶") === "123456");
+check("anything else is refused", [null, "", "12345", "1234567", "12345a", "abcdef"].every((v) => parseCode(v) === null));
 check("decimal or text traveller counts are refused", !parseBooking(form({ ...good, adults: "1.5" })).ok && !parseBooking(form({ ...good, adults: "deux" })).ok);
 
 console.log("Search bar prefill");

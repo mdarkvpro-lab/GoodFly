@@ -5,6 +5,8 @@ import { redirect } from "next/navigation";
 import { after } from "next/server";
 import { defaultLocale, isLocale, type Locale } from "@/i18n/config";
 import { PERMISSIONS } from "@/lib/staff/access";
+import { sendMail } from "@/lib/notify/mail";
+import { directionMail } from "@/lib/notify/mail-text";
 import { pushToDirection } from "@/lib/notify/push";
 import { requireDirection, staffPath } from "@/lib/staff/dal";
 
@@ -141,11 +143,15 @@ function alertDirection(supabase: Supa, lang: Locale, me: { id: string; name: st
     const employeeName = rows.find((r) => r.id === employee)?.full_name || "—";
     const recipients = to === "others" ? rows.filter((r) => r.role === "direction" && !r.disabled_at && r.id !== me.id).map((r) => r.id) : to;
     const body = text.body.replace("{boss}", me.name).replace("{employee}", employeeName);
-    await Promise.allSettled(
-      recipients.map((rid) =>
-        pushToDirection(supabase, rid, { title: text.title, body, url: `/${lang}/espace/notifications?vue=${view}`, tag: `request-${employee}` }),
-      ),
-    );
+    const path = `/${lang}/espace/notifications?vue=${view}`;
+    // Link only from configuration (never from the request's Host).
+    const site = process.env.SITE_URL && /^https:\/\/[a-z0-9.-]+(:\d+)?$/i.test(process.env.SITE_URL) ? process.env.SITE_URL : "";
+    // E-mail only to active Direction accounts other than the sender (same rule as the phone alert).
+    const emails = rows.filter((r) => recipients.includes(r.id) && r.role === "direction" && !r.disabled_at && r.id !== me.id && r.email).map((r) => r.email as string);
+    await Promise.allSettled([
+      ...recipients.map((rid) => pushToDirection(supabase, rid, { title: text.title, body, url: path, tag: `request-${employee}` })),
+      ...(emails.length ? [sendMail({ to: emails, ...directionMail(text.title, body, site ? site + path : undefined) })] : []),
+    ]);
   });
 }
 
