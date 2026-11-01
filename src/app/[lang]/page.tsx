@@ -46,9 +46,9 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
         <Featured dict={dict} href={`/${lang}/programmes`} />
         <Comfort dict={dict} />
         <Why dict={dict} />
-        <FinalCta dict={dict} />
+        <FinalCta dict={dict} lang={lang} />
       </main>
-      <Footer dict={dict} />
+      <Footer dict={dict} lang={lang} />
     </>
   );
 }

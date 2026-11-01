@@ -62,3 +62,23 @@ export const destinations = [
 ] as const;
 
 export type DestinationId = (typeof destinations)[number]["id"];
+
+/** Agency contact details (shown in the footer and used for the WhatsApp button). */
+export const AGENCY = {
+  address: {
+    fr: "Route de Kénitra (face aux Arcades), Immeuble 4, Appartement 1, Salé",
+    ar: "طريق القنيطرة (أمام الأقواس القنيطرة)، عمارة 4، شقة 1، سلا",
+  },
+  phones: [
+    { display: "05 30 16 43 43", tel: "+212530164343" },
+    { display: "06 58 89 99 07", tel: "+212658899907" },
+  ],
+  whatsapp: "212658899907",
+  email: "goodfly64@gmail.com",
+} as const;
+
+/** Official WhatsApp link to the agency with a first message in the visitor's language. */
+export function agencyWhatsApp(lang: Locale): string {
+  const text = lang === "ar" ? "السلام عليكم، أريد معلومات عن رحلة مع GoodFly." : "Bonjour GoodFly, je souhaite des informations sur un voyage.";
+  return `https://wa.me/${AGENCY.whatsapp}?text=${encodeURIComponent(text)}`;
+}

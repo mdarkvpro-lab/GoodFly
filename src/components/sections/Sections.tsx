@@ -1,4 +1,6 @@
 import Image from "next/image";
+import { AGENCY, agencyWhatsApp } from "@/config/site";
+import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries";
 import { Reveal } from "@/components/motion/Reveal";
 import styles from "./Sections.module.css";
@@ -110,7 +112,7 @@ export function Why({ dict }: Props) {
 
 const cityLights = [80, 140, 210, 290, 360, 430, 500, 580, 650, 720, 790, 860, 930, 1000, 1080, 1150, 1220, 1300, 1370];
 
-export function FinalCta({ dict }: Props) {
+export function FinalCta({ dict, lang }: Props & { lang: Locale }) {
   const t = dict.finalCta;
   return (
     <section className={styles.final} aria-labelledby="final-title">
@@ -133,7 +135,7 @@ export function FinalCta({ dict }: Props) {
           <a href="#booking" className={styles.sunButton}>
             {t.plan}
           </a>
-          <a href="#" className={styles.ghostButton}>
+          <a href={agencyWhatsApp(lang)} className={styles.ghostButton} target="_blank" rel="noopener noreferrer">
             {t.whatsapp}
           </a>
         </div>
@@ -142,24 +144,44 @@ export function FinalCta({ dict }: Props) {
   );
 }
 
-export function Footer({ dict }: Props) {
+export function Footer({ dict, lang }: Props & { lang: Locale }) {
   const t = dict.footer;
   const nav = dict.nav;
+  const wa = agencyWhatsApp(lang);
   return (
     <footer className={styles.footer}>
       <div className={`container ${styles.footerRow}`}>
         <div className={styles.footerBrand}>
           {/* eslint-disable-next-line @next/next/no-img-element -- tiny pre-sized logo */}
           <img className={styles.footerLogo} src="/brand/goodfly-logo.webp" width={86} height={48} alt="GoodFly" />
-          <p>{t.contact}</p>
+          <address className={styles.footerContact}>
+            <span dir="auto">{AGENCY.address[lang]}</span>
+            <span>
+              {AGENCY.phones.map((ph, i) => (
+                <span key={ph.tel}>
+                  {i > 0 && " · "}
+                  <a href={`tel:${ph.tel}`} dir="ltr">
+                    {ph.display}
+                  </a>
+                </span>
+              ))}
+            </span>
+            <span>
+              <a href={`mailto:${AGENCY.email}`} dir="ltr">
+                {AGENCY.email}
+              </a>
+            </span>
+          </address>
         </div>
         <nav aria-label={t.explore} className={styles.footerNav}>
-          <a href="#destinations">{nav.destinations}</a>
-          <a href="#services">{nav.flights}</a>
-          <a href="#services">{nav.stays}</a>
+          <a href={`/${lang}#destinations`}>{nav.destinations}</a>
+          <a href={`/${lang}#services`}>{nav.flights}</a>
+          <a href={`/${lang}#services`}>{nav.stays}</a>
         </nav>
         <nav aria-label={t.info} className={styles.footerNav}>
-          <a href="#">{t.contactLink}</a>
+          <a href={wa} target="_blank" rel="noopener noreferrer">
+            {t.contactLink}
+          </a>
           <a href="#">{t.legal}</a>
           <a href="#">{t.privacy}</a>
         </nav>

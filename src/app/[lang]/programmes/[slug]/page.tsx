@@ -107,7 +107,7 @@ export default async function ProgramPage({ params }: PageProps<"/[lang]/program
           <Detail lang={lang} dict={dict} params={params} />
         </Suspense>
       </main>
-      <Footer dict={dict} />
+      <Footer dict={dict} lang={lang} />
     </>
   );
 }

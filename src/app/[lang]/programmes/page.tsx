@@ -76,7 +76,7 @@ export default async function ProgramsPage({ params }: PageProps<"/[lang]/progra
           </ul>
         )}
       </main>
-      <Footer dict={dict} />
+      <Footer dict={dict} lang={lang} />
     </>
   );
 }

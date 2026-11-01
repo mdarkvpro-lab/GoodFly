@@ -66,7 +66,7 @@ export default async function ReservationPage({ params, searchParams }: PageProp
           <Request lang={lang} dict={dict} searchParams={searchParams} />
         </Suspense>
       </main>
-      <Footer dict={dict} />
+      <Footer dict={dict} lang={lang} />
     </>
   );
 }
