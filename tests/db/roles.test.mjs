@@ -569,6 +569,17 @@ await check("an employee is never returned as a Direction target", async () => {
   await expectRows(as("Z", `select * from public.direction_push_targets($1, $2)`, [FORM_KEY, ids.A]), 0);
 });
 
+console.log("Resending a code");
+const canResend = async (email, key = FORM_KEY) => (await asAnon(`select public.can_resend_email_code($1, $2) as r`, [key, email])).rows[0].r;
+await check("a resend is allowed only after a recent code to the same address", async () => {
+  if ((await canResend("jamais@exemple.ma")) !== false) throw new Error("resend without a first code");
+  await newCode("renvoi@exemple.ma", H("c"), H("7"));
+  if ((await canResend("RENVOI@exemple.ma")) !== true) throw new Error("recent code not seen");
+  await db.query(`update private.email_codes set created_at = now() - interval '11 minutes' where email = 'renvoi@exemple.ma'`);
+  if ((await canResend("renvoi@exemple.ma")) !== false) throw new Error("old code still allows a resend");
+  await expectError(canResend("renvoi@exemple.ma", "wrong-key"), "form_key");
+});
+
 console.log("Temporary password");
 await check("an employee cannot clear the forced password change", async () => {
   await db.query(`update public.profiles set must_change_password = true, disabled_at = null, role = 'agent' where id = $1`, [ids.A]);

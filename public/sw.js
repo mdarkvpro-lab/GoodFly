@@ -9,7 +9,8 @@ self.addEventListener("push", (event) => {
   } catch {
     data = {};
   }
-  const url = typeof data.url === "string" && data.url.startsWith("/") ? data.url : "/fr/espace/reservations";
+  // Only a page of this site ("/..." but never "//other-site" or "/\other-site").
+  const url = typeof data.url === "string" && /^\/(?![/\\])/.test(data.url) ? data.url : "/fr/espace/reservations";
   event.waitUntil(
     self.registration.showNotification(String(data.title || "GoodFly"), {
       body: String(data.body || ""),
@@ -24,7 +25,9 @@ self.addEventListener("push", (event) => {
 
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();
-  const url = new URL(event.notification.data?.url || "/fr/espace/reservations", self.location.origin).href;
+  let url = new URL(event.notification.data?.url || "/fr/espace/reservations", self.location.origin);
+  if (url.origin !== self.location.origin) url = new URL("/fr/espace/reservations", self.location.origin);
+  url = url.href;
   event.waitUntil(
     self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((list) => {
       for (const c of list) {

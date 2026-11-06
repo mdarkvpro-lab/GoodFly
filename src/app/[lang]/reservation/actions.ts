@@ -86,8 +86,10 @@ export async function submitBooking(_prev: BookingFormState, form: FormData): Pr
     return save(db, formKey, ipHash, lang, v, values);
   }
 
-  // "send" or "resend": anti-robot check (Cloudflare Turnstile, once its keys are set) on the first send.
-  if (intent !== "resend" && !(await verifyTurnstile(form.get("cf-turnstile-response"), ip))) return { error: "captcha", values };
+  // "send" or "resend": anti-robot check (Cloudflare Turnstile, once its keys are set). A resend skips it
+  // only when this address got a code in the last 10 minutes (the database says so, not the form).
+  const resend = intent === "resend" && (await db.rpc("can_resend_email_code", { form_key: formKey, email: v.email })).data === true;
+  if (!resend && !(await verifyTurnstile(form.get("cf-turnstile-response"), ip))) return { error: "captcha", values };
   const problem = await emailDomainProblem(v.email);
   if (problem) return { errors: { email: problem }, error: "check", values };
 

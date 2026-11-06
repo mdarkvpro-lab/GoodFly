@@ -19,7 +19,8 @@
     "owner:setup": "node owner-console/setup.ts",
     "test:staff": "node tests/staff/stats.test.ts && node tests/staff/programs.test.ts && node tests/staff/bookings.test.ts && node tests/staff/notify.test.ts",
     "telegram:setup": "node scripts/telegram/setup.ts",
-    "mail:setup": "node scripts/mail/setup.ts"
+    "mail:setup": "node scripts/mail/setup.ts",
+    "turnstile:setup": "node scripts/turnstile/setup.ts"
   },
   "dependencies": {
     "@formatjs/intl-localematcher": "^0.10.0",
