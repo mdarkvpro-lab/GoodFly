@@ -3,6 +3,7 @@ import { IBM_Plex_Sans_Arabic, Manrope } from "next/font/google";
 import { notFound } from "next/navigation";
 import { isLocale, localeDir, locales } from "@/i18n/config";
 import { InlineScript } from "@/components/InlineScript";
+import { ThemeSync } from "@/components/ThemeSync";
 import { getDictionary } from "@/i18n/dictionaries";
 import "../globals.css";
 
@@ -58,7 +59,10 @@ export default async function RootLayout({ children, params }: LayoutProps<"/[la
       <head>
         <InlineScript html={themeScript} />
       </head>
-      <body>{children}</body>
+      <body>
+        <ThemeSync />
+        {children}
+      </body>
     </html>
   );
 }

@@ -16,7 +16,9 @@
     "currentLanguageShort": "FR",
     "toggleTheme": "Changer de thème",
     "skipToContent": "Aller au contenu",
-    "programs": "Programmes"
+    "programs": "Programmes",
+    "openMenu": "Ouvrir le menu",
+    "closeMenu": "Fermer le menu"
   },
   "hero": {
     "eyebrow": "Bienvenue chez GoodFly · Au départ de {airport}",

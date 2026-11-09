@@ -1,6 +1,11 @@
 import { readFileSync } from "node:fs";
 import { expect, test } from "@playwright/test";
 import { MAILBOX } from "./mail-catcher";
+import type { Page } from "@playwright/test";
+
+/** Waits for the anti-robot check (Cloudflare's always-passing test key in tests) to give its token. */
+const turnstileReady = (page: Page) =>
+  expect(page.locator('input[name="cf-turnstile-response"]')).not.toHaveValue("", { timeout: 15_000 });
 
 // These tests never complete a request: no booking is written to the real database.
 // E-mails go to a local catcher (see mail-catcher.ts), never to a real inbox.
@@ -59,10 +64,12 @@ test.describe("Booking request form", () => {
     await main.getByRole("textbox", { name: /^Téléphone/ }).fill("0612345678");
     await main.getByRole("checkbox", { name: /loi 09-08/ }).check();
     await email.fill("salma@yopmail.com");
+    await turnstileReady(page);
     await main.getByRole("button", { name: "Envoyer la demande" }).click();
     await expect(page.getByText(/adresses e-mail temporaires ne sont pas acceptées/)).toBeVisible();
     await main.getByRole("checkbox", { name: /loi 09-08/ }).check();
     await main.getByRole("textbox", { name: /^E-mail/ }).fill("salma@domaine-qui-n-existe-pas-gf.com");
+    await turnstileReady(page);
     await main.getByRole("button", { name: "Envoyer la demande" }).click();
     await expect(page.getByText(/Ce domaine e-mail n'existe pas/)).toBeVisible();
   });
@@ -78,6 +85,7 @@ test.describe("Booking request form", () => {
     await main.getByRole("textbox", { name: /^Téléphone/ }).fill("0612345678");
     await main.getByRole("textbox", { name: /^E-mail/ }).fill(address);
     await main.getByRole("checkbox", { name: /loi 09-08/ }).check();
+    await turnstileReady(page);
     await main.getByRole("button", { name: "Envoyer la demande" }).click();
 
     await expect(main.getByRole("heading", { name: "Confirmez votre adresse e-mail" })).toBeVisible();

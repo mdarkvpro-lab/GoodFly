@@ -16,7 +16,9 @@
     "currentLanguageShort": "ع",
     "toggleTheme": "تغيير المظهر",
     "skipToContent": "انتقل إلى المحتوى",
-    "programs": "البرامج"
+    "programs": "البرامج",
+    "openMenu": "فتح القائمة",
+    "closeMenu": "إغلاق القائمة"
   },
   "hero": {
     "eyebrow": "مرحبًا بكم في GoodFly · انطلاقًا من {airport}",

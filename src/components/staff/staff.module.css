@@ -17,6 +17,7 @@
   align-items: center;
   gap: 12px 28px;
   min-height: 68px;
+  padding-block: 10px;
 }
 
 .brand {
@@ -822,6 +823,17 @@
 
 @media (max-width: 720px) {
   .whoRole {
+    display: none;
+  }
+}
+
+/* Small phones: logo and buttons stay on one line. */
+@media (max-width: 480px) {
+  .topRow {
+    gap: 10px 14px;
+  }
+
+  .badge {
     display: none;
   }
 }

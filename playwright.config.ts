@@ -29,7 +29,15 @@ export default defineConfig({
     command: `npm run start -- -p ${PORT}`,
     url: `http://localhost:${PORT}/fr`,
     reuseExistingServer: !process.env.CI,
-    env: { MAIL_HOST: "127.0.0.1", MAIL_PORT: String(MAIL_PORT), MAIL_USER: "site@goodfly.test", MAIL_PASSWORD: "test" },
+    env: {
+      MAIL_HOST: "127.0.0.1",
+      MAIL_PORT: String(MAIL_PORT),
+      MAIL_USER: "site@goodfly.test",
+      MAIL_PASSWORD: "test",
+      // Cloudflare's official Turnstile test keys: the check always passes, so tests never hit the real one.
+      TURNSTILE_SITE_KEY: "1x00000000000000000000AA",
+      TURNSTILE_SECRET_KEY: "1x0000000000000000000000000000000AA",
+    },
     timeout: 60_000,
   },
 });
