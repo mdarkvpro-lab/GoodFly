@@ -22,6 +22,20 @@ const paths = {
     </>
   ),
   arrow: <path d="M5 12h14M13 6l6 6-6 6" />,
+  // Social pages, drawn in the same line style (not the networks' official logos).
+  instagram: (
+    <>
+      <rect x="3.5" y="3.5" width="17" height="17" rx="5" />
+      <circle cx="12" cy="12" r="4" />
+      <circle cx="17.2" cy="6.8" r="0.6" fill="currentColor" />
+    </>
+  ),
+  facebook: (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M15 8.5h-1.6A1.9 1.9 0 0 0 11.5 10.4V21M9 13.2h5" />
+    </>
+  ),
 } as const;
 
 export type IconName = keyof typeof paths;

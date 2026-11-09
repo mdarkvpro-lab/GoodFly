@@ -75,6 +75,11 @@ export const AGENCY = {
   ],
   whatsapp: "212658899907",
   email: "goodfly64@gmail.com",
+  /** The agency's own social pages. */
+  social: {
+    instagram: "https://www.instagram.com/goodfly64/",
+    facebook: "https://www.facebook.com/goodfly.net",
+  },
 } as const;
 
 /** Official WhatsApp link to the agency with a first message in the visitor's language. */

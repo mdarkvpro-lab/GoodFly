@@ -587,6 +587,35 @@
   filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.35));
 }
 
+.social {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.socialLabel {
+  margin-inline-end: 4px;
+  font-weight: 600;
+}
+
+.social a {
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  color: var(--ink);
+  transition: background-color var(--dur-ui) var(--ease-ui), color var(--dur-ui) var(--ease-ui), border-color var(--dur-ui) var(--ease-ui);
+}
+
+.social a:hover {
+  background: var(--blue);
+  border-color: var(--blue);
+  color: #fff;
+}
+
 .footerNav {
   flex: 1 1 160px;
   display: flex;

@@ -164,6 +164,15 @@ export function Footer({ dict, lang }: Props & { lang: Locale }) {
               </a>
             </span>
           </address>
+          <div className={styles.social}>
+            <span className={styles.socialLabel}>{t.follow}</span>
+            <a href={AGENCY.social.instagram} target="_blank" rel="noopener noreferrer" aria-label={t.instagram} title={t.instagram}>
+              <Icon name="instagram" size={20} />
+            </a>
+            <a href={AGENCY.social.facebook} target="_blank" rel="noopener noreferrer" aria-label={t.facebook} title={t.facebook}>
+              <Icon name="facebook" size={20} />
+            </a>
+          </div>
         </div>
         <nav aria-label={t.explore} className={styles.footerNav}>
           <a href={`/${lang}#destinations`}>{nav.destinations}</a>

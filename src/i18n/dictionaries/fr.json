@@ -142,7 +142,10 @@
     "contactLink": "Contact",
     "legal": "Mentions légales",
     "privacy": "Confidentialité",
-    "staff": "Espace équipe"
+    "staff": "Espace équipe",
+    "follow": "Suivez-nous",
+    "instagram": "GoodFly sur Instagram",
+    "facebook": "GoodFly sur Facebook"
   },
   "reservation": {
     "title": "Demande de réservation",
