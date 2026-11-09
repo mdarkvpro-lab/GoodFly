@@ -28,12 +28,15 @@ const FIELDS = ["full_name", "phone", "email", "from_place", "to_place", "travel
 const echo = (form: FormData) => Object.fromEntries(FIELDS.map((k) => [k, String(form.get(k) ?? "").slice(0, 1000)]));
 
 /**
- * The visitor's address, keyed-hashed (never stored in clear). The first x-forwarded-for entry
- * is set by the hosting platform's proxy; without a proxy it is only as trustworthy as the client.
+ * The visitor's address, keyed-hashed (never stored in clear). CLIENT_IP_HEADER names the header
+ * the host itself sets and the visitor cannot fake (on Netlify: x-nf-client-connection-ip).
+ * Without it, the first x-forwarded-for entry is only as trustworthy as the host's proxy.
  */
 async function visitorIp() {
   const h = await headers();
-  return (h.get("x-forwarded-for")?.split(",")[0] || h.get("x-real-ip") || "unknown").trim().slice(0, 64);
+  const trusted = process.env.CLIENT_IP_HEADER?.trim().toLowerCase();
+  const ip = (trusted && h.get(trusted)) || h.get("x-forwarded-for")?.split(",")[0] || h.get("x-real-ip") || "unknown";
+  return ip.trim().slice(0, 64);
 }
 
 /** Link to the staff page for the alerts, only from configuration (never from the request's Host). */

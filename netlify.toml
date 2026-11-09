@@ -1,0 +1,6 @@
+# Netlify: Next.js is detected automatically (OpenNext adapter). Only the build and the Node version are fixed here.
+[build]
+  command = "npm run build"
+
+[build.environment]
+  NODE_VERSION = "24"
