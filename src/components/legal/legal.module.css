@@ -1,0 +1,154 @@
+/* Legal pages: a readable column of numbered clauses, with a sticky table of contents on wide screens. */
+.main {
+  padding-block: 48px 120px;
+}
+
+.head {
+  max-width: 720px;
+  display: grid;
+  gap: 12px;
+  margin-bottom: 48px;
+}
+
+.eyebrow {
+  color: var(--label);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+}
+
+.intro {
+  color: var(--muted);
+  font-size: 1.1rem;
+}
+
+.updated {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: 56px;
+  align-items: start;
+}
+
+.toc {
+  position: sticky;
+  top: 96px;
+  display: grid;
+  gap: 18px;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: var(--bg-alt);
+}
+
+.toc ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 4px;
+  counter-reset: toc;
+}
+
+.toc li {
+  counter-increment: toc;
+}
+
+.toc li a {
+  display: flex;
+  gap: 10px;
+  padding: 6px 8px;
+  border-radius: 10px;
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 0.92rem;
+  line-height: 1.4;
+}
+
+.toc li a::before {
+  content: counter(toc, decimal-leading-zero);
+  color: var(--blue);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.toc li a:hover {
+  background: var(--bg);
+}
+
+.other {
+  color: var(--blue);
+  font-weight: 700;
+  font-size: 0.92rem;
+  text-decoration: none;
+  padding-inline: 8px;
+}
+
+.body {
+  max-width: 68ch;
+  display: grid;
+  gap: 40px;
+}
+
+.section {
+  display: grid;
+  gap: 12px;
+  scroll-margin-top: 96px;
+}
+
+.section h2 {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 800;
+  text-wrap: balance;
+}
+
+.num {
+  color: var(--blue);
+  font-size: 0.95rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.section p,
+.section ul {
+  margin: 0;
+  color: var(--ink-soft, var(--ink));
+}
+
+.section ul {
+  display: grid;
+  gap: 8px;
+  padding-inline-start: 22px;
+}
+
+.section li::marker {
+  color: var(--blue);
+}
+
+/* Information the agency still has to give. */
+.todo {
+  padding: 1px 6px;
+  border-radius: 6px;
+  background: color-mix(in srgb, #f8d400 32%, transparent);
+  color: var(--ink);
+  font-weight: 600;
+}
+
+@media (max-width: 860px) {
+  .layout {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .toc {
+    position: static;
+  }
+}
