@@ -43,7 +43,7 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
           }))}
         />
         <Services dict={dict} lang={lang} />
-        <Featured dict={dict} href={`/${lang}/programmes`} />
+        <Featured dict={dict} href={`/${lang}/services/sejours`} />
         <Comfort dict={dict} />
         <Why dict={dict} />
         <FinalCta dict={dict} lang={lang} />

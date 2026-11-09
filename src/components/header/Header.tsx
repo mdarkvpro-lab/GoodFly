@@ -40,9 +40,9 @@ export function Header({ lang, dict }: Props) {
             </span>
           </Link>
           <ThemeToggle label={t.toggleTheme} />
-          <a href={`/${lang}#booking`} className={styles.book}>
+          <Link href={`/${lang}/reservation`} className={styles.book}>
             {t.book}
-          </a>
+          </Link>
           <MobileMenu items={links} openLabel={t.openMenu} closeLabel={t.closeMenu} navLabel={t.label} />
         </div>
       </div>

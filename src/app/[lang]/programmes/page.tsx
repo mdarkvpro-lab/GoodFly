@@ -39,7 +39,7 @@ export default async function ProgramsPage({ params }: PageProps<"/[lang]/progra
         {programs.length === 0 ? (
           <div className={styles.empty}>
             <p>{t.empty}</p>
-            <Link className={styles.button} href={`/${lang}#booking`}>
+            <Link className={styles.button} href={`/${lang}/reservation`}>
               {t.emptyCta}
             </Link>
           </div>

@@ -14,6 +14,14 @@ test.describe("Public programmes", () => {
     const cards = page.getByRole("main").getByRole("heading", { level: 2 });
     const empty = page.getByRole("link", { name: "Demander une offre" });
     await expect(cards.first().or(empty)).toBeVisible();
+    if (await empty.isVisible()) await expect(empty).toHaveAttribute("href", "/fr/reservation");
+  });
+
+  test("the header's Réserver button opens the booking form from any page", async ({ page }) => {
+    await page.goto("/fr/programmes");
+    await page.getByRole("banner").getByRole("link", { name: "Réserver" }).click();
+    await expect(page).toHaveURL(/\/fr\/reservation$/);
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Demande de réservation");
   });
 
   test("Arabic programmes page is right-to-left", async ({ page }) => {
