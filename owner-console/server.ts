@@ -14,6 +14,8 @@ import { SupabaseStore, type AdminStore } from "./lib/store.ts";
 import * as V from "./lib/views.ts";
 
 const CSS = readFileSync(fileURLToPath(new URL("./public/app.css", import.meta.url)), "utf8");
+// The site's own logo, served to the console pages (img-src 'self').
+const LOGO = readFileSync(fileURLToPath(new URL("../public/brand/goodfly-logo.webp", import.meta.url)));
 const MAX_BODY = 16 * 1024;
 const UUID = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}";
 
@@ -74,6 +76,10 @@ export function createApp({ store, guard, maxDirection, demo }: AppOptions) {
     if (method === "GET" && path === "/app.css") {
       res.writeHead(200, { "content-type": "text/css; charset=utf-8", ...SECURITY_HEADERS });
       return res.end(CSS);
+    }
+    if (method === "GET" && path === "/logo.webp") {
+      res.writeHead(200, { "content-type": "image/webp", ...SECURITY_HEADERS });
+      return res.end(LOGO);
     }
 
     // 2. Every POST must come from our own pages.
