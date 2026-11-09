@@ -41,6 +41,10 @@ const ICONS = {
 const icon = (name: keyof typeof ICONS, cls = "icon") =>
   `<svg class="${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${ICONS[name]}</svg>`;
 
+// Same plane and dotted route as the website's hero emblem.
+const PLANE = "M18 0 L5 -2 L-5 -15 L-9.5 -15 L-4 -2 L-12 -2 L-16 -7.5 L-19 -7.5 L-16.5 0 L-19 7.5 L-16 7.5 L-12 2 L-4 2 L-9.5 15 L-5 15 L5 2 Z";
+const ROUTE = "M 18 478 C 150 270, 330 118, 588 150";
+
 /** The logo's sun-over-sea emblem (same shapes as the website), animated by app.css only. */
 function emblem(): string {
   const bands = [[64, 44], [116, 36], [160, 31], [199, 26], [233, 22], [263, 18], [289, 14]]
@@ -61,8 +65,13 @@ function emblem(): string {
     <path class="wave w3" d="${wave(394, 12, 130)}" fill="#0858f8"/>
     <path class="wave w2" d="${wave(438, 10, 30)}" fill="#0a46c8"/>
   </g>
-  <path class="route" d="M 18 478 C 150 270, 330 118, 588 150"/>
-  <path class="emblem-plane" transform="translate(468 128) rotate(-12) scale(2)" d="M18 0 L5 -2 L-5 -15 L-9.5 -15 L-4 -2 L-12 -2 L-16 -7.5 L-19 -7.5 L-16.5 0 L-19 7.5 L-16 7.5 L-12 2 L-4 2 L-9.5 15 L-5 15 L5 2 Z"/>
+  <path id="route" class="route" d="${ROUTE}"/>
+  <g class="plane-moving">
+    <path class="emblem-plane" transform="scale(2)" d="${PLANE}"/>
+    <animateMotion dur="14s" repeatCount="indefinite" rotate="auto" keyPoints="0;1" keyTimes="0;1" calcMode="spline" keySplines="0.45 0 0.55 1"><mpath href="#route"/></animateMotion>
+    <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.1;0.88;1" dur="14s" repeatCount="indefinite"/>
+  </g>
+  <path class="emblem-plane plane-still" transform="translate(468 128) rotate(-12) scale(2)" d="${PLANE}"/>
 </svg>`;
 }
 

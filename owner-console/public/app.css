@@ -234,6 +234,7 @@ tbody tr:hover { background: rgba(206, 224, 255, 0.04); }
 .w3 { animation-duration: 7s; }
 .route { fill: none; stroke: rgba(92, 194, 255, 0.7); stroke-width: 3; stroke-dasharray: 2 12; stroke-linecap: round; }
 .emblem-plane { fill: var(--sky); }
+.plane-still { display: none; }
 @keyframes drift { to { transform: translateX(-484px); } }
 
 /* ── Footer ───────────────────────────────────────── */
@@ -258,5 +259,7 @@ tbody tr:hover { background: rgba(206, 224, 255, 0.04); }
 
 @media (prefers-reduced-motion: reduce) {
   .wave { animation: none; }
+  .plane-moving { display: none; }
+  .plane-still { display: inline; }
   .person, button, .button { transition: none; }
 }
