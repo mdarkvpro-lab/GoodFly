@@ -82,14 +82,14 @@ export function HeroEmblem() {
         {/* Dotted flight route and the plane that flies along it */}
         <path id="gf-route" className={styles.route} d={ROUTE} />
         <g className={styles.planeMoving}>
-          <path className={styles.planeShape} d={PLANE} transform="scale(1.5)" />
+          <path className={styles.planeShape} d={PLANE} transform="scale(2)" />
           <animateMotion dur="14s" repeatCount="indefinite" rotate="auto" keyPoints="0;1" keyTimes="0;1" calcMode="spline" keySplines="0.45 0 0.55 1">
             <mpath href="#gf-route" />
           </animateMotion>
           <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.1;0.88;1" dur="14s" repeatCount="indefinite" />
         </g>
         <g className={styles.planeStill} transform="translate(468 128) rotate(-12)">
-          <path className={styles.planeShape} d={PLANE} transform="scale(1.5)" />
+          <path className={styles.planeShape} d={PLANE} transform="scale(2)" />
         </g>
       </svg>
     </div>
