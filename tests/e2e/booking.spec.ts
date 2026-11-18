@@ -14,9 +14,12 @@ test.describe("Booking request form", () => {
     await page.goto("/fr/reservation?to=Istanbul&travellers=2%20adultes");
     await expect(page.getByRole("heading", { level: 1 })).toHaveText("Demande de réservation");
     const main = page.getByRole("main");
-    for (const name of [/^Nom complet/, /^Téléphone/, /^E-mail/, /^Départ/, /^Destination/, /^Dates souhaitées/, /^Précisions/]) {
+    for (const name of [/^Nom complet/, /^Téléphone/, /^E-mail/, /^Départ/, /^Destination/, /^Précisions/]) {
       await expect(main.getByRole("textbox", { name })).toBeVisible();
     }
+    // Dates are chosen in a calendar, never typed.
+    for (const name of ["Date de départ", "Date de retour"]) await expect(main.getByLabel(name)).toHaveAttribute("type", "date");
+    await expect(main.getByRole("checkbox", { name: "Mes dates sont flexibles" })).not.toBeChecked();
     await expect(main.getByRole("spinbutton", { name: /^Adultes/ })).toHaveValue("2");
     await expect(main.getByRole("checkbox", { name: /loi 09-08/ })).not.toBeChecked();
     await expect(page.locator('meta[name="robots"]').first()).toHaveAttribute("content", /noindex/);

@@ -97,6 +97,38 @@
   color: #ff9d94;
 }
 
+/* Date fields open the browser's calendar; the whole field is clickable. */
+.input[type="date"] {
+  cursor: pointer;
+  min-width: 0;
+}
+
+.input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.75;
+}
+
+:global([data-theme="dark"]) .input[type="date"] {
+  color-scheme: dark;
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  color: var(--ink-soft);
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.check input {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  accent-color: var(--blue);
+}
+
 .consent {
   display: flex;
   align-items: flex-start;

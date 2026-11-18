@@ -5,6 +5,7 @@ import { useActionState, useEffect, useState } from "react";
 import { submitBooking, type BookingFormState } from "@/app/[lang]/reservation/actions";
 import type { Locale } from "@/i18n/config";
 import { Icon } from "@/components/Icon";
+import { DateRange } from "./DateRange";
 import { Turnstile } from "./Turnstile";
 import styles from "./booking.module.css";
 
@@ -128,10 +129,31 @@ export function BookingForm({ lang, t, initial, programLocked, turnstileSiteKey 
         <div className={styles.grid}>
           {!programLocked && initial.service !== "visa" && field("from_place", { maxLength: 120, autoComplete: "off" })}
           {!programLocked && field("to_place", { maxLength: 120, autoComplete: "off" }, true)}
-          {field("travel_dates", { maxLength: 120, autoComplete: "off" })}
+          <DateRange
+            key={`dates-${key}`}
+            labelClass={styles.label}
+            inputClass={styles.input}
+            from={{ name: "date_from", label: t.fields.date_from, defaultValue: v("date_from"), inputProps: aria("date_from"), after: err("date_from") }}
+            to={{
+              name: "date_to",
+              label: t.fields.date_to,
+              defaultValue: v("date_to"),
+              inputProps: aria("date_to"),
+              after: (
+                <>
+                  <span className={styles.hint}>{t.hints.date_to}</span>
+                  {err("date_to")}
+                </>
+              ),
+            }}
+          />
           {field("adults", { type: "number", min: 1, max: 20, inputMode: "numeric" }, true)}
           {field("children", { type: "number", min: 0, max: 20, inputMode: "numeric" })}
         </div>
+        <label className={styles.check}>
+          <input key={`flex-${key}`} type="checkbox" name="dates_flexible" defaultChecked={v("dates_flexible") === "on"} />
+          <span>{t.fields.dates_flexible}</span>
+        </label>
         <label className={styles.label}>
           <span>{t.fields.message}</span>
           <textarea key={`message-${key}`} className={styles.textarea} name="message" maxLength={1000} defaultValue={v("message")} dir="auto" {...aria("message")} />

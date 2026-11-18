@@ -39,11 +39,18 @@ test.describe("homepage", () => {
     const form = page.getByRole("form", { name: "Rechercher un voyage" });
     await expect(form.getByLabel("Départ")).toHaveValue("Rabat–Salé (RBA)");
     await form.getByLabel("Destination").fill("Istanbul");
+    // Calendar fields (day, month, year), and the return cannot be before the departure.
+    await expect(form.getByLabel("Aller")).toHaveAttribute("type", "date");
+    await form.getByLabel("Aller").fill("2030-12-20");
+    await expect(form.getByLabel("Retour")).toHaveAttribute("min", "2030-12-20");
+    await form.getByLabel("Retour").fill("2030-12-27");
     await form.getByRole("button", { name: "Rechercher" }).click();
     await expect(page).toHaveURL(/\/fr\/reservation\?/);
     const request = page.getByRole("main");
     await expect(request.getByRole("textbox", { name: /^Destination/ })).toHaveValue("Istanbul");
     await expect(request.getByRole("textbox", { name: /^Départ/ })).toHaveValue("Rabat–Salé (RBA)");
+    await expect(request.getByLabel("Date de départ")).toHaveValue("2030-12-20");
+    await expect(request.getByLabel("Date de retour")).toHaveValue("2030-12-27");
   });
 
   test("theme toggle switches to dark and is remembered", async ({ page }) => {

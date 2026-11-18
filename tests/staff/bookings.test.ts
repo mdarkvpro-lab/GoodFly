@@ -1,6 +1,6 @@
 // Booking request validation, search-bar prefill and access.  node tests/staff/bookings.test.ts
 import { can, staffHome, staffNav } from "../../src/lib/staff/access.ts";
-import { parseBooking, parseCode, prefillFromSearch, serviceFromSlug, SERVICE_SLUGS } from "../../src/lib/bookings/validate.ts";
+import { parseBooking, parseCode, prefillFromSearch, serviceFromSlug, SERVICE_SLUGS, travelDates, isoDate } from "../../src/lib/bookings/validate.ts";
 
 let pass = 0;
 let fail = 0;
@@ -37,11 +37,27 @@ check("anything else is refused", [null, "", "12345", "1234567", "12345a", "abcd
 check("decimal or text traveller counts are refused", !parseBooking(form({ ...good, adults: "1.5" })).ok && !parseBooking(form({ ...good, adults: "deux" })).ok);
 
 console.log("Search bar prefill");
-const p = prefillFromSearch({ from: "Casablanca (CMN)", to: "Istanbul", dates: "20-27 déc.", travellers: "3 adultes · Économie" });
-check("search bar values carry over", p.from_place === "Casablanca (CMN)" && p.to_place === "Istanbul" && p.adults === "3", JSON.stringify(p));
+const p = prefillFromSearch({ from: "Casablanca (CMN)", to: "Istanbul", depart: "2027-12-20", retour: "2027-12-27", travellers: "3 adultes · Économie" });
+check("search bar values carry over", p.from_place === "Casablanca (CMN)" && p.to_place === "Istanbul" && p.adults === "3" && p.date_from === "2027-12-20" && p.date_to === "2027-12-27", JSON.stringify(p));
+check("search bar dates that are not real days are dropped", prefillFromSearch({ depart: "2027-02-30", retour: "demain" }).date_from === "" && prefillFromSearch({ retour: "<x>" }).date_to === "");
 check("unknown traveller text falls back to 1", prefillFromSearch({ travellers: "beaucoup" }).adults === "1");
 check("bad programme slugs are dropped", prefillFromSearch({ programme: "<script>" }).program === "");
 check("overlong values are cut", prefillFromSearch({ to: "x".repeat(500) }).to_place.length === 120);
+
+console.log("Travel dates (calendar)");
+const dates = (q: Record<string, string>, lang = "fr") => travelDates((k) => q[k], lang, "2026-11-18");
+check("a departure and a return are written for the team", dates({ date_from: "2026-12-20", date_to: "2026-12-27" }).text === "du 20/12/2026 au 27/12/2026", dates({ date_from: "2026-12-20", date_to: "2026-12-27" }).text);
+check("one-way and flexible are written too", dates({ date_from: "2026-12-20", dates_flexible: "on" }).text === "départ le 20/12/2026 · dates flexibles");
+check("Arabic clients get Arabic wording", dates({ date_from: "2026-12-20", date_to: "2026-12-27" }, "ar").text === "من 20/12/2026 إلى 27/12/2026");
+check("no dates is allowed", dates({}).text === "" && !Object.keys(dates({}).errors).length);
+check("a past departure is refused", dates({ date_from: "2026-11-01" }).errors.date_from === "past");
+check("yesterday is tolerated (time zones)", !dates({ date_from: "2026-11-17" }).errors.date_from);
+check("a return before the departure is refused", dates({ date_from: "2026-12-20", date_to: "2026-12-19" }).errors.date_to === "before");
+check("a return without a departure is refused", dates({ date_to: "2026-12-27" }).errors.date_to === "needsFrom");
+check("typed text or impossible days are refused", dates({ date_from: "20 décembre" }).errors.date_from === "format" && dates({ date_from: "2027-02-30" }).errors.date_from === "format");
+check("dates more than three years ahead are refused", dates({ date_from: "2031-01-01" }).errors.date_from === "far");
+check("isoDate reads only real yyyy-mm-dd days", isoDate("2028-02-29") === "2028-02-29" && isoDate("2027-02-29") === null && isoDate("2027-13-01") === null);
+check("the free-text dates field is ignored (calendar only)", parseBooking(form({ ...good, travel_dates: "<script>" })).ok && (parseBooking(form({ ...good, travel_dates: "<script>" })) as { value: { travel_dates: string } }).value.travel_dates === "");
 
 console.log("Access");
 const booker = { role: "agent" as const, permissions: ["bookings.manage" as const] };

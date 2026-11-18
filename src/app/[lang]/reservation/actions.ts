@@ -24,7 +24,7 @@ export type BookingFormState =
   | { errors?: BookingErrors; error?: FormError; values: Record<string, string> }
   | undefined;
 
-const FIELDS = ["full_name", "phone", "email", "from_place", "to_place", "travel_dates", "adults", "children", "message", "program", "service"] as const;
+const FIELDS = ["full_name", "phone", "email", "from_place", "to_place", "date_from", "date_to", "dates_flexible", "adults", "children", "message", "program", "service"] as const;
 const echo = (form: FormData) => Object.fromEntries(FIELDS.map((k) => [k, String(form.get(k) ?? "").slice(0, 1000)]));
 
 /**

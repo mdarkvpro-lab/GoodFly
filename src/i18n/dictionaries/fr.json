@@ -38,8 +38,8 @@
     "from": "Départ",
     "to": "Destination",
     "toPlaceholder": "Où allez-vous ?",
-    "dates": "Dates",
-    "datesPlaceholder": "Aller — Retour",
+    "depart": "Aller",
+    "return": "Retour",
     "travellers": "Voyageurs",
     "travellersDefault": "1 adulte · Économie",
     "submit": "Rechercher"
@@ -160,7 +160,9 @@
         "email": "E-mail",
         "from_place": "Départ",
         "to_place": "Destination",
-        "travel_dates": "Dates souhaitées",
+        "date_from": "Date de départ",
+        "date_to": "Date de retour",
+        "dates_flexible": "Mes dates sont flexibles",
         "adults": "Adultes",
         "children": "Enfants",
         "message": "Précisions (hôtel, bagages, budget…)"
@@ -168,7 +170,7 @@
       "hints": {
         "phone": "Le conseiller vous appellera sur ce numéro.",
         "email": "Obligatoire : vous recevrez un code à 6 chiffres pour la confirmer.",
-        "travel_dates": "Ex. : du 20 au 27 décembre, ou « flexible »."
+        "date_to": "Laissez vide pour un aller simple."
       },
       "errors": {
         "check": "Vérifiez les champs signalés.",
@@ -187,7 +189,13 @@
         "email.disposable": "Les adresses e-mail temporaires ne sont pas acceptées. Utilisez votre adresse habituelle.",
         "mail": "Le code n'a pas pu être envoyé. Vérifiez l'adresse e-mail ou réessayez dans un instant.",
         "wait": "Un code vient d'être envoyé. Attendez une minute avant d'en demander un autre.",
-        "codeTooMany": "Trop de codes demandés pour cette adresse. Réessayez dans une heure ou appelez-nous au 05 30 16 43 43."
+        "codeTooMany": "Trop de codes demandés pour cette adresse. Réessayez dans une heure ou appelez-nous au 05 30 16 43 43.",
+        "date_from.past": "Choisissez une date à partir d'aujourd'hui.",
+        "date_from.far": "Choisissez une date dans les trois prochaines années.",
+        "date_from.format": "Date invalide.",
+        "date_to.format": "Date invalide.",
+        "date_to.before": "Le retour doit être le même jour ou après le départ.",
+        "date_to.needsFrom": "Choisissez d'abord la date de départ."
       },
       "consent": "J'accepte que GoodFly utilise ces informations pour me recontacter au sujet de cette demande (loi 09-08). Elles ne sont jamais revendues.",
       "submit": "Envoyer la demande",

@@ -1,3 +1,4 @@
+import { DateRange } from "@/components/booking/DateRange";
 import { homeAirportLabel } from "@/config/site";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries";
@@ -17,10 +18,12 @@ export function BookingBar({ lang, dict }: Props) {
         <span>{t.to}</span>
         <input name="to" placeholder={t.toPlaceholder} autoComplete="off" />
       </label>
-      <label className={styles.field}>
-        <span>{t.dates}</span>
-        <input name="dates" placeholder={t.datesPlaceholder} autoComplete="off" />
-      </label>
+      <DateRange
+        labelClass={`${styles.field} ${styles.dateField}`}
+        inputClass={styles.dateInput}
+        from={{ name: "depart", label: t.depart }}
+        to={{ name: "retour", label: t.return }}
+      />
       <label className={styles.field}>
         <span>{t.travellers}</span>
         <input name="travellers" defaultValue={t.travellersDefault} autoComplete="off" />
