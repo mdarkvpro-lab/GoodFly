@@ -137,15 +137,21 @@
     "whatsapp": "واتساب 06 58 89 99 07"
   },
   "footer": {
-    "explore": "استكشف",
-    "info": "معلومات",
+    "explore": "السفر",
+    "info": "الوكالة",
     "contactLink": "اتصل بنا",
     "legal": "الإشعارات القانونية",
     "privacy": "الخصوصية",
     "staff": "فضاء الفريق",
-    "follow": "تابعونا",
     "instagram": "GoodFly على إنستغرام",
-    "facebook": "GoodFly على فيسبوك"
+    "facebook": "GoodFly على فيسبوك",
+    "tagline": "رحلات جوية وإقامات وتأشيرات، نحضّرها معكم من وكالتنا في سلا.",
+    "passAgency": "الوكالة",
+    "passPhone": "الهاتف",
+    "passEmail": "البريد الإلكتروني",
+    "passFrom": "الانطلاق",
+    "visas": "التأشيرات",
+    "backToTop": "أعلى الصفحة"
   },
   "reservation": {
     "title": "طلب حجز",

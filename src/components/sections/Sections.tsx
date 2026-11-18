@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { AGENCY, agencyWhatsApp } from "@/config/site";
+import { AGENCY, agencyWhatsApp, homeAirport } from "@/config/site";
 import { SERVICE_SLUGS } from "@/lib/bookings/validate";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries";
@@ -139,54 +139,72 @@ export function FinalCta({ dict, lang }: Props & { lang: Locale }) {
 export function Footer({ dict, lang }: Props & { lang: Locale }) {
   const t = dict.footer;
   const nav = dict.nav;
-  const wa = agencyWhatsApp(lang);
   return (
     <footer className={styles.footer}>
-      <div className={`container ${styles.footerRow}`}>
-        <div className={styles.footerBrand}>
+      <div className={`container ${styles.footerGrid}`}>
+        <div className={styles.footerIntro}>
           {/* eslint-disable-next-line @next/next/no-img-element -- tiny pre-sized logo */}
           <img className={styles.footerLogo} src="/brand/goodfly-logo.webp" width={86} height={48} alt="GoodFly" />
-          <address className={styles.footerContact}>
-            <span dir="auto">{AGENCY.address[lang]}</span>
-            <span>
-              {AGENCY.phones.map((ph, i) => (
-                <span key={ph.tel}>
-                  {i > 0 && " · "}
-                  <a href={`tel:${ph.tel}`} dir="ltr">
+          <p className={styles.footerTagline}>{t.tagline}</p>
+
+          {/* The agency's contact details, laid out like a boarding pass: the stub carries the home airport. */}
+          <div className={styles.pass}>
+            <address className={styles.passMain}>
+              <span className={styles.passLabel}>{t.passAgency}</span>
+              <span className={styles.passValue} dir="auto">
+                {AGENCY.address[lang]}
+              </span>
+              <span className={styles.passLabel}>{t.passPhone}</span>
+              <span className={styles.passValue}>
+                {AGENCY.phones.map((ph) => (
+                  <a key={ph.tel} href={`tel:${ph.tel}`} dir="ltr">
                     {ph.display}
                   </a>
-                </span>
-              ))}
-            </span>
-            <span>
-              <a href={`mailto:${AGENCY.email}`} dir="ltr">
-                {AGENCY.email}
-              </a>
-            </span>
-          </address>
-          <div className={styles.social}>
-            <span className={styles.socialLabel}>{t.follow}</span>
-            <a href={AGENCY.social.instagram} target="_blank" rel="noopener noreferrer" aria-label={t.instagram} title={t.instagram}>
-              <Icon name="instagram" size={20} />
-            </a>
-            <a href={AGENCY.social.facebook} target="_blank" rel="noopener noreferrer" aria-label={t.facebook} title={t.facebook}>
-              <Icon name="facebook" size={20} />
-            </a>
+                ))}
+              </span>
+              <span className={styles.passLabel}>{t.passEmail}</span>
+              <span className={styles.passValue}>
+                <a href={`mailto:${AGENCY.email}`} dir="ltr">
+                  {AGENCY.email}
+                </a>
+              </span>
+            </address>
+            <div className={styles.passStub}>
+              <span className={styles.passLabel}>{t.passFrom}</span>
+              <span className={styles.passCode}>{homeAirport}</span>
+              <span className={styles.passSocial}>
+                <a href={AGENCY.social.instagram} target="_blank" rel="noopener noreferrer" aria-label={t.instagram} title={t.instagram}>
+                  <Icon name="instagram" size={18} />
+                </a>
+                <a href={AGENCY.social.facebook} target="_blank" rel="noopener noreferrer" aria-label={t.facebook} title={t.facebook}>
+                  <Icon name="facebook" size={18} />
+                </a>
+              </span>
+            </div>
           </div>
         </div>
-        <nav aria-label={t.explore} className={styles.footerNav}>
+
+        <nav aria-labelledby="footer-travel" className={styles.footerCol}>
+          <h2 id="footer-travel">{t.explore}</h2>
           <a href={`/${lang}#destinations`}>{nav.destinations}</a>
+          <a href={`/${lang}/programmes`}>{nav.programs}</a>
           <a href={`/${lang}/services/vols`}>{nav.flights}</a>
           <a href={`/${lang}/services/sejours`}>{nav.stays}</a>
+          <a href={`/${lang}/services/visas`}>{t.visas}</a>
         </nav>
-        <nav aria-label={t.info} className={styles.footerNav}>
-          <a href={wa} target="_blank" rel="noopener noreferrer">
+        <nav aria-labelledby="footer-info" className={styles.footerCol}>
+          <h2 id="footer-info">{t.info}</h2>
+          <a href={agencyWhatsApp(lang)} target="_blank" rel="noopener noreferrer">
             {t.contactLink}
           </a>
           <a href={`/${lang}/mentions-legales`}>{t.legal}</a>
           <a href={`/${lang}/confidentialite`}>{t.privacy}</a>
           <a href={`/${lang}/espace/connexion`}>{t.staff}</a>
         </nav>
+      </div>
+      <div className={`container ${styles.footerBottom}`}>
+        <span>© GoodFly</span>
+        <a href="#main">{t.backToTop}</a>
       </div>
     </footer>
   );

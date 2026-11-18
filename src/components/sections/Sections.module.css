@@ -556,79 +556,215 @@
 }
 
 /* ───── Footer ───── */
+/* Footer: the night scene of the final call to action continues, in both themes.
+   One memorable element, the contact card cut like a boarding pass; the rest stays quiet. */
 .footer {
-  border-top: 1px solid var(--line);
-}
-
-.footerRow {
-  padding-block: 64px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 48px;
+  background: var(--night-bg);
+  color: var(--night-muted);
+  border-top: 1px solid rgba(238, 243, 251, 0.08);
   font-size: 15px;
-  color: var(--muted);
 }
 
-.footerBrand {
-  flex: 2 1 260px;
+.footerGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 0.7fr) minmax(0, 0.7fr);
+  gap: 56px;
+  padding-block: 72px 56px;
 }
 
-.footerBrand p + p {
-  margin-top: 12px;
+.footerIntro {
+  display: grid;
+  gap: 18px;
+  align-content: start;
+  max-width: 560px;
 }
 
 .footerLogo {
   display: block;
-  height: 48px;
+  height: 52px;
   width: auto;
-}
-
-:global([data-theme="dark"]) .footerLogo {
+  /* The royal-blue script needs a soft light halo to stay legible on night navy. */
   filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.35));
 }
 
-.social {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 20px;
+.footerTagline {
+  color: var(--night-ink);
+  font-size: 1.1rem;
+  font-weight: 500;
+  line-height: 1.5;
+  max-width: 36ch;
 }
 
-.socialLabel {
-  margin-inline-end: 4px;
+/* Boarding pass: main part + a perforated stub with notches cut on both edges. */
+.pass {
+  --notch: 11px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  margin-top: 6px;
+  border-radius: 18px;
+  background: var(--night-surface);
+  border: 1px solid rgba(238, 243, 251, 0.1);
+  mask:
+    radial-gradient(circle var(--notch) at var(--stub-edge) 0, transparent 98%, #000) top / 100% 51% no-repeat,
+    radial-gradient(circle var(--notch) at var(--stub-edge) 100%, transparent 98%, #000) bottom / 100% 51% no-repeat;
+  --stub-edge: calc(100% - 132px);
+}
+
+:global([dir="rtl"]) .pass {
+  --stub-edge: 132px;
+}
+
+.passMain {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 10px 18px;
+  align-content: start;
+  padding: 22px 24px;
+  font-style: normal;
+}
+
+.passLabel {
+  color: var(--night-muted);
+  font-size: 0.8rem;
   font-weight: 600;
+  line-height: 1.9;
 }
 
-.social a {
+.passValue {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  color: var(--night-ink);
+  font-weight: 500;
+  line-height: 1.55;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.passValue a,
+.footerCol a,
+.footerBottom a {
+  color: inherit;
+  text-decoration: none;
+  transition: color var(--dur-ui) var(--ease-ui);
+}
+
+.passValue a:hover,
+.footerCol a:hover,
+.footerBottom a:hover {
+  color: #8fd0ff;
+}
+
+.passStub {
+  width: 132px;
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 4px;
+  padding: 20px 12px;
+  border-inline-start: 2px dashed rgba(238, 243, 251, 0.18);
+  text-align: center;
+}
+
+.passCode {
+  color: var(--night-accent);
+  font-family: var(--font-latin), sans-serif;
+  font-size: 2.1rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  line-height: 1;
+}
+
+.passSocial {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.passSocial a {
   display: inline-grid;
   place-items: center;
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  border: 1px solid var(--line);
-  color: var(--ink);
+  border: 1px solid rgba(238, 243, 251, 0.18);
+  color: var(--night-ink);
   transition: background-color var(--dur-ui) var(--ease-ui), color var(--dur-ui) var(--ease-ui), border-color var(--dur-ui) var(--ease-ui);
 }
 
-.social a:hover {
-  background: var(--blue);
-  border-color: var(--blue);
-  color: #fff;
+.passSocial a:hover {
+  background: var(--night-accent);
+  border-color: var(--night-accent);
+  color: var(--night-bg);
 }
 
-.footerNav {
-  flex: 1 1 160px;
+.footerCol {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
-.footerNav a {
-  text-decoration: none;
+.footerCol h2 {
+  margin: 0 0 6px;
+  color: var(--night-ink);
+  font-size: 1rem;
+  font-weight: 700;
 }
 
-.footerNav a:hover {
-  color: var(--ink);
+.footerBottom {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 12px;
+  padding-block: 20px 28px;
+  border-top: 1px solid rgba(238, 243, 251, 0.08);
+  font-size: 14px;
+}
+
+.footer a:focus-visible {
+  outline: 2px solid var(--night-accent);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+@media (max-width: 960px) {
+  .footerGrid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 40px 32px;
+  }
+
+  .footerIntro {
+    grid-column: 1 / -1;
+    max-width: none;
+  }
+}
+
+@media (max-width: 520px) {
+  .pass {
+    --stub-edge: calc(100% - 104px);
+  }
+
+  :global([dir="rtl"]) .pass {
+    --stub-edge: 104px;
+  }
+
+  .passStub {
+    width: 104px;
+  }
+
+  .passMain {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
+    padding: 18px;
+  }
+
+  .passValue {
+    margin-bottom: 10px;
+  }
+
+  .passCode {
+    font-size: 1.7rem;
+  }
 }
 
 @media (max-width: 900px) {

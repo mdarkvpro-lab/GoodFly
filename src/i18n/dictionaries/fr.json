@@ -137,15 +137,21 @@
     "whatsapp": "WhatsApp 06 58 89 99 07"
   },
   "footer": {
-    "explore": "Explorer",
-    "info": "Informations",
+    "explore": "Voyager",
+    "info": "L'agence",
     "contactLink": "Contact",
     "legal": "Mentions légales",
     "privacy": "Confidentialité",
     "staff": "Espace équipe",
-    "follow": "Suivez-nous",
     "instagram": "GoodFly sur Instagram",
-    "facebook": "GoodFly sur Facebook"
+    "facebook": "GoodFly sur Facebook",
+    "tagline": "Vols, séjours et visas, préparés avec vous depuis notre agence de Salé.",
+    "passAgency": "Agence",
+    "passPhone": "Téléphone",
+    "passEmail": "E-mail",
+    "passFrom": "Départ",
+    "visas": "Visas",
+    "backToTop": "Haut de page"
   },
   "reservation": {
     "title": "Demande de réservation",
