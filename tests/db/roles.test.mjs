@@ -18,8 +18,13 @@ await db.exec(`
   create table auth.users (id uuid primary key, email text, raw_user_meta_data jsonb default '{}'::jsonb, encrypted_password text);
   create function auth.uid() returns uuid language sql stable as
     $$ select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid $$;
+  -- Same as Supabase: the token's claims (here: sub, aal and iat set by the test helpers).
+  create function auth.jwt() returns jsonb language sql stable as
+    $$ select coalesce(nullif(current_setting('request.jwt.claims', true), ''), '{}')::jsonb $$;
+  create table auth.sessions (id uuid primary key, user_id uuid);
   grant usage on schema auth to authenticated, anon;
   grant execute on function auth.uid() to authenticated, anon;
+  grant execute on function auth.jwt() to authenticated, anon;
   -- Minimal stand-in for Supabase Storage (buckets, objects, foldername()).
   create schema storage;
   create table storage.buckets (id text primary key, name text, public boolean, file_size_limit bigint, allowed_mime_types text[]);
@@ -57,12 +62,14 @@ await db.exec(`
   update public.profiles set role = 'agent' where id = '${ids.A}';
 `);
 
-async function as(user, sql, params = []) {
-  await db.exec(`set role authenticated; select set_config('request.jwt.claim.sub', '${ids[user]}', false);`);
+// A staff session that passed 2FA ("aal2"), issued now, unless the test says otherwise.
+async function as(user, sql, params = [], claims = {}) {
+  const jwt = JSON.stringify({ sub: ids[user], aal: "aal2", iat: Math.floor(Date.now() / 1000), ...claims });
+  await db.exec(`set role authenticated; select set_config('request.jwt.claim.sub', '${ids[user]}', false); select set_config('request.jwt.claims', '${jwt}', false);`);
   try {
     return await db.query(sql, params);
   } finally {
-    await db.exec(`reset role; select set_config('request.jwt.claim.sub', '', false);`);
+    await db.exec(`reset role; select set_config('request.jwt.claim.sub', '', false); select set_config('request.jwt.claims', '', false);`);
   }
 }
 
@@ -578,6 +585,60 @@ await check("a resend is allowed only after a recent code to the same address", 
   await db.query(`update private.email_codes set created_at = now() - interval '11 minutes' where email = 'renvoi@exemple.ma'`);
   if ((await canResend("renvoi@exemple.ma")) !== false) throw new Error("old code still allows a resend");
   await expectError(canResend("renvoi@exemple.ma", "wrong-key"), "form_key");
+});
+
+console.log("Two-factor authentication");
+const ZY = ids.Z;
+await check("a session without 2FA (aal1) has no staff rights in the database", async () => {
+  const r = await as("Z", `select public.my_role() as r, public.has_permission('bookings.manage') as p`, [], { aal: "aal1" });
+  if (r.rows[0].r !== null || r.rows[0].p !== false) throw new Error(JSON.stringify(r.rows));
+  await expectError(as("Z", `select public.staff_booking_stats()`, [], { aal: "aal1" }), "reports.view");
+});
+await check("an aal1 session still reads its own profile (to know where to send the user)", () =>
+  expectRows(as("Z", `select id from public.profiles where id = $1`, [ZY], { aal: "aal1" }), 1));
+await check("a session with 2FA (aal2) keeps its rights", async () => {
+  const r = await as("Z", `select public.my_role() as r`);
+  if (r.rows[0].r !== "direction") throw new Error(JSON.stringify(r.rows));
+});
+const H64 = (n) => String(n).padStart(64, "a");
+const tenHashes = (seed) => Array.from({ length: 10 }, (_, i) => H64(`${seed}${i}`.replace(/[^0-9a-f]/g, "b")));
+await check("backup codes: 10 distinct hashes, only with 2FA", async () => {
+  await expectError(as("Z", `select public.set_backup_codes($1)`, [tenHashes("c")], { aal: "aal1" }), "two-factor");
+  await expectError(as("Z", `select public.set_backup_codes($1)`, [tenHashes("c").slice(0, 9)]), "invalid");
+  await expectError(as("Z", `select public.set_backup_codes($1)`, [[...tenHashes("c").slice(0, 9), tenHashes("c")[0]]]), "invalid");
+  await as("Z", `select public.set_backup_codes($1)`, [tenHashes("c")]);
+  const r = await as("Z", `select public.backup_codes_left() as n`);
+  if (r.rows[0].n !== 10) throw new Error(JSON.stringify(r.rows));
+});
+await check("backup codes are never readable or spendable by users", async () => {
+  await expectError(as("Z", `select * from private.mfa_backup_codes`), "permission denied");
+  await expectError(as("Z", `select public.consume_backup_code($1, $2)`, [ZY, tenHashes("c")[0]]), "permission denied");
+  await expectError(asAnon(`select public.mfa_reset($1, 'owner_cli')`, [ZY]), "permission denied");
+  await expectError(as("Z", `select public.mfa_reset($1, 'owner_cli')`, [ZY]), "permission denied");
+});
+await check("a backup code works once; wrong codes are counted and limited", async () => {
+  const one = async (h) => (await db.query(`select public.consume_backup_code($1, $2) as ok`, [ZY, h])).rows[0].ok;
+  if ((await one(tenHashes("c")[3])) !== true) throw new Error("valid code refused");
+  if ((await one(tenHashes("c")[3])) !== false) throw new Error("code used twice");
+  for (let i = 0; i < 4; i++) await one(H64("ff" + i));
+  await expectError(db.query(`select public.consume_backup_code($1, $2)`, [ZY, tenHashes("c")[4]]), "too_many");
+  await db.query(`delete from private.mfa_recovery_failures where user_id = $1`, [ZY]);
+});
+await check("users cannot move their own security epoch", () =>
+  expectError(as("Z", `update public.profiles set security_epoch = now() + interval '1 day' where id = $1`, [ZY]), "server only"));
+await check("a reset ends every session, refuses older tokens and forgets the backup codes", async () => {
+  await db.query(`insert into auth.sessions (id, user_id) values ('11111111-1111-1111-1111-111111111111', $1), ('22222222-2222-2222-2222-222222222222', $1)`, [ZY]);
+  const before = Math.floor(Date.now() / 1000) - 5;
+  await db.query(`select public.mfa_reset($1, 'backup_code', '22222222-2222-2222-2222-222222222222')`, [ZY]);
+  const s = await db.query(`select id from auth.sessions where user_id = $1`, [ZY]);
+  if (s.rows.length !== 1 || s.rows[0].id !== "22222222-2222-2222-2222-222222222222") throw new Error(JSON.stringify(s.rows));
+  const old = await as("Z", `select public.my_role() as r`, [], { iat: before });
+  if (old.rows[0].r !== null) throw new Error("a token from before the reset still works");
+  const fresh = await as("Z", `select public.my_role() as r`, [], { iat: Math.floor(Date.now() / 1000) + 1 });
+  if (fresh.rows[0].r !== "direction") throw new Error("a new 2FA token is refused");
+  if ((await db.query(`select count(*)::int as n from private.mfa_backup_codes where user_id = $1`, [ZY])).rows[0].n !== 0) throw new Error("codes kept");
+  await expectRows(db.query(`select 1 from public.audit_log where action = 'mfa_reset' and target = $1`, [ZY]), 1);
+  await expectError(db.query(`select public.mfa_reset($1, 'website')`, [ZY]), "invalid");
 });
 
 console.log("Temporary password");

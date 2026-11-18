@@ -860,3 +860,57 @@
 .navIcon {
   margin-inline-end: 6px;
 }
+
+/* ───── Two-factor authentication ───── */
+.otp {
+  max-width: 260px;
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.qr {
+  width: 200px;
+  height: 200px;
+  padding: 12px;
+  border-radius: 16px;
+  /* QR codes need dark modules on a light ground, in both themes. */
+  background: #fff;
+}
+
+.totpKey {
+  display: block;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px dashed var(--line);
+  background: var(--bg-alt);
+  font-size: 0.95rem;
+  letter-spacing: 0.08em;
+  overflow-wrap: anywhere;
+  user-select: all;
+}
+
+.backupCodes {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 24px;
+  margin: 0;
+  padding: 18px 22px 18px 40px;
+  border-radius: 14px;
+  border: 2px dashed var(--blue);
+  background: var(--blue-soft);
+  color: var(--ink);
+  font-size: 1.05rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.06em;
+  user-select: all;
+}
+
+@media (max-width: 420px) {
+  .backupCodes {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

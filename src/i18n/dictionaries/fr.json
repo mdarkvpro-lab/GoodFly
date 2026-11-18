@@ -267,7 +267,8 @@
         "rate": "Trop de tentatives. Réessayez dans quelques minutes.",
         "config": "La connexion n'est pas encore configurée sur ce serveur.",
         "useDirection": "Ce compte est un compte Direction : choisissez « Direction ».",
-        "useEmployee": "Ce compte est un compte employé : choisissez « Employé »."
+        "useEmployee": "Ce compte est un compte employé : choisissez « Employé ».",
+        "session": "Votre session a été fermée pour votre sécurité. Reconnectez-vous."
       },
       "accountType": "Je suis",
       "employee": "Employé",
@@ -411,7 +412,8 @@
       "bookingDeleted": "Demande supprimée.",
       "restoreRequested": "Demande de réactivation envoyée à l'autre compte Direction.",
       "restoreApproved": "Réactivation acceptée : l'employé a de nouveau accès.",
-      "restoreRejected": "Réactivation refusée : l'employé reste retiré."
+      "restoreRejected": "Réactivation refusée : l'employé reste retiré.",
+      "othersSignedOut": "Vos autres appareils ont été déconnectés."
     },
     "errors": {
       "forbidden": "Action refusée : ce compte est protégé.",
@@ -422,7 +424,8 @@
       "pending": "Une demande est déjà en attente pour cet employé.",
       "otherBoss": "C'est l'autre compte Direction qui doit décider.",
       "notEmployee": "Ce compte n’est pas un employé actif.",
-      "notRemoved": "Cet employé n'est pas retiré."
+      "notRemoved": "Cet employé n'est pas retiré.",
+      "session": "Votre session a été fermée pour votre sécurité. Reconnectez-vous."
     },
     "permissions": {
       "programs.manage": "Publier les programmes",
@@ -633,6 +636,47 @@
         "unsupported": "Ce navigateur ne reçoit pas les alertes. Sur iPhone : ouvrez le site dans Safari, « Partager » → « Sur l'écran d'accueil », puis ouvrez GoodFly depuis l'écran d'accueil.",
         "error": "Impossible d'activer les alertes. Réessayez."
       }
+    },
+    "twoFactor": {
+      "setupTitle": "Activez la double authentification",
+      "setupIntro": "Pour protéger les données des clients, chaque compte GoodFly demande un code à 6 chiffres en plus du mot de passe. Installez sur votre téléphone une application d'authentification gratuite : Google Authenticator, Microsoft Authenticator ou une autre.",
+      "start": "Commencer",
+      "step1": "Dans l'application, ajoutez un compte et scannez ce QR code.",
+      "manual": "Impossible de scanner ? Saisissez cette clé dans l'application :",
+      "step2": "Tapez le code à 6 chiffres affiché par l'application.",
+      "code": "Code à 6 chiffres",
+      "confirm": "Activer",
+      "codesTitle": "Vos 10 codes de secours",
+      "codesIntro": "Si vous perdez votre téléphone, chaque code permet une seule fois de retrouver l'accès. Notez-les ou imprimez-les et gardez-les dans un endroit sûr : ils ne seront plus affichés.",
+      "copy": "Copier les codes",
+      "copied": "Codes copiés.",
+      "done": "J'ai noté mes codes, continuer",
+      "challengeTitle": "Code de vérification",
+      "challengeIntro": "Ouvrez votre application d'authentification et tapez le code à 6 chiffres de GoodFly.",
+      "verify": "Vérifier",
+      "lostPhone": "Téléphone perdu ? Utiliser un code de secours",
+      "recoveryTitle": "Utiliser un code de secours",
+      "recoveryIntro": "Tapez un de vos 10 codes de secours. La double authentification de votre compte sera retirée et vous la réactiverez tout de suite sur votre nouveau téléphone. Vos autres appareils seront déconnectés.",
+      "backupCode": "Code de secours",
+      "useCode": "Utiliser ce code",
+      "noCodes": "Plus de codes de secours ? Demandez au propriétaire du site de réinitialiser votre double authentification.",
+      "back": "Retour au code de l'application",
+      "errors": {
+        "code": "Le code contient 6 chiffres.",
+        "wrong": "Code incorrect ou expiré. Tapez le code affiché maintenant.",
+        "rate": "Trop d'essais. Réessayez dans quelques minutes.",
+        "generic": "Une erreur est survenue. Réessayez.",
+        "format": "Un code de secours contient 10 caractères (ex. : ABCDE-23456).",
+        "tooMany": "Trop de codes incorrects. Réessayez dans une heure.",
+        "already": "La double authentification est déjà activée sur ce compte.",
+        "wrongBackup": "Code de secours incorrect ou déjà utilisé."
+      },
+      "accountTitle": "Double authentification",
+      "accountOn": "Activée : un code de l'application est demandé à chaque connexion.",
+      "accountLeft": "Codes de secours restants : {n} sur 10.",
+      "regenerate": "Créer 10 nouveaux codes de secours",
+      "regenerateHint": "Les anciens codes ne marcheront plus.",
+      "signOutOthers": "Déconnecter mes autres appareils"
     }
   },
   "programs": {

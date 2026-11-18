@@ -60,6 +60,8 @@ export async function changePassword(_prev: FormState, form: FormData): Promise<
   // The database clears the "temporary password" flag itself when the password changes.
   const { error } = await supabase.auth.updateUser({ password });
   if (error) return { error: error.code === "same_password" ? "same" : error.code === "weak_password" ? "weak" : "generic" };
+  // A new password ends every other session of the account (other browsers, lost phone…).
+  await supabase.auth.signOut({ scope: "others" });
   redirect(`${staffPath(lang, staffHome(user))}?m=password`);
 }
 

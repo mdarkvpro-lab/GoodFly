@@ -2,6 +2,33 @@ import type { NextConfig } from "next";
 
 const SUPABASE_HOST = "snszmxawilmjqfbfdtds.supabase.co";
 
+const SUPABASE = `https://${SUPABASE_HOST}`;
+const TURNSTILE = "https://challenges.cloudflare.com";
+
+/**
+ * Where the browser may load from or talk to. Scripts: this site (Next.js, Netlify's own script)
+ * and the Cloudflare anti-robot check only. Inline scripts stay allowed because Next.js needs them
+ * without per-request nonces (pages are prerendered); even so, an injected script could not load
+ * code from elsewhere nor send data anywhere but this site, Supabase and Cloudflare.
+ */
+const contentSecurityPolicy = [
+  "default-src 'self'",
+  `script-src 'self' 'unsafe-inline' ${TURNSTILE}${process.env.NODE_ENV === "production" ? "" : " 'unsafe-eval'"}`,
+  "style-src 'self' 'unsafe-inline'",
+  `img-src 'self' data: blob: ${SUPABASE}`,
+  "font-src 'self' data:",
+  `connect-src 'self' ${SUPABASE} wss://${SUPABASE_HOST} ${TURNSTILE}`,
+  `frame-src ${TURNSTILE}`,
+  "worker-src 'self'",
+  "manifest-src 'self'",
+  "media-src 'self'",
+  "frame-ancestors 'none'",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  "upgrade-insecure-requests",
+].join("; ");
+
 const securityHeaders = [
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
@@ -9,8 +36,7 @@ const securityHeaders = [
   { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), payment=(), usb=()" },
   { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
   { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
-  // No CSP script rules here (Next.js inline bootstrap); framing, plugins and base URL are locked down.
-  { key: "Content-Security-Policy", value: "frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'" },
+  { key: "Content-Security-Policy", value: contentSecurityPolicy },
 ];
 
 const nextConfig: NextConfig = {

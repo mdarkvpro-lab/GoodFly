@@ -17,7 +17,9 @@
     "owner:passcode": "node owner-console/passcode.ts",
     "test:owner": "node tests/owner/owner.test.ts",
     "owner:setup": "node owner-console/setup.ts",
-    "test:staff": "node tests/staff/stats.test.ts && node tests/staff/programs.test.ts && node tests/staff/bookings.test.ts && node tests/staff/notify.test.ts",
+    "owner:reset-2fa": "node owner-console/reset-2fa.ts",
+    "test:2fa-live": "node --env-file=.env.local tests/live/two-factor.live.ts",
+    "test:staff": "node tests/staff/stats.test.ts && node tests/staff/programs.test.ts && node tests/staff/bookings.test.ts && node tests/staff/notify.test.ts && node tests/staff/two-factor.test.ts",
     "telegram:setup": "node scripts/telegram/setup.ts",
     "mail:setup": "node scripts/mail/setup.ts",
     "turnstile:setup": "node scripts/turnstile/setup.ts"

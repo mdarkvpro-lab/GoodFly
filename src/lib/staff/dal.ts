@@ -18,7 +18,11 @@ export { can, staffHome, type Permission, type StaffUser };
 
 export const staffPath = (lang: Locale, page = "") => `/${lang}/espace${page ? `/${page}` : ""}`;
 
-type Options = { permission?: Permission; directionOnly?: boolean; allowPasswordChange?: boolean };
+/**
+ * `mfaStep`: a page of the 2FA sign-in itself (set up, code, backup code): reachable after the
+ * password alone. Every other page needs a session that passed 2FA ("aal2").
+ */
+type Options = { permission?: Permission; directionOnly?: boolean; allowPasswordChange?: boolean; mfaStep?: boolean };
 
 /** One session + profile read per request, however many components ask for it. */
 const loadSession = cache(async () => {
@@ -31,7 +35,7 @@ const loadSession = cache(async () => {
   if (!claims?.sub) return { supabase, claims: null, profile: null };
   const { data: profile } = await supabase
     .from("profiles")
-    .select("id, full_name, email, role, disabled_at, permissions, must_change_password")
+    .select("id, full_name, email, role, disabled_at, permissions, must_change_password, security_epoch")
     .eq("id", claims.sub)
     .maybeSingle();
   return { supabase, claims, profile };
@@ -47,6 +51,19 @@ export async function requireStaff(lang: Locale, opts: Options = {}) {
     redirect(`${staffPath(lang, "connexion")}?e=forbidden`);
   }
 
+  // After a 2FA reset, every token issued before it is refused (the database refuses it too).
+  const epoch = Math.floor(new Date(profile.security_epoch ?? 0).getTime() / 1000);
+  if (Number(claims.iat ?? 0) < epoch) {
+    await supabase.auth.signOut({ scope: "local" });
+    redirect(`${staffPath(lang, "connexion")}?e=session`);
+  }
+
+  // Password alone is not enough: the 6-digit code of the authenticator app is required.
+  const aal = claims.aal === "aal2" ? "aal2" : "aal1";
+  if (aal !== "aal2" && !opts.mfaStep) {
+    redirect(staffPath(lang, (await hasTotp(supabase)) ? "verification" : "activer-2fa"));
+  }
+
   const user: StaffUser = {
     id: profile.id,
     email: profile.email || String(claims.email ?? ""),
@@ -56,12 +73,18 @@ export async function requireStaff(lang: Locale, opts: Options = {}) {
     mustChangePassword: profile.must_change_password === true,
   };
   // First sign-in with a temporary password: change it before anything else.
-  if (user.mustChangePassword && !opts.allowPasswordChange) redirect(staffPath(lang, "mot-de-passe"));
+  if (user.mustChangePassword && !opts.allowPasswordChange && !opts.mfaStep) redirect(staffPath(lang, "mot-de-passe"));
   // Pages an account may not use send it to its own home page instead.
   if ((opts.directionOnly && user.role !== "direction") || (opts.permission && !can(user, opts.permission))) {
     redirect(staffPath(lang, staffHome(user)));
   }
-  return { supabase, user };
+  return { supabase, user, aal };
+}
+
+/** True when the account has a confirmed authenticator app. */
+export async function hasTotp(supabase: Awaited<ReturnType<typeof createClient>>) {
+  const { data } = await supabase.auth.mfa.listFactors();
+  return Boolean(data?.totp?.some((f) => f.status === "verified"));
 }
 
 export const requireDirection = (lang: Locale, opts: { allowPasswordChange?: boolean } = {}) =>
