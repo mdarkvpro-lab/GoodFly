@@ -7,6 +7,7 @@ import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries";
 import { can, staffNav } from "@/lib/staff/access";
 import { BookingAlerts } from "./BookingAlerts";
+import { StaffMenu } from "./StaffMenu";
 import { countAwaitingDecision, countNewBookings, requireStaff, staffPath } from "@/lib/staff/dal";
 import styles from "./staff.module.css";
 
@@ -65,33 +66,38 @@ export function StaffShell({ lang, dict, children, withNav = true }: Props) {
             <img src="/brand/goodfly-logo.webp" width={72} height={40} alt="GoodFly" />
             <span className={styles.badge}>{dict.staff.title}</span>
           </Link>
-          {withNav && (
-            <nav aria-label={t.label} className={styles.nav}>
-              <Suspense fallback={null}>
-                <StaffNav lang={lang} t={t} bookingsLive={dict.staff.bookings.live} />
-              </Suspense>
-            </nav>
-          )}
-          <div className={styles.topActions}>
-            {withNav && (
-              <Suspense fallback={null}>
-                <WhoAmI lang={lang} t={t} />
-              </Suspense>
-            )}
-            <ThemeToggle label={dict.nav.toggleTheme} />
-            {withNav ? (
-              <form action={signOut}>
-                <input type="hidden" name="lang" value={lang} />
-                <button className={styles.ghost} type="submit">
-                  {t.logout}
-                </button>
-              </form>
-            ) : (
+          {withNav ? (
+            <>
+              <div className={styles.themeSlot}>
+                <ThemeToggle label={dict.nav.toggleTheme} />
+              </div>
+              <StaffMenu openLabel={dict.nav.openMenu} closeLabel={dict.nav.closeMenu}>
+                <nav aria-label={t.label} className={styles.nav}>
+                  <Suspense fallback={null}>
+                    <StaffNav lang={lang} t={t} bookingsLive={dict.staff.bookings.live} />
+                  </Suspense>
+                </nav>
+                <div className={styles.topActions}>
+                  <Suspense fallback={null}>
+                    <WhoAmI lang={lang} t={t} />
+                  </Suspense>
+                  <form action={signOut}>
+                    <input type="hidden" name="lang" value={lang} />
+                    <button className={styles.ghost} type="submit">
+                      {t.logout}
+                    </button>
+                  </form>
+                </div>
+              </StaffMenu>
+            </>
+          ) : (
+            <div className={styles.topActions}>
+              <ThemeToggle label={dict.nav.toggleTheme} />
               <Link className={styles.ghost} href={`/${lang}`}>
                 {t.site}
               </Link>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </header>
       <main id="main" className={`container ${styles.main}`}>

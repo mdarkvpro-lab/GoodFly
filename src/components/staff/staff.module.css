@@ -447,13 +447,16 @@
 .check {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+  min-height: 44px;
   font-size: 0.95rem;
+  cursor: pointer;
 }
 
 .check input {
-  width: 18px;
-  height: 18px;
+  flex: none;
+  width: 22px;
+  height: 22px;
   accent-color: var(--blue);
 }
 
@@ -632,12 +635,13 @@
 .facts a.waLink {
   display: inline-flex;
   align-items: center;
+  min-height: 44px;
   margin-top: 6px;
-  padding: 4px 12px;
+  padding: 0 18px;
   border-radius: var(--radius-pill);
   background: #1f8f4e;
   color: #fff;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
   text-decoration: none;
 }
@@ -912,5 +916,192 @@
 @media (max-width: 420px) {
   .backupCodes {
     grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ───── Staff menu: inline on wide screens, behind a button on phones ───── */
+.collapsible {
+  order: 2;
+  flex: 1 1 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 28px;
+  min-width: 0;
+}
+
+.themeSlot {
+  order: 3;
+  display: flex;
+}
+
+.menuToggle {
+  display: none;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+@media (max-width: 860px) {
+  .topRow {
+    flex-wrap: nowrap;
+    gap: 10px;
+  }
+
+  .themeSlot {
+    order: 0;
+    margin-inline-start: auto;
+  }
+
+  .menuToggle {
+    display: inline-grid;
+  }
+
+  .collapsible {
+    display: none;
+  }
+
+  .collapsible[data-open="true"] {
+    position: absolute;
+    inset-inline: 0;
+    top: 100%;
+    display: grid;
+    gap: 14px;
+    padding: 10px 20px 20px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--line);
+    box-shadow: 0 18px 40px rgba(8, 19, 39, 0.16);
+    max-height: calc(100dvh - 80px);
+    overflow-y: auto;
+  }
+
+  .collapsible[data-open="true"] .nav {
+    display: grid;
+    gap: 0;
+  }
+
+  .collapsible[data-open="true"] .nav a {
+    display: flex;
+    align-items: center;
+    min-height: 50px;
+    padding: 0 6px;
+    border-radius: 0;
+    border-bottom: 1px solid var(--line);
+    font-size: 17px;
+  }
+
+  .collapsible[data-open="true"] .topActions {
+    margin-inline-start: 0;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+}
+
+/* Tables become one card per row on phones (labels come from data-label). */
+@media (max-width: 720px) {
+  .stackTable {
+    min-width: 0;
+  }
+
+  .stackTable thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .stackTable tr {
+    display: grid;
+    gap: 6px;
+    padding: 14px 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .stackTable tbody tr:first-child {
+    border-top: 0;
+  }
+
+  .stackTable td {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 10px;
+    padding: 0;
+    border-top: 0;
+  }
+
+  .stackTable td[data-label]::before {
+    content: attr(data-label);
+    min-width: 7em;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .stackStrong {
+    font-weight: 700;
+    font-size: 15px;
+  }
+}
+
+/* Photo field: the native file input is hidden behind a clear, translated button. */
+.fileInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.fileButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  min-height: 46px;
+  padding: 0 20px;
+  border-radius: var(--radius-pill);
+  border: 1px dashed var(--blue);
+  background: var(--blue-soft);
+  color: var(--ink);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.fileInput:focus-visible + .fileButton {
+  outline: 3px solid var(--blue);
+  outline-offset: 2px;
+}
+
+.photoPreview {
+  width: 100%;
+  max-width: 320px;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+}
+
+/* Long forms on phones: the save button stays reachable at the bottom of the screen. */
+@media (max-width: 720px) {
+  .stickySubmit {
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+    margin-inline: -16px;
+    padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px));
+    background: var(--surface);
+    border-top: 1px solid var(--line);
+  }
+
+  .stickySubmit .button {
+    width: 100%;
   }
 }

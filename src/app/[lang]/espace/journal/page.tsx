@@ -15,7 +15,7 @@ async function Journal({ lang, dict }: { lang: Locale; dict: Dictionary }) {
   if (!entries.length) return <p className={`${styles.card} ${styles.muted}`}>{t.empty}</p>;
   return (
     <div className={`${styles.card} ${styles.tableWrap}`}>
-      <table className={styles.table}>
+      <table className={`${styles.table} ${styles.stackTable}`}>
         <thead>
           <tr>
             <th scope="col">{t.when}</th>
@@ -28,9 +28,9 @@ async function Journal({ lang, dict }: { lang: Locale; dict: Dictionary }) {
           {entries.map((e) => (
             <tr key={e.id}>
               <td className={styles.muted}>{when.format(new Date(e.created_at))}</td>
-              <td>{actions[e.action] ?? e.action}</td>
-              <td>{(e.target && names.get(e.target)) || String(e.details.email ?? e.details.reference ?? e.details.title ?? "—")}</td>
-              <td>{e.actor ? (names.get(e.actor) ?? "—") : t.system}</td>
+              <td className={styles.stackStrong}>{actions[e.action] ?? e.action}</td>
+              <td data-label={t.account}>{(e.target && names.get(e.target)) || String(e.details.email ?? e.details.reference ?? e.details.title ?? "—")}</td>
+              <td data-label={t.by}>{e.actor ? (names.get(e.actor) ?? "—") : t.system}</td>
             </tr>
           ))}
         </tbody>

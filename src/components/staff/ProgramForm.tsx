@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import { saveProgram, type ProgramFormState } from "@/app/[lang]/espace/programmes/actions";
 import type { Locale } from "@/i18n/config";
+import { PhotoPicker } from "./PhotoPicker";
 import styles from "./staff.module.css";
 
 export type ProgramFormValues = Partial<Record<string, string>> & { id?: string; image_url?: string };
@@ -15,6 +16,8 @@ type T = {
   save: string;
   removeImage: string;
   currentImage: string;
+  choosePhoto: string;
+  changePhoto: string;
 };
 
 export function ProgramForm({ lang, t, initial }: { lang: Locale; t: T; initial: ProgramFormValues }) {
@@ -80,12 +83,7 @@ export function ProgramForm({ lang, t, initial }: { lang: Locale; t: T; initial:
       </div>
 
       <div className={styles.grid2}>
-        <label className={styles.label}>
-          {t.fields.image}
-          <input className={styles.input} name="image" type="file" accept="image/jpeg,image/png,image/webp" {...aria("image")} />
-          <span className={styles.muted}>{t.hints.image}</span>
-          {err("image")}
-        </label>
+        <PhotoPicker name="image" label={t.fields.image} choose={t.choosePhoto} change={t.changePhoto} hint={t.hints.image} error={err("image")} ariaProps={aria("image")} />
         {initial.image_url && (
           <div className={styles.label}>
             {t.currentImage}
@@ -110,7 +108,7 @@ export function ProgramForm({ lang, t, initial }: { lang: Locale; t: T; initial:
         </select>
       </label>
 
-      <div>
+      <div className={styles.stickySubmit}>
         <button className={styles.button} type="submit" disabled={pending}>
           {t.save}
         </button>

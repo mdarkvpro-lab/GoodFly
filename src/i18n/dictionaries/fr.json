@@ -383,7 +383,9 @@
         "reset_employee_password": "Mot de passe réinitialisé",
         "request_employee_restore": "Réactivation demandée",
         "approve_employee_restore": "Réactivation acceptée",
-        "reject_employee_restore": "Réactivation refusée"
+        "reject_employee_restore": "Réactivation refusée",
+        "mfa_reset": "Double authentification réinitialisée",
+        "mfa_backup_codes_created": "Codes de secours créés"
       }
     },
     "me": {
@@ -528,7 +530,7 @@
       },
       "hints": {
         "slug": "Lettres minuscules, chiffres et tirets. Laissez vide pour la créer depuis le titre.",
-        "image": "JPEG, PNG ou WebP, 5 Mo maximum."
+        "image": "JPEG, PNG ou WebP. Les grandes photos du téléphone sont réduites automatiquement."
       },
       "errors": {
         "check": "Vérifiez les champs signalés.",
@@ -549,7 +551,9 @@
       },
       "save": "Enregistrer",
       "removeImage": "Retirer la photo",
-      "currentImage": "Photo actuelle"
+      "currentImage": "Photo actuelle",
+      "choosePhoto": "Choisir une photo",
+      "changePhoto": "Changer de photo"
     },
     "bookings": {
       "title": "Réservations",
@@ -676,7 +680,11 @@
       "accountLeft": "Codes de secours restants : {n} sur 10.",
       "regenerate": "Créer 10 nouveaux codes de secours",
       "regenerateHint": "Les anciens codes ne marcheront plus.",
-      "signOutOthers": "Déconnecter mes autres appareils"
+      "signOutOthers": "Déconnecter mes autres appareils",
+      "openInApp": "Ajouter dans l'application d'authentification",
+      "openInAppHint": "L'application est sur ce téléphone ? Touchez ce bouton. Sinon, scannez le QR code avec le téléphone.",
+      "copyKey": "Copier la clé",
+      "keyCopied": "Clé copiée."
     }
   },
   "programs": {

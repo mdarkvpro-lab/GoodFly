@@ -17,7 +17,7 @@ async function Programs({ lang, dict }: { lang: Locale; dict: Dictionary }) {
   if (!programs.length) return <p className={`${styles.card} ${styles.muted}`}>{t.empty}</p>;
   return (
     <div className={`${styles.card} ${styles.tableWrap}`}>
-      <table className={styles.table}>
+      <table className={`${styles.table} ${styles.stackTable}`}>
         <thead>
           <tr>
             <th scope="col">{t.photo}</th>
@@ -43,10 +43,12 @@ async function Programs({ lang, dict }: { lang: Locale; dict: Dictionary }) {
                     /{p.slug}
                   </span>
                 </td>
-                <td>
+                <td data-label={t.fields.status}>
                   <span className={`${styles.tag} ${p.status === "published" ? styles.tagOn : styles.tagOff}`}>{t.statuses[p.status]}</span>
                 </td>
-                <td className={styles.muted}>{date.format(new Date(p.updated_at))}</td>
+                <td className={styles.muted} data-label={t.updated}>
+                  {date.format(new Date(p.updated_at))}
+                </td>
                 <td>
                   <div className={styles.actionsCell}>
                     <Link className={styles.ghost} href={staffPath(lang, `programmes/${p.id}`)}>

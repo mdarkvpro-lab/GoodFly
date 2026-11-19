@@ -175,7 +175,7 @@ async function Employees({ lang, dict }: { lang: Locale; dict: Dictionary }) {
             {t.removedTitle}
           </h2>
           <div className={`${styles.card} ${styles.tableWrap}`}>
-            <table className={styles.table}>
+            <table className={`${styles.table} ${styles.stackTable}`}>
               <tbody>
                 {removed.map((r) => (
                   <tr key={r.id}>

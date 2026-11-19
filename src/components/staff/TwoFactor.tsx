@@ -45,6 +45,34 @@ const CodeField = ({ label }: { label: string }) => (
   </label>
 );
 
+/** Copies a text (falls back silently when the browser refuses). */
+function CopyButton({ text, label, done }: { text: string; label: string; done: string }) {
+  const [copied, setCopied] = useState(false);
+  return (
+    <div className={styles.row}>
+      <button
+        type="button"
+        className={styles.ghost}
+        onClick={async () => {
+          try {
+            await navigator.clipboard.writeText(text);
+            setCopied(true);
+          } catch {
+            setCopied(false);
+          }
+        }}
+      >
+        {label}
+      </button>
+      {copied && (
+        <span className={styles.muted} role="status">
+          {done}
+        </span>
+      )}
+    </div>
+  );
+}
+
 /** The 10 backup codes, shown once, with a copy button. */
 export function BackupCodes({ codes, t, next }: { codes: string[]; t: T; next?: string }) {
   const [copied, setCopied] = useState(false);
@@ -111,6 +139,11 @@ export function EnrollFlow({ lang, t, next }: { lang: Locale; t: T; next: string
     <form action={action} className={styles.form}>
       <input type="hidden" name="lang" value={lang} />
       <input type="hidden" name="factorId" value={start.factorId} />
+      <p className={styles.muted}>{t.openInAppHint}</p>
+      {/* otpauth:// opens the authenticator app on the same phone (no scanning needed). */}
+      <a className={styles.button} href={start.uri}>
+        {t.openInApp}
+      </a>
       <p>{t.step1}</p>
       {/* eslint-disable-next-line @next/next/no-img-element -- QR code returned by Supabase Auth as an SVG data URI */}
       <img className={styles.qr} src={start.qr} alt="" width={200} height={200} />
@@ -118,6 +151,7 @@ export function EnrollFlow({ lang, t, next }: { lang: Locale; t: T; next: string
       <code className={styles.totpKey} dir="ltr">
         {start.secret}
       </code>
+      <CopyButton text={start.secret} label={t.copyKey} done={t.keyCopied} />
       <p>{t.step2}</p>
       <Alert text={state?.error ? (t.errors[state.error] ?? t.errors.generic) : null} />
       <CodeField label={t.code} />

@@ -30,7 +30,7 @@ async function makeBackupCodes(supabase: Supabase, userId: string): Promise<stri
   return error ? null : codes;
 }
 
-export type EnrollStart = { factorId: string; qr: string; secret: string } | { error: "generic" | "already" };
+export type EnrollStart = { factorId: string; qr: string; secret: string; uri: string } | { error: "generic" | "already" };
 
 /** Step 1 of the setup: a new authenticator secret (QR code). Any unfinished setup is replaced. */
 export async function startEnrollment(langValue: string): Promise<EnrollStart> {
@@ -43,7 +43,7 @@ export async function startEnrollment(langValue: string): Promise<EnrollStart> {
   }
   const { data, error } = await supabase.auth.mfa.enroll({ factorType: "totp", friendlyName: `GoodFly ${new Date().toISOString().slice(0, 10)}` });
   if (error || !data) return { error: "generic" };
-  return { factorId: data.id, qr: data.totp.qr_code, secret: data.totp.secret };
+  return { factorId: data.id, qr: data.totp.qr_code, secret: data.totp.secret, uri: data.totp.uri };
 }
 
 export type EnrollState = { error?: "code" | "wrong" | "generic"; codes?: string[] } | undefined;

@@ -383,7 +383,9 @@
         "reset_employee_password": "إعادة تعيين كلمة المرور",
         "request_employee_restore": "طلب إعادة تفعيل",
         "approve_employee_restore": "قبول إعادة التفعيل",
-        "reject_employee_restore": "رفض إعادة التفعيل"
+        "reject_employee_restore": "رفض إعادة التفعيل",
+        "mfa_reset": "إعادة ضبط التحقق بخطوتين",
+        "mfa_backup_codes_created": "إنشاء رموز احتياطية"
       }
     },
     "me": {
@@ -528,7 +530,7 @@
       },
       "hints": {
         "slug": "حروف لاتينية صغيرة وأرقام وشرطات. اتركه فارغًا ليُنشأ من العنوان.",
-        "image": "JPEG أو PNG أو WebP، بحد أقصى 5 ميغابايت."
+        "image": "JPEG أو PNG أو WebP. تُصغَّر صور الهاتف الكبيرة تلقائيًا."
       },
       "errors": {
         "check": "تحقق من الحقول المشار إليها.",
@@ -549,7 +551,9 @@
       },
       "save": "حفظ",
       "removeImage": "إزالة الصورة",
-      "currentImage": "الصورة الحالية"
+      "currentImage": "الصورة الحالية",
+      "choosePhoto": "اختيار صورة",
+      "changePhoto": "تغيير الصورة"
     },
     "bookings": {
       "title": "الحجوزات",
@@ -676,7 +680,11 @@
       "accountLeft": "الرموز الاحتياطية المتبقية: {n} من 10.",
       "regenerate": "إنشاء 10 رموز احتياطية جديدة",
       "regenerateHint": "لن تعمل الرموز القديمة بعد ذلك.",
-      "signOutOthers": "تسجيل خروج أجهزتي الأخرى"
+      "signOutOthers": "تسجيل خروج أجهزتي الأخرى",
+      "openInApp": "إضافة إلى تطبيق المصادقة",
+      "openInAppHint": "التطبيق موجود على هذا الهاتف؟ المس هذا الزر. وإلا فامسح رمز QR بالهاتف.",
+      "copyKey": "نسخ المفتاح",
+      "keyCopied": "تم نسخ المفتاح."
     }
   },
   "programs": {
