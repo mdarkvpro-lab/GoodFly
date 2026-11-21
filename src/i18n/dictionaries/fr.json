@@ -755,5 +755,11 @@
         "cta": "Demander une assistance visa"
       }
     }
+  },
+  "notFound": {
+    "title": "Cette page n'existe pas",
+    "text": "Le lien est peut-être ancien ou mal recopié. Repartez de l'accueil ou consultez nos programmes.",
+    "home": "Retour à l'accueil",
+    "programs": "Voir les programmes"
   }
 }

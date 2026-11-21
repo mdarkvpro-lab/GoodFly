@@ -5,6 +5,7 @@ import { isLocale, localeDir, locales } from "@/i18n/config";
 import { InlineScript } from "@/components/InlineScript";
 import { ThemeSync } from "@/components/ThemeSync";
 import { getDictionary } from "@/i18n/dictionaries";
+import { siteUrl } from "@/config/site";
 import "../globals.css";
 
 const manrope = Manrope({
@@ -32,9 +33,19 @@ export async function generateMetadata({ params }: LayoutProps<"/[lang]">): Prom
   if (!isLocale(lang)) return {};
   const dict = await getDictionary(lang);
   return {
+    // Makes every relative link in the metadata (languages, share images) a full address.
+    metadataBase: new URL(siteUrl()),
     title: dict.meta.title,
     description: dict.meta.description,
     alternates: { languages: { fr: "/fr", ar: "/ar" } },
+    openGraph: {
+      type: "website",
+      siteName: "GoodFly",
+      locale: lang === "ar" ? "ar_MA" : "fr_MA",
+      title: dict.meta.title,
+      description: dict.meta.description,
+      images: ["/brand/goodfly-logo.webp"],
+    },
   };
 }
 

@@ -87,3 +87,36 @@ export function agencyWhatsApp(lang: Locale): string {
   const text = lang === "ar" ? "السلام عليكم، أريد معلومات عن رحلة مع GoodFly." : "Bonjour GoodFly, je souhaite des informations sur un voyage.";
   return `https://wa.me/${AGENCY.whatsapp}?text=${encodeURIComponent(text)}`;
 }
+
+/**
+ * Public address of the site (https://…, no trailing slash), from SITE_URL.
+ * Used for the sitemap, robots.txt and absolute links shared on social networks.
+ */
+export function siteUrl(): string {
+  const url = process.env.SITE_URL;
+  return url && /^https?:\/\/[a-z0-9.-]+(:\d+)?$/i.test(url) ? url : "https://goodfly.ma";
+}
+
+/** schema.org description of the agency, read by Google for its business panel and search results. */
+export function agencyJsonLd(lang: Locale) {
+  const base = siteUrl();
+  return {
+    "@context": "https://schema.org",
+    "@type": "TravelAgency",
+    name: "GoodFly",
+    url: `${base}/${lang}`,
+    logo: `${base}/brand/goodfly-logo.webp`,
+    image: `${base}/brand/goodfly-logo.webp`,
+    email: AGENCY.email,
+    telephone: AGENCY.phones.map((p) => p.tel),
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: AGENCY.address[lang],
+      addressLocality: lang === "ar" ? "سلا" : "Salé",
+      addressCountry: "MA",
+    },
+    areaServed: "MA",
+    availableLanguage: ["fr", "ar"],
+    sameAs: Object.values(AGENCY.social),
+  };
+}

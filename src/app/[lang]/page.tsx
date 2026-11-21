@@ -3,7 +3,7 @@ import { Header } from "@/components/header/Header";
 import { Hero } from "@/components/hero/Hero";
 import { Destinations } from "@/components/sections/Destinations";
 import { Comfort, Featured, FinalCta, Footer, Services, Why } from "@/components/sections/Sections";
-import { destinations, distanceKm, homeAirport, homeAirportName } from "@/config/site";
+import { agencyJsonLd, destinations, distanceKm, homeAirport, homeAirportName } from "@/config/site";
 import { isLocale, localeDir } from "@/i18n/config";
 import { getDictionary } from "@/i18n/dictionaries";
 
@@ -15,6 +15,11 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
 
   return (
     <>
+      <script
+        type="application/ld+json"
+        // "<" is escaped so no text from the data can close the script tag.
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(agencyJsonLd(lang)).replace(/</g, "\\u003c") }}
+      />
       <a href="#main" className="skip-link">
         {dict.nav.skipToContent}
       </a>
