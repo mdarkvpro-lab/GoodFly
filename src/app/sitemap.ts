@@ -33,5 +33,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ),
     ...entry("/mentions-legales", { changeFrequency: "yearly", priority: 0.2 }),
     ...entry("/confidentialite", { changeFrequency: "yearly", priority: 0.2 }),
+    ...entry("/conditions", { changeFrequency: "yearly", priority: 0.3 }),
+    ...entry("/annulation-remboursement", { changeFrequency: "yearly", priority: 0.3 }),
   ];
 }

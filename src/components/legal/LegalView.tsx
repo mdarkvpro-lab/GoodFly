@@ -22,7 +22,13 @@ function withTodos(text: string): ReactNode {
 
 export function LegalView({ lang, dict, kind }: { lang: Locale; dict: Dictionary; kind: LegalKind }) {
   const page = legalContent(lang, kind);
-  const other: LegalKind = kind === "mentions" ? "privacy" : "mentions";
+  const labels: Record<LegalKind, string> = {
+    mentions: dict.footer.legal,
+    privacy: dict.footer.privacy,
+    terms: dict.footer.terms,
+    refunds: dict.footer.refunds,
+  };
+  const others = (Object.keys(LEGAL_PATHS) as LegalKind[]).filter((k) => k !== kind);
   return (
     <>
       <a href="#main" className="skip-link">
@@ -46,9 +52,11 @@ export function LegalView({ lang, dict, kind }: { lang: Locale; dict: Dictionary
                 </li>
               ))}
             </ol>
-            <Link className={styles.other} href={`/${lang}/${LEGAL_PATHS[other]}`}>
-              {other === "privacy" ? dict.footer.privacy : dict.footer.legal}
-            </Link>
+            {others.map((k) => (
+              <Link key={k} className={styles.other} href={`/${lang}/${LEGAL_PATHS[k]}`}>
+                {labels[k]}
+              </Link>
+            ))}
           </nav>
 
           <div className={styles.body}>

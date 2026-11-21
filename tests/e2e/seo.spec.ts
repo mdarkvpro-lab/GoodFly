@@ -47,3 +47,26 @@ test.describe("search engines and error pages", () => {
     await expect(page.getByRole("heading", { level: 1 })).toHaveText("هذه الصفحة غير موجودة");
   });
 });
+
+test.describe("terms and refund pages", () => {
+  for (const [path, fr, ar] of [
+    ["conditions", "Conditions générales", "الشروط العامة"],
+    ["annulation-remboursement", "Annulation et remboursement", "الإلغاء والاسترجاع"],
+  ] as const) {
+    test(`${path}: linked from the footer, in French and Arabic`, async ({ page }) => {
+      await page.goto("/fr");
+      await page.getByRole("contentinfo").getByRole("link", { name: fr }).click();
+      await expect(page).toHaveURL(new RegExp(`/fr/${path}$`));
+      await expect(page.getByRole("heading", { level: 1 })).toHaveText(fr);
+      await page.goto(`/ar/${path}`);
+      await expect(page.locator("html")).toHaveAttribute("dir", "rtl");
+      await expect(page.getByRole("heading", { level: 1 })).toHaveText(ar);
+    });
+  }
+
+  test("sitemap includes the terms and refund pages", async ({ request }) => {
+    const xml = await (await request.get("/sitemap.xml")).text();
+    expect(xml).toContain("/fr/conditions</loc>");
+    expect(xml).toContain("/ar/annulation-remboursement</loc>");
+  });
+});

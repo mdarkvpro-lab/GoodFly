@@ -199,6 +199,8 @@ export function Footer({ dict, lang }: Props & { lang: Locale }) {
           </a>
           <a href={`/${lang}/mentions-legales`}>{t.legal}</a>
           <a href={`/${lang}/confidentialite`}>{t.privacy}</a>
+          <a href={`/${lang}/conditions`}>{t.terms}</a>
+          <a href={`/${lang}/annulation-remboursement`}>{t.refunds}</a>
           <a href={`/${lang}/espace/connexion`}>{t.staff}</a>
         </nav>
       </div>
