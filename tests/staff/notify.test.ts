@@ -1,7 +1,7 @@
 // Telegram alert text: no personal data, no injected lines or links.  node tests/staff/notify.test.ts
-import { bookingMessage, bookingPush } from "../../src/lib/notify/booking-message.ts";
+import { bookingMessage, bookingPush, lowReviewMessage } from "../../src/lib/notify/booking-message.ts";
 import { waLink, waNumber } from "../../src/lib/bookings/whatsapp.ts";
-import { codeMail, confirmationMail, directionMail, staffBookingMail } from "../../src/lib/notify/mail-text.ts";
+import { codeMail, confirmationMail, directionMail, reviewInviteMail, staffBookingMail } from "../../src/lib/notify/mail-text.ts";
 
 let pass = 0;
 let fail = 0;
@@ -64,6 +64,17 @@ check("the team e-mail has the reference, the service and the link", staff.subje
 check("the team e-mail has no client contact details", !/Salma|06 ?12|@/.test(staff.text), staff.text);
 const boss = directionMail("Demande de retrait", "Mohamed demande\nvotre accord", "https://goodfly.ma/fr/espace/notifications");
 check("Direction e-mails are one clean line plus the link", boss.subject === "GoodFly : Demande de retrait" && boss.text.startsWith("Mohamed demande votre accord") && boss.text.endsWith("/notifications"));
+
+console.log("Review invitation");
+const url = "https://goodfly.ma/fr/avis/" + "a".repeat(64);
+const inv = reviewInviteMail("fr", "Salma", "Istanbul", url);
+check("French invitation has the name, destination and the link", inv.text.includes("Bonjour Salma") && inv.text.includes("de Istanbul") && inv.text.includes(url) && inv.html!.includes(`href="${url}"`), inv.text);
+const invAr = reviewInviteMail("ar", "سلمى", "", url);
+check("Arabic invitation is right-to-left and works without destination", invAr.html!.includes('dir="rtl"') && !invAr.text.includes("السلامة من"), invAr.text);
+const invEvil = reviewInviteMail("fr", "<script>x</script>", "Paris\nhttps://evil.example", url);
+check("names are escaped and kept on one line", !invEvil.html!.includes("<script>") && !invEvil.text.split("\n").some((l) => l.startsWith("https://evil")), invEvil.text);
+const low = lowReviewMessage("GF-1A2B3C4D", 1, "https://goodfly.ma/fr/espace/avis");
+check("low-rating alert: stars, reference and link only", low.startsWith("Avis client à 1/5") && low.includes("GF-1A2B3C4D") && low.endsWith("/espace/avis"), low);
 
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

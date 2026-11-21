@@ -65,6 +65,7 @@ const writer = { role: "agent" as const, permissions: ["programs.manage" as cons
 check("bookings need the permission", can(booker, "bookings.manage") && !can(writer, "bookings.manage"));
 check("a booking agent lands on Réservations", staffHome(booker) === "reservations");
 check("the menu shows Réservations only with the permission", staffNav(booker).some((i) => i.key === "bookings") && !staffNav(writer).some((i) => i.key === "bookings"));
+check("the menu shows Avis clients with the same permission", staffNav(booker).some((i) => i.key === "reviews") && !staffNav(writer).some((i) => i.key === "reviews"));
 
 console.log("Services");
 check("a known service is kept", parseBooking(form({ ...good, service: "visa" })).ok && (parseBooking(form({ ...good, service: "visa" })) as { value: { service: string } }).value.service === "visa");

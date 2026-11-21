@@ -27,9 +27,13 @@ export async function updateBooking(form: FormData) {
   const id = String(form.get("id") ?? "");
   const status = String(form.get("status") ?? "");
   const note = String(form.get("note") ?? "").replace(/\r\n/g, "\n").trim();
-  if (!UUID.test(id) || !(BOOKING_STATUSES as readonly string[]).includes(status) || note.length > 1000) redirect(backTo(lang, form, "e=generic"));
-  const { error } = await supabase.rpc("update_booking_request", { request: id, new_status: status, note });
-  redirect(backTo(lang, form, error ? "e=generic" : "m=bookingSaved"));
+  // Real return date of a confirmed trip (YYYY-MM-DD from the date field, or empty).
+  const returnOn = String(form.get("return_date") ?? "").trim();
+  if (!UUID.test(id) || !(BOOKING_STATUSES as readonly string[]).includes(status) || note.length > 1000 || (returnOn && !/^\d{4}-\d{2}-\d{2}$/.test(returnOn))) {
+    redirect(backTo(lang, form, "e=generic"));
+  }
+  const { error } = await supabase.rpc("update_booking_request", { request: id, new_status: status, note, return_on: returnOn || null });
+  redirect(backTo(lang, form, error ? (error.message.includes("return_date") ? "e=returnDate" : "e=generic") : "m=bookingSaved"));
 }
 
 /** Direction only: erase a request (e.g. the client asks to delete their data). */

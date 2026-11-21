@@ -70,3 +70,29 @@ test.describe("terms and refund pages", () => {
     expect(xml).toContain("/ar/annulation-remboursement</loc>");
   });
 });
+
+test.describe("client reviews", () => {
+  test("a wrong review link explains the problem and is never indexed", async ({ page }) => {
+    await page.goto("/fr/avis/" + "0".repeat(64));
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Lien non valable");
+    await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/);
+    await page.goto("/ar/avis/abc");
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("رابط غير صالح");
+  });
+
+  test("review links are kept out of search engines", async ({ request }) => {
+    const body = await (await request.get("/robots.txt")).text();
+    expect(body).toContain("Disallow: /fr/avis/");
+    expect(body).toContain("Disallow: /ar/avis/");
+  });
+
+  test("the daily invitation job refuses calls without the server key", async ({ request }) => {
+    expect((await request.post("/api/jobs/review-invitations")).status()).toBe(401);
+    expect((await request.post("/api/jobs/review-invitations", { headers: { authorization: "Bearer wrong" } })).status()).toBe(401);
+  });
+
+  test("the homepage has no reviews section while none is approved", async ({ page }) => {
+    await page.goto("/fr");
+    await expect(page.getByRole("heading", { name: "L'avis de nos voyageurs" })).toHaveCount(0);
+  });
+});

@@ -40,7 +40,7 @@ for (const sql of migrations) await db.exec(sql);
 // Supabase grants table privileges to API roles by default; RLS does the filtering.
 await db.exec(`
   grant usage on schema public to authenticated, anon;
-  grant select, insert, update, delete on public.profiles, public.audit_log, public.programs, public.employee_removal_requests, public.booking_requests, public.push_subscriptions, public.password_resets to authenticated;
+  grant select, insert, update, delete on public.profiles, public.audit_log, public.programs, public.employee_removal_requests, public.booking_requests, public.push_subscriptions, public.password_resets, public.reviews to authenticated;
   grant select on public.programs to anon;
 `);
 
@@ -651,6 +651,108 @@ await check("changing the password clears the flag", async () => {
   await db.query(`update auth.users set encrypted_password = 'new-hash' where id = $1`, [ids.A]);
   const r = await db.query(`select must_change_password from public.profiles where id = $1`, [ids.A]);
   if (r.rows[0].must_change_password !== false) throw new Error("flag still set");
+});
+
+console.log("Client reviews");
+// Fresh state for this section: two active Direction accounts, employee A active, a new request.
+await db.query(`update public.profiles set role = 'direction', disabled_at = null, security_epoch = now() - interval '1 hour' where id in ($1, $2)`, [ids.Z, ids.Y]);
+await db.query(`update public.profiles set role = 'agent', disabled_at = null, must_change_password = false, security_epoch = now() - interval '1 hour' where id = $1`, [ids.A]);
+bookingRef = (await submit(req({ phone: "0633333300", email: "salma@exemple.ma" }))).rows[0].ref;
+const confirmTrip = async (ref, returnOn) => {
+  const id = (await db.query(`select id from public.booking_requests where reference = $1`, [ref])).rows[0].id;
+  await as("Z", `select public.update_booking_request($1, 'confirmed', '', $2::date)`, [id, returnOn]);
+  return id;
+};
+const daysAgo = (n) => new Date(Date.now() - n * 86400000).toISOString().slice(0, 10);
+let reviewToken = "";
+let reviewId = "";
+await check("a return date before the request is refused", async () => {
+  const id = (await db.query(`select id from public.booking_requests where reference = $1`, [bookingRef])).rows[0].id;
+  await expectError(as("Z", `select public.update_booking_request($1, 'confirmed', '', '2000-01-01')`, [id]), "return_date");
+});
+await check("staff record the return date (journaled)", async () => {
+  // The request was created just now: pretend it came in a month ago, so the trip can be over.
+  await db.query(`update public.booking_requests set created_at = now() - interval '40 days' where reference = $1`, [bookingRef]);
+  const id = await confirmTrip(bookingRef, daysAgo(3));
+  const r = await db.query(`select return_date::text as d from public.booking_requests where id = $1`, [id]);
+  if (r.rows[0].d !== daysAgo(3)) throw new Error(JSON.stringify(r.rows));
+  await expectRows(db.query(`select 1 from public.audit_log where action = 'booking_updated' and details ->> 'return_date' = $1`, [daysAgo(3)]), 1);
+});
+await check("the daily job needs the server key", () => expectError(asAnon(`select * from public.due_review_invitations('wrong')`), "form_key"));
+await check("a trip that ended 3 days ago gets one invitation, only once", async () => {
+  const r = await asAnon(`select * from public.due_review_invitations($1)`, [FORM_KEY]);
+  const mine = r.rows.filter((x) => x.reference === bookingRef);
+  if (mine.length !== 1 || !/^[0-9a-f]{64}$/.test(mine[0].token) || mine[0].first_name !== "Salma" || mine[0].email !== "salma@exemple.ma") throw new Error(JSON.stringify(r.rows));
+  reviewToken = mine[0].token;
+  const again = await asAnon(`select * from public.due_review_invitations($1)`, [FORM_KEY]);
+  if (again.rows.some((x) => x.reference === bookingRef)) throw new Error("invited twice");
+  const stored = await db.query(`select token_hash, display_name from public.reviews where reference = $1`, [bookingRef]);
+  if (stored.rows[0].token_hash === reviewToken || stored.rows[0].display_name !== "Salma B.") throw new Error(JSON.stringify(stored.rows));
+});
+await check("a trip that ends tomorrow or ended yesterday is not invited yet", async () => {
+  const a = await submit(req({ phone: "0633333301", email: "demain@exemple.ma" }));
+  const b = await submit(req({ phone: "0633333302", email: "hier@exemple.ma" }));
+  await db.query(`update public.booking_requests set created_at = now() - interval '40 days' where reference in ($1, $2)`, [a.rows[0].ref, b.rows[0].ref]);
+  await confirmTrip(a.rows[0].ref, new Date(Date.now() + 86400000).toISOString().slice(0, 10));
+  await confirmTrip(b.rows[0].ref, daysAgo(1));
+  const r = await asAnon(`select reference from public.due_review_invitations($1)`, [FORM_KEY]);
+  if (r.rows.length) throw new Error(JSON.stringify(r.rows));
+});
+await check("visitors cannot read reviews directly", () => expectError(asAnon(`select * from public.reviews`), "permission denied"));
+await check("the link opens the form; a wrong link does not", async () => {
+  const ok = await asAnon(`select * from public.review_by_token($1, $2)`, [FORM_KEY, reviewToken]);
+  if (ok.rows[0].state !== "open" || ok.rows[0].first_name !== "Salma") throw new Error(JSON.stringify(ok.rows));
+  const bad = await asAnon(`select * from public.review_by_token($1, $2)`, [FORM_KEY, "f".repeat(64)]);
+  if (bad.rows[0].state !== "invalid") throw new Error(JSON.stringify(bad.rows));
+});
+await check("stars must be 1 to 5", () => expectError(asAnon(`select public.submit_review($1, $2, 6, 'x', true)`, [FORM_KEY, reviewToken]), "invalid"));
+await check("the client sends the review once; it waits for approval", async () => {
+  const r = await asAnon(`select public.submit_review($1, $2, 2, 'Hôtel loin du centre', true) as ref`, [FORM_KEY, reviewToken]);
+  if (r.rows[0].ref !== bookingRef) throw new Error(JSON.stringify(r.rows));
+  await expectError(asAnon(`select public.submit_review($1, $2, 5, 'encore', true)`, [FORM_KEY, reviewToken]), "unavailable");
+  const state = await asAnon(`select state from public.review_by_token($1, $2)`, [FORM_KEY, reviewToken]);
+  if (state.rows[0].state !== "done") throw new Error(JSON.stringify(state.rows));
+  await expectRows(asAnon(`select * from public.public_reviews()`), 0);
+});
+await check("an expired link is refused", async () => {
+  const c = await submit(req({ phone: "0633333303", email: "ancien@exemple.ma" }));
+  await db.query(`update public.booking_requests set created_at = now() - interval '40 days' where reference = $1`, [c.rows[0].ref]);
+  await confirmTrip(c.rows[0].ref, daysAgo(2));
+  const t = (await asAnon(`select token from public.due_review_invitations($1) where reference = $2`, [FORM_KEY, c.rows[0].ref])).rows[0].token;
+  await db.query(`update public.reviews set invited_at = now() - interval '61 days' where reference = $1`, [c.rows[0].ref]);
+  const s = await asAnon(`select state from public.review_by_token($1, $2)`, [FORM_KEY, t]);
+  if (s.rows[0].state !== "expired") throw new Error(JSON.stringify(s.rows));
+  await expectError(asAnon(`select public.submit_review($1, $2, 5, '', false)`, [FORM_KEY, t]), "unavailable");
+});
+await check("an employee without bookings.manage cannot see or approve reviews", async () => {
+  await as("Y", `select public.set_employee_permissions($1, array['programs.manage'])`, [ids.A]);
+  await expectRows(as("A", `select id from public.reviews`), 0);
+  reviewId = (await db.query(`select id from public.reviews where reference = $1`, [bookingRef])).rows[0].id;
+  await expectError(as("A", `select public.moderate_review($1, 'approved')`, [reviewId]), "bookings.manage");
+});
+await check("an employee with bookings.manage approves (journaled); the homepage shows it", async () => {
+  await as("Y", `select public.set_employee_permissions($1, array['bookings.manage'])`, [ids.A]);
+  await as("A", `select public.moderate_review($1, 'approved')`, [reviewId]);
+  await expectRows(db.query(`select 1 from public.audit_log where action = 'review_approved' and target = $1`, [reviewId]), 1);
+  const pub = await asAnon(`select * from public.public_reviews()`);
+  if (pub.rows.length !== 1 || pub.rows[0].name !== "Salma B." || pub.rows[0].rating !== 2) throw new Error(JSON.stringify(pub.rows));
+  if (Object.keys(pub.rows[0]).some((k) => ["email", "token_hash", "reference", "booking_id"].includes(k))) throw new Error("private column exposed");
+});
+await check("without the client's agreement the name stays hidden", async () => {
+  await db.query(`update public.reviews set show_name = false where id = $1`, [reviewId]);
+  const pub = await asAnon(`select name from public.public_reviews()`);
+  if (pub.rows[0].name !== "") throw new Error(JSON.stringify(pub.rows));
+});
+await check("a rejected review leaves the homepage; an invitation cannot be approved", async () => {
+  await as("Z", `select public.moderate_review($1, 'rejected')`, [reviewId]);
+  await expectRows(asAnon(`select * from public.public_reviews()`), 0);
+  const invited = (await db.query(`select id from public.reviews where status = 'invited' limit 1`)).rows[0]?.id;
+  if (invited) await expectError(as("Z", `select public.moderate_review($1, 'approved')`, [invited]), "not_found");
+});
+await check("deleting the booking deletes its review", async () => {
+  const id = (await db.query(`select id from public.booking_requests where reference = $1`, [bookingRef])).rows[0].id;
+  await db.query(`delete from public.booking_requests where id = $1`, [id]);
+  await expectRows(db.query(`select 1 from public.reviews where reference = $1`, [bookingRef]), 0);
 });
 
 console.log(`\n${pass} passed, ${fail} failed`);

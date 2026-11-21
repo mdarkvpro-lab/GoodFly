@@ -32,6 +32,7 @@ async function Bookings({ lang, dict, searchParams }: { lang: Locale; dict: Dict
     staffNames(lang),
   ]);
   const date = new Intl.DateTimeFormat(lang === "ar" ? "ar-MA" : "fr-MA", { dateStyle: "medium", timeStyle: "short", timeZone: "Africa/Casablanca" });
+  const day = new Intl.DateTimeFormat(lang === "ar" ? "ar-MA" : "fr-MA", { dateStyle: "medium", timeZone: "Africa/Casablanca" });
   const hidden = (name: string, value: string) => <input type="hidden" name={name} value={value} />;
 
   return (
@@ -142,6 +143,17 @@ async function Bookings({ lang, dict, searchParams }: { lang: Locale; dict: Dict
                   <textarea className={styles.textarea} name="note" maxLength={1000} defaultValue={b.staff_note} dir="auto" />
                 </label>
               </div>
+              <label className={styles.label}>
+                {t.returnDate}
+                <input className={styles.input} type="date" name="return_date" defaultValue={b.return_date ?? ""} dir="ltr" />
+                <span className={styles.muted}>
+                  {b.review_invited_at
+                    ? t.reviewInvited.replace("{date}", day.format(new Date(b.review_invited_at)))
+                    : b.email
+                      ? t.returnHint
+                      : t.noEmail}
+                </span>
+              </label>
               <div className={styles.row}>
                 <button className={styles.button} type="submit">
                   {t.save}

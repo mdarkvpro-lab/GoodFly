@@ -11,7 +11,7 @@ export type LegalPage = { title: string; eyebrow: string; intro: string; updated
 export type LegalKind = "mentions" | "privacy" | "terms" | "refunds";
 
 const phones = AGENCY.phones.map((p) => p.display).join(" · ");
-const UPDATED = { fr: "Dernière mise à jour : 9 novembre 2026", ar: "آخر تحديث: 9 نونبر 2026" };
+const UPDATED = { fr: "Dernière mise à jour : 21 novembre 2026", ar: "آخر تحديث: 21 نونبر 2026" };
 
 const FR: Record<LegalKind, LegalPage> = {
   mentions: {
@@ -100,6 +100,7 @@ const FR: Record<LegalKind, LegalPage> = {
         list: [
           "vous rappeler et préparer votre voyage avec vous ;",
           "vous envoyer le code de vérification et la confirmation de votre demande ;",
+          "après un voyage confirmé, vous envoyer un seul e-mail pour vous demander votre avis ;",
           "protéger le formulaire contre les robots et les abus.",
         ],
         after: ["Ces traitements reposent sur votre consentement, donné en cochant la case du formulaire. Vos données ne sont jamais vendues ni louées."],
@@ -115,6 +116,13 @@ const FR: Record<LegalKind, LegalPage> = {
           "Netlify : hébergement du site ;",
           "Google (Gmail) : envoi des e-mails ;",
           "Cloudflare Turnstile : vérification anti-robot du formulaire.",
+        ],
+      },
+      {
+        title: "Votre avis après le voyage",
+        paragraphs: [
+          "Deux jours après votre retour, vous recevez un lien personnel pour noter le voyage. Répondre est libre. Votre avis est relu par l'équipe avant d'être publié sur le site, avec la destination et le mois du voyage.",
+          "Votre prénom et l'initiale de votre nom n'apparaissent que si vous cochez la case prévue. Votre e-mail, votre téléphone et votre nom complet ne sont jamais publiés. Vous pouvez demander à tout moment le retrait de votre avis.",
         ],
       },
       {
@@ -376,7 +384,7 @@ const AR: Record<LegalKind, LegalPage> = {
       },
       {
         title: "لماذا نستعملها",
-        list: ["للاتصال بك وتحضير رحلتك معك؛", "لإرسال رمز التحقق وتأكيد طلبك؛", "لحماية الاستمارة من الروبوتات والإساءة."],
+        list: ["للاتصال بك وتحضير رحلتك معك؛", "لإرسال رمز التحقق وتأكيد طلبك؛", "بعد رحلة مؤكدة، لإرسال رسالة إلكترونية واحدة نطلب فيها رأيك؛", "لحماية الاستمارة من الروبوتات والإساءة."],
         after: ["تقوم هذه المعالجة على موافقتك، التي تعطيها بتحديد خانة الاستمارة. لا تُباع معطياتك ولا تُؤجَّر أبدًا."],
       },
       {
@@ -390,6 +398,13 @@ const AR: Record<LegalKind, LegalPage> = {
           "Netlify: استضافة الموقع؛",
           "Google (Gmail): إرسال الرسائل الإلكترونية؛",
           "Cloudflare Turnstile: التحقق من أن مرسل الاستمارة ليس روبوتًا.",
+        ],
+      },
+      {
+        title: "رأيك بعد الرحلة",
+        paragraphs: [
+          "بعد عودتك بيومين، تتوصل برابط شخصي لتقييم الرحلة، والإجابة اختيارية. يراجع الفريق رأيك قبل نشره في الموقع مع الوجهة وشهر الرحلة.",
+          "لا يظهر اسمك الأول والحرف الأول من اسمك العائلي إلا إذا حددت الخانة المخصصة لذلك. لا يُنشر أبدًا بريدك الإلكتروني ولا هاتفك ولا اسمك الكامل، ويمكنك في أي وقت طلب سحب رأيك.",
         ],
       },
       {

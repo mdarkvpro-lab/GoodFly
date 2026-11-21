@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { Header } from "@/components/header/Header";
 import { Hero } from "@/components/hero/Hero";
 import { Destinations } from "@/components/sections/Destinations";
+import { Reviews } from "@/components/sections/Reviews";
 import { Comfort, Featured, FinalCta, Footer, Services, Why } from "@/components/sections/Sections";
 import { agencyJsonLd, destinations, distanceKm, homeAirport, homeAirportName } from "@/config/site";
 import { isLocale, localeDir } from "@/i18n/config";
@@ -51,6 +52,7 @@ export default async function HomePage({ params }: PageProps<"/[lang]">) {
         <Featured dict={dict} href={`/${lang}/services/sejours`} />
         <Comfort dict={dict} />
         <Why dict={dict} />
+        <Reviews dict={dict} lang={lang} />
         <FinalCta dict={dict} lang={lang} />
       </main>
       <Footer dict={dict} lang={lang} />

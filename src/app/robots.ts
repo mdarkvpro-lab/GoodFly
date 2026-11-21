@@ -8,7 +8,8 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: "*",
       allow: "/",
-      disallow: locales.map((lang) => `/${lang}/espace`),
+      // Staff area and the private review links sent by e-mail.
+      disallow: locales.flatMap((lang) => [`/${lang}/espace`, `/${lang}/avis/`]),
     },
     sitemap: `${siteUrl()}/sitemap.xml`,
   };

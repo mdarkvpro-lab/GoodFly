@@ -96,3 +96,43 @@ export function staffBookingMail(b: BookingSummary, staffUrl?: string) {
 export function directionMail(title: string, body: string, url?: string) {
   return { subject: `GoodFly : ${line(title)}`, text: [line(body, 300), ...(url ? ["", `Ouvrir : ${url}`] : [])].join("\n") };
 }
+
+const REVIEW = {
+  fr: {
+    subject: "Comment s'est passé votre voyage ?",
+    hello: (name: string) => `Bonjour ${name},`,
+    body: (dest: string) =>
+      `Bon retour${dest ? ` de ${dest}` : ""} ! Votre avis aide GoodFly à s'améliorer et aide d'autres voyageurs à choisir. Une minute suffit : une note de 1 à 5 étoiles et, si vous le souhaitez, quelques mots.`,
+    button: "Donner mon avis",
+    private: "Ce lien est personnel et ne fonctionne qu'une fois. Votre avis n'est publié sur le site qu'après relecture, et votre prénom seulement si vous l'acceptez.",
+    contact: "Un souci pendant le voyage ? Répondez à ce message ou appelez le 05 30 16 43 43.",
+  },
+  ar: {
+    subject: "كيف كانت رحلتك؟",
+    hello: (name: string) => `مرحبًا ${name}،`,
+    body: (dest: string) =>
+      `حمدًا لله على السلامة${dest ? ` من ${dest}` : ""}! رأيك يساعد GoodFly على التحسن ويساعد مسافرين آخرين على الاختيار. يكفي دقيقة واحدة: تقييم من 1 إلى 5 نجوم، وبضع كلمات إن أردت.`,
+    button: "أعطِ رأيي",
+    private: "هذا الرابط شخصي ويعمل مرة واحدة فقط. لا يُنشر رأيك في الموقع إلا بعد مراجعته، ولا يظهر اسمك الأول إلا إذا وافقت.",
+    contact: "واجهت مشكلة خلال الرحلة؟ أجب على هذه الرسالة أو اتصل بالرقم 05 30 16 43 43.",
+  },
+};
+
+/** Sent 2 days after the return date: a private one-time link to rate the trip. */
+export function reviewInviteMail(lang: Lang, firstName: string, destination: string, url: string) {
+  const t = REVIEW[lang];
+  const hello = t.hello(line(firstName, 40));
+  const body = t.body(line(destination, 80));
+  return {
+    subject: t.subject,
+    text: [hello, "", body, "", `${t.button} : ${url}`, "", t.private, "", t.contact].join("\n"),
+    html: page(
+      lang,
+      `<p style="margin:0 0 12px">${esc(hello)}</p>
+<p style="margin:0 0 20px">${esc(body)}</p>
+<p style="margin:0 0 20px;text-align:center"><a href="${esc(url)}" style="display:inline-block;padding:14px 28px;border-radius:999px;background:#0858f8;color:#ffffff;font-weight:bold;text-decoration:none">${esc(t.button)}</a></p>
+<p style="margin:0 0 12px;color:#4a5578;font-size:14px">${esc(t.private)}</p>
+<p style="margin:0;color:#4a5578;font-size:14px">${esc(t.contact)}</p>`,
+    ),
+  };
+}

@@ -48,3 +48,10 @@ export function bookingPush(b: BookingSummary) {
     tag: `booking-${b.reference}`,
   };
 }
+
+/** Telegram alert to the Direction for a low rating (1 or 2 stars): reference only, no client details. */
+export function lowReviewMessage(reference: string, stars: number, staffUrl?: string): string {
+  const lines = [`Avis client à ${stars}/5 : à rappeler`, `Réf. ${clean(reference, 20)}`];
+  if (staffUrl) lines.push("", `Ouvrir : ${staffUrl}`);
+  return lines.join("\n");
+}

@@ -255,7 +255,8 @@
       "signedInAs": "Connecté :",
       "roleDirection": "Direction",
       "roleEmployee": "Employé",
-      "notifications": "Notifications"
+      "notifications": "Notifications",
+      "reviews": "Avis clients"
     },
     "login": {
       "title": "Connexion équipe",
@@ -387,7 +388,9 @@
         "approve_employee_restore": "Réactivation acceptée",
         "reject_employee_restore": "Réactivation refusée",
         "mfa_reset": "Double authentification réinitialisée",
-        "mfa_backup_codes_created": "Codes de secours créés"
+        "mfa_backup_codes_created": "Codes de secours créés",
+        "review_approved": "Avis client publié",
+        "review_rejected": "Avis client refusé"
       }
     },
     "me": {
@@ -417,7 +420,9 @@
       "restoreRequested": "Demande de réactivation envoyée à l'autre compte Direction.",
       "restoreApproved": "Réactivation acceptée : l'employé a de nouveau accès.",
       "restoreRejected": "Réactivation refusée : l'employé reste retiré.",
-      "othersSignedOut": "Vos autres appareils ont été déconnectés."
+      "othersSignedOut": "Vos autres appareils ont été déconnectés.",
+      "reviewApproved": "Avis publié sur le site.",
+      "reviewRejected": "Avis retiré : il n'apparaît pas sur le site."
     },
     "errors": {
       "forbidden": "Action refusée : ce compte est protégé.",
@@ -429,7 +434,8 @@
       "otherBoss": "C'est l'autre compte Direction qui doit décider.",
       "notEmployee": "Ce compte n’est pas un employé actif.",
       "notRemoved": "Cet employé n'est pas retiré.",
-      "session": "Votre session a été fermée pour votre sécurité. Reconnectez-vous."
+      "session": "Votre session a été fermée pour votre sécurité. Reconnectez-vous.",
+      "returnDate": "Date de retour impossible : elle doit être après la demande (et dans les 2 ans)."
     },
     "permissions": {
       "programs.manage": "Publier les programmes",
@@ -606,7 +612,11 @@
         "denied": "Les notifications sont bloquées pour ce site dans le navigateur. Autorisez-les dans les réglages du navigateur, puis rechargez la page.",
         "unsupported": "Ce navigateur ne reçoit pas les alertes. Sur iPhone : ouvrez le site dans Safari, « Partager » → « Sur l'écran d'accueil », puis ouvrez GoodFly depuis l'écran d'accueil.",
         "error": "Impossible d'activer les alertes. Réessayez."
-      }
+      },
+      "returnDate": "Date de retour",
+      "returnHint": "À remplir quand le voyage est confirmé : 2 jours après cette date, le client reçoit un e-mail pour donner son avis.",
+      "reviewInvited": "Avis demandé au client le {date}",
+      "noEmail": "Pas d'e-mail : le client ne recevra pas de demande d'avis."
     },
     "notifications": {
       "title": "Notifications",
@@ -687,6 +697,30 @@
       "openInAppHint": "L'application est sur ce téléphone ? Touchez ce bouton. Sinon, scannez le QR code avec le téléphone.",
       "copyKey": "Copier la clé",
       "keyCopied": "Clé copiée."
+    },
+    "reviews": {
+      "title": "Avis clients",
+      "intro": "Avis envoyés par les clients après leur voyage. Rien n'apparaît sur le site avant d'être publié ici.",
+      "filterLabel": "Filtrer les avis",
+      "statuses": {
+        "pending": "À relire",
+        "approved": "Publiés",
+        "rejected": "Refusés",
+        "invited": "Demandés"
+      },
+      "empty": "Aucun avis dans cette liste.",
+      "stars": "{n} sur 5",
+      "received": "Reçu le {date}",
+      "invitedOn": "Demandé le {date}, pas encore de réponse",
+      "trip": "Voyage",
+      "name": "Nom affiché",
+      "nameHidden": "Le client ne souhaite pas que son nom apparaisse",
+      "noComment": "(pas de commentaire)",
+      "approve": "Publier sur le site",
+      "reject": "Ne pas publier",
+      "unpublish": "Retirer du site",
+      "low": "Note basse : appelez le client pour comprendre ce qui s'est passé.",
+      "openBooking": "Voir la réservation"
     }
   },
   "programs": {
@@ -763,5 +797,46 @@
     "text": "Le lien est peut-être ancien ou mal recopié. Repartez de l'accueil ou consultez nos programmes.",
     "home": "Retour à l'accueil",
     "programs": "Voir les programmes"
+  },
+  "reviewPage": {
+    "metaTitle": "Votre avis · GoodFly",
+    "eyebrow": "Votre avis",
+    "title": "Comment s'est passé votre voyage{dest} ?",
+    "hello": "Bonjour {name}, merci de prendre une minute pour nous répondre.",
+    "stars": "Votre note",
+    "starLabel": "{n} étoile(s) sur 5",
+    "starHints": [
+      "Très décevant",
+      "Décevant",
+      "Correct",
+      "Très bien",
+      "Excellent"
+    ],
+    "comment": "Votre commentaire (facultatif)",
+    "commentHint": "Ce qui vous a plu, ce qui peut être amélioré…",
+    "showName": "J'accepte que mon prénom et l'initiale de mon nom apparaissent avec mon avis sur le site.",
+    "notice": "Votre avis est relu par l'équipe GoodFly avant d'être publié. Il peut ne pas être publié s'il contient des informations personnelles ou des propos injurieux.",
+    "submit": "Envoyer mon avis",
+    "sending": "Envoi…",
+    "errorStars": "Choisissez une note de 1 à 5 étoiles.",
+    "errorGeneric": "L'avis n'a pas pu être envoyé. Réessayez dans un instant.",
+    "doneTitle": "Merci pour votre avis !",
+    "doneText": "Il a bien été reçu. Au plaisir de vous faire voyager à nouveau.",
+    "doneLow": "Nous sommes désolés que tout ne se soit pas bien passé. Un responsable de l'agence va vous contacter.",
+    "invalidTitle": "Lien non valable",
+    "invalidText": "Ce lien est incomplet ou n'existe pas. Vérifiez que vous l'avez bien copié depuis l'e-mail.",
+    "doneAlreadyTitle": "Avis déjà envoyé",
+    "doneAlreadyText": "Vous avez déjà donné votre avis pour ce voyage. Merci !",
+    "expiredTitle": "Lien expiré",
+    "expiredText": "Ce lien n'est plus valable (60 jours). Vous pouvez toujours nous écrire ou nous appeler.",
+    "home": "Retour à l'accueil"
+  },
+  "reviews": {
+    "eyebrow": "Ils ont voyagé avec nous",
+    "title": "L'avis de nos voyageurs",
+    "listLabel": "Avis de clients",
+    "anonymous": "Voyageur GoodFly",
+    "rating": "Note : {n} sur 5",
+    "note": "Avis envoyés par des clients après leur voyage, relus par l'agence."
   }
 }

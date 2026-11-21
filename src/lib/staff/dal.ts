@@ -203,12 +203,14 @@ export type StaffBooking = {
   service: "" | "flight" | "stay" | "visa";
   staff_note: string;
   handled_by: string | null;
+  return_date: string | null;
+  review_invited_at: string | null;
   created_at: string;
   updated_at: string;
 };
 
 const BOOKING_COLUMNS =
-  "id, reference, program_title, program_id, full_name, phone, email, from_place, to_place, travel_dates, adults, children, message, lang, status, service, staff_note, handled_by, created_at, updated_at";
+  "id, reference, program_title, program_id, full_name, phone, email, from_place, to_place, travel_dates, adults, children, message, lang, status, service, staff_note, handled_by, return_date, review_invited_at, created_at, updated_at";
 
 /** Booking requests, newest first (needs bookings.manage; RLS enforces the same). */
 export async function listBookings(lang: Locale, status?: BookingStatus): Promise<StaffBooking[]> {
@@ -297,4 +299,37 @@ export async function countAwaitingDecision(lang: Locale): Promise<number> {
     .eq("status", "pending")
     .neq("requested_by", user.id);
   return count ?? 0;
+}
+
+export const REVIEW_STATUSES = ["pending", "approved", "rejected", "invited"] as const;
+export type ReviewStatus = (typeof REVIEW_STATUSES)[number];
+
+export type StaffReview = {
+  id: string;
+  booking_id: string | null;
+  reference: string;
+  lang: string;
+  display_name: string;
+  destination: string;
+  trip_month: string | null;
+  status: ReviewStatus;
+  rating: number | null;
+  comment: string;
+  show_name: boolean;
+  invited_at: string;
+  submitted_at: string | null;
+  moderated_by: string | null;
+};
+
+/** Client reviews for one list (needs bookings.manage; RLS enforces the same). */
+export async function listReviews(lang: Locale, status: ReviewStatus): Promise<StaffReview[]> {
+  const { supabase } = await requireStaff(lang, { permission: "bookings.manage" });
+  const { data, error } = await supabase
+    .from("reviews")
+    .select("id, booking_id, reference, lang, display_name, destination, trip_month, status, rating, comment, show_name, invited_at, submitted_at, moderated_by")
+    .eq("status", status)
+    .order(status === "invited" ? "invited_at" : "submitted_at", { ascending: false })
+    .limit(200);
+  if (error) throw new Error(error.message);
+  return (data ?? []) as StaffReview[];
 }
