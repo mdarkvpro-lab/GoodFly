@@ -178,7 +178,7 @@ const FR: Record<LegalKind, LegalPage> = {
         title: "Prix et paiement",
         paragraphs: [
           "Les prix sont en dirhams marocains (MAD), toutes taxes comprises sauf mention contraire. Le prix confirmé est celui de l'offre écrite, pas celui affiché sur le site.",
-          "Paiement : en agence, par virement ou par {{autres moyens acceptés — à préciser}}. Acompte à la réservation : {{pourcentage — à préciser}} ; solde au plus tard {{nombre de jours}} jours avant le départ.",
+          "Les moyens de paiement, le montant de l'acompte et la date du solde sont indiqués dans l'offre écrite de chaque voyage.",
           "Un prix confirmé peut seulement changer dans les cas prévus par la loi (par exemple une hausse des taxes d'aéroport ou du carburant décidée par la compagnie). Vous en êtes informé par écrit avant le départ.",
         ],
       },
@@ -205,7 +205,7 @@ const FR: Record<LegalKind, LegalPage> = {
       {
         title: "Réclamations",
         paragraphs: [
-          `Pour toute réclamation, écrivez à ${AGENCY.email} ou passez à l'agence, de préférence dans les {{nombre}} jours après le retour. Nous répondons dans les meilleurs délais.`,
+          `Pour toute réclamation, écrivez à ${AGENCY.email} ou passez à l'agence. Nous répondons dans les meilleurs délais.`,
         ],
       },
       {
@@ -235,20 +235,16 @@ const FR: Record<LegalKind, LegalPage> = {
       },
       {
         title: "Si vous annulez un voyage organisé (programme, séjour)",
-        paragraphs: ["Frais retenus sur le prix total, selon la date d'annulation :"],
-        list: [
-          "plus de {{30}} jours avant le départ : {{montant ou % — à décider}} ;",
-          "de {{30}} à {{15}} jours : {{% — à décider}} ;",
-          "de {{14}} à {{7}} jours : {{% — à décider}} ;",
-          "moins de {{7}} jours ou absence au départ : {{100 %}}.",
+        paragraphs: [
+          "Il n'y a pas de barème fixe : les frais d'annulation dépendent de ce que GoodFly a déjà payé aux compagnies et aux hôtels au moment de l'annulation. Le conseiller vous les explique dans l'offre, et à nouveau avant d'annuler.",
+          "Les billets d'avion, visas et frais de dossier déjà émis suivent les règles ci-dessous, même si l'annulation est faite tôt.",
         ],
-        after: ["Les billets d'avion, visas et frais de dossier déjà émis suivent les règles ci-dessous, même si l'annulation est faite tôt."],
       },
       {
         title: "Billets d'avion seuls",
         paragraphs: [
           "Chaque billet suit le tarif de la compagnie aérienne. Beaucoup de tarifs économiques ne sont ni remboursables ni modifiables ; d'autres le sont avec des frais. Le conseiller vous indique les conditions du tarif avant l'émission.",
-          "Si la compagnie rembourse, GoodFly vous reverse le montant reçu, moins des frais de service de {{montant — à décider}} MAD. Le délai dépend de la compagnie (souvent plusieurs semaines).",
+          "Si la compagnie rembourse, GoodFly vous reverse le montant reçu, moins les éventuels frais de service indiqués dans l'offre. Le délai dépend de la compagnie (souvent plusieurs semaines).",
           "Les taxes d'aéroport d'un billet non utilisé peuvent être remboursées sur demande.",
         ],
       },
@@ -268,7 +264,7 @@ const FR: Record<LegalKind, LegalPage> = {
       {
         title: "Omra et Hajj",
         paragraphs: [
-          "Ces voyages dépendent de quotas et de règles fixés par les autorités saoudiennes et marocaines. Leurs conditions d'annulation particulières sont écrites dans chaque programme : {{conditions — à préciser par l'agence}}.",
+          "Ces voyages dépendent de quotas et de règles fixés par les autorités saoudiennes et marocaines. Leurs conditions d'annulation sont précisées dans l'offre de chaque programme.",
         ],
       },
       {
@@ -281,7 +277,7 @@ const FR: Record<LegalKind, LegalPage> = {
       {
         title: "Modifier un voyage",
         paragraphs: [
-          "Un changement de dates, de nom ou de prestation est possible si les prestataires l'acceptent. Les frais qu'ils facturent, plus des frais de service de {{montant — à décider}} MAD, restent à votre charge.",
+          "Un changement de dates, de nom ou de prestation est possible si les prestataires l'acceptent. Les frais qu'ils facturent restent à votre charge ; le conseiller vous les annonce avant toute modification.",
         ],
       },
       {
@@ -293,7 +289,7 @@ const FR: Record<LegalKind, LegalPage> = {
       {
         title: "Délai et mode de remboursement",
         paragraphs: [
-          "Le remboursement est fait par le même moyen que le paiement (ou par virement), dans les {{nombre}} jours après la réception de votre demande, ou après le remboursement reçu du prestataire quand il en dépend.",
+          "Le remboursement est fait par le même moyen que le paiement (ou par virement), dès que possible après votre demande, ou après le remboursement reçu du prestataire quand il en dépend.",
         ],
       },
     ],
@@ -452,7 +448,7 @@ const AR: Record<LegalKind, LegalPage> = {
         title: "الأسعار والأداء",
         paragraphs: [
           "الأسعار بالدرهم المغربي، شاملة لجميع الرسوم ما لم يُذكر خلاف ذلك. السعر المعتمد هو سعر العرض المكتوب، وليس السعر المعروض في الموقع.",
-          "الأداء: بالوكالة، أو بالتحويل البنكي، أو {{وسائل أخرى — تُحدَّد لاحقًا}}. التسبيق عند الحجز: {{النسبة — تُحدَّد لاحقًا}}؛ والباقي قبل المغادرة بـ {{عدد الأيام}} يومًا على الأقل.",
+          "وسائل الأداء ومبلغ التسبيق وأجل أداء الباقي مذكورة في العرض المكتوب لكل رحلة.",
           "لا يتغير السعر المعتمد إلا في الحالات التي يسمح بها القانون (مثل ارتفاع رسوم المطار أو الوقود الذي تقرره شركة الطيران)، ويتم إخبارك كتابيًا قبل المغادرة.",
         ],
       },
@@ -478,7 +474,7 @@ const AR: Record<LegalKind, LegalPage> = {
       },
       {
         title: "الشكايات",
-        paragraphs: [`لأي شكاية، راسلنا على ${AGENCY.email} أو زر الوكالة، ويُفضَّل ذلك خلال {{عدد}} يومًا بعد العودة. نجيبك في أقرب الآجال.`],
+        paragraphs: [`لأي شكاية، راسلنا على ${AGENCY.email} أو زر الوكالة. نجيبك في أقرب الآجال.`],
       },
       {
         title: "المعطيات الشخصية",
@@ -507,20 +503,16 @@ const AR: Record<LegalKind, LegalPage> = {
       },
       {
         title: "إذا ألغيت رحلة منظمة (برنامج، إقامة)",
-        paragraphs: ["المصاريف المقتطعة من الثمن الإجمالي حسب تاريخ الإلغاء:"],
-        list: [
-          "أكثر من {{30}} يومًا قبل المغادرة: {{مبلغ أو نسبة — تُحدَّد لاحقًا}}؛",
-          "من {{30}} إلى {{15}} يومًا: {{نسبة — تُحدَّد لاحقًا}}؛",
-          "من {{14}} إلى {{7}} أيام: {{نسبة — تُحدَّد لاحقًا}}؛",
-          "أقل من {{7}} أيام أو عدم الحضور: {{100 %}}.",
+        paragraphs: [
+          "لا يوجد سُلَّم ثابت: مصاريف الإلغاء تتوقف على ما دفعته GoodFly لشركات الطيران والفنادق عند تاريخ الإلغاء. يشرحها لك المستشار في العرض، ومرة أخرى قبل الإلغاء.",
+          "تذاكر الطيران والتأشيرات ومصاريف الملف الصادرة تخضع للقواعد أسفله، حتى لو تم الإلغاء مبكرًا.",
         ],
-        after: ["تذاكر الطيران والتأشيرات ومصاريف الملف الصادرة تخضع للقواعد أسفله، حتى لو تم الإلغاء مبكرًا."],
       },
       {
         title: "تذاكر الطيران وحدها",
         paragraphs: [
           "تخضع كل تذكرة لتسعيرة شركة الطيران. كثير من التسعيرات الاقتصادية غير قابلة للاسترجاع ولا للتعديل، وبعضها قابل لذلك مع مصاريف. يُعلمك المستشار بشروط التسعيرة قبل إصدار التذكرة.",
-          "إذا استرجعت الشركة المبلغ، تعيد لك GoodFly ما توصلت به، ناقص مصاريف خدمة قدرها {{المبلغ — يُحدَّد لاحقًا}} درهم. المدة تتوقف على الشركة (غالبًا عدة أسابيع).",
+          "إذا استرجعت الشركة المبلغ، تعيد لك GoodFly ما توصلت به، ناقص مصاريف الخدمة المذكورة في العرض إن وُجدت. المدة تتوقف على الشركة (غالبًا عدة أسابيع).",
           "يمكن استرجاع رسوم المطار لتذكرة لم تُستعمل عند الطلب.",
         ],
       },
@@ -540,7 +532,7 @@ const AR: Record<LegalKind, LegalPage> = {
       {
         title: "العمرة والحج",
         paragraphs: [
-          "ترتبط هذه الرحلات بحصص وقواعد تحددها السلطات السعودية والمغربية، وشروط إلغائها الخاصة مكتوبة في كل برنامج: {{الشروط — تحددها الوكالة}}.",
+          "ترتبط هذه الرحلات بحصص وقواعد تحددها السلطات السعودية والمغربية، وشروط إلغائها مذكورة في عرض كل برنامج.",
         ],
       },
       {
@@ -553,7 +545,7 @@ const AR: Record<LegalKind, LegalPage> = {
       {
         title: "تعديل الرحلة",
         paragraphs: [
-          "يمكن تغيير التواريخ أو الاسم أو الخدمة إذا قبل مقدمو الخدمات ذلك. وتبقى على عاتقك المصاريف التي يحتسبونها، إضافة إلى مصاريف خدمة قدرها {{المبلغ — يُحدَّد لاحقًا}} درهم.",
+          "يمكن تغيير التواريخ أو الاسم أو الخدمة إذا قبل مقدمو الخدمات ذلك. وتبقى على عاتقك المصاريف التي يحتسبونها، ويُعلمك المستشار بها قبل أي تعديل.",
         ],
       },
       {
@@ -565,7 +557,7 @@ const AR: Record<LegalKind, LegalPage> = {
       {
         title: "أجل وطريقة الاسترجاع",
         paragraphs: [
-          "يتم الاسترجاع بنفس وسيلة الأداء (أو بتحويل بنكي) داخل أجل {{عدد}} يومًا من التوصل بطلبك، أو بعد توصلنا بالمبلغ من مقدم الخدمة عندما يتوقف الأمر عليه.",
+          "يتم الاسترجاع بنفس وسيلة الأداء (أو بتحويل بنكي) في أقرب وقت بعد طلبك، أو بعد توصلنا بالمبلغ من مقدم الخدمة عندما يتوقف الأمر عليه.",
         ],
       },
     ],
